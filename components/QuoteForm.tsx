@@ -33,7 +33,11 @@ export default function QuoteForm({
   showUrgency = false,
   compact = false,
 }: QuoteFormProps) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    name: string; company: string; email: string; phone: string;
+    state: string; equipment_type: string; issue_description: string;
+    urgency: "emergency" | "urgent" | "standard";
+  }>({
     name: "", company: "", email: "", phone: "",
     state: "", equipment_type: "", issue_description: "", urgency: "standard",
   });
