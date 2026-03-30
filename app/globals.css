@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bandit-black: #0A0A0A;
+    --bandit-green: #39FF14;
+    --bandit-green-muted: #22C55E;
+    --bandit-grey: #6B7280;
+    --bandit-grey-light: #F3F4F6;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bandit-black);
+    color: white;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  /* Primary CTA — Electric Green */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#39FF14] text-[#0A0A0A] font-bold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-[#22C55E] hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] active:scale-95;
+  }
+
+  /* Secondary CTA — outlined white */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-white text-white font-semibold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-white hover:text-[#0A0A0A] active:scale-95;
+  }
+
+  /* Ghost green outlined */
+  .btn-ghost-green {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#39FF14] text-[#39FF14] font-semibold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-[#39FF14] hover:text-[#0A0A0A] active:scale-95;
+  }
+
+  /* Section container */
+  .container-site {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Form input */
+  .input-field {
+    @apply w-full bg-[#1A1A1A] border border-[#374151] text-white placeholder-gray-500 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-[#39FF14] focus:ring-1 focus:ring-[#39FF14] transition-colors;
+  }
+
+  /* Form label */
+  .input-label {
+    @apply block text-sm font-medium text-gray-300 mb-1.5;
+  }
+
+  /* Card on dark background */
+  .card-dark {
+    @apply bg-[#111111] border border-[#1F2937] rounded-xl p-6;
+  }
+
+  /* Card on grey background */
+  .card-grey {
+    @apply bg-[#F3F4F6] text-[#0A0A0A] rounded-xl p-6;
+  }
+
+  /* Green accent badge */
+  .badge-green {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium bg-[#39FF14]/10 text-[#39FF14] border border-[#39FF14]/20;
+  }
+
+  /* Section heading */
+  .section-heading {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight;
+  }
+
+  /* Divider line */
+  .divider-green {
+    @apply h-px bg-gradient-to-r from-transparent via-[#39FF14] to-transparent my-16;
+  }
+}
