@@ -1,0 +1,46 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <!-- White head silhouette with ear bumps and jagged fur sides -->
+  <path fill="#FFFFFF" d="
+    M50,12
+    L37,7 L20,2 L26,20
+    L13,27
+    L10,38 L15,44 L9,52
+    L17,72
+    C25,86 38,93 50,93
+    C62,93 75,86 83,72
+    L91,52
+    L85,44 L90,38
+    L87,27
+    L74,20 L80,2 L63,7
+    Z
+  "/>
+
+  <!-- Inner ear triangles (dark cutouts) -->
+  <polygon fill="#0A0A0A" points="20,6 14,22 28,22"/>
+  <polygon fill="#0A0A0A" points="80,6 86,22 72,22"/>
+
+  <!-- Eye mask with center spike -->
+  <path fill="#0A0A0A" d="
+    M50,27
+    L44,36 L13,36
+    L9,42 L11,52
+    L19,58 L28,51 L36,61
+    L50,65
+    L64,61 L72,51 L81,58
+    L89,52 L91,42
+    L87,36 L56,36
+    Z
+  "/>
+
+  <!-- Left eye slit (white, within mask) -->
+  <polygon fill="#FFFFFF" points="19,48 32,42 37,49 24,55"/>
+
+  <!-- Right eye slit (white, within mask) -->
+  <polygon fill="#FFFFFF" points="81,48 68,42 63,49 76,55"/>
+
+  <!-- Muzzle (white circle) -->
+  <circle fill="#FFFFFF" cx="50" cy="77" r="15"/>
+
+  <!-- Nose dot (dark) -->
+  <ellipse fill="#0A0A0A" cx="50" cy="80" rx="5.5" ry="4.5"/>
+</svg>

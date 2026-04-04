@@ -30,13 +30,22 @@ export default function Nav() {
       <div className="container-site">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-xl font-black text-white tracking-tighter group-hover:text-[#39FF14] transition-colors">
-              BANDIT
-            </span>
-            <span className="hidden sm:block text-xs text-gray-500 font-mono">
-              RECYCLING
-            </span>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <img
+              src="/bandit-mark.svg"
+              alt="Bandit"
+              width={32}
+              height={32}
+              className="w-8 h-8 transition-all duration-200 group-hover:drop-shadow-[0_0_8px_rgba(57,255,20,0.6)]"
+            />
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl font-black text-white tracking-tighter group-hover:text-[#39FF14] transition-colors">
+                BANDIT
+              </span>
+              <span className="hidden sm:block text-xs text-gray-500 font-mono tracking-widest">
+                RECYCLING
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}

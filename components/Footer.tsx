@@ -25,9 +25,18 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <Link href="/" className="inline-block mb-4">
-              <span className="text-2xl font-black text-white tracking-tighter">BANDIT</span>
-              <span className="block text-xs text-gray-500 font-mono -mt-1">RECYCLING</span>
+            <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
+              <img
+                src="/bandit-mark.svg"
+                alt="Bandit"
+                width={36}
+                height={36}
+                className="w-9 h-9"
+              />
+              <div>
+                <div className="text-2xl font-black text-white tracking-tighter leading-none group-hover:text-[#39FF14] transition-colors">BANDIT</div>
+                <div className="text-xs text-gray-500 font-mono tracking-widest leading-tight">RECYCLING</div>
+              </div>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
               Automated B2B recycling partner. Baler repair, preventive maintenance, and bale wire supply across the Southeast US.
