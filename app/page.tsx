@@ -178,6 +178,62 @@ export default async function HomePage() {
 
       <div className="divider-green container-site" />
 
+      {/* ── MEET BANDIT ───────────────────────────────────────────── */}
+      <section className="py-24 bg-[#0A0A0A] overflow-hidden">
+        <div className="container-site">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            {/* Mascot */}
+            <div className="flex justify-center lg:justify-start">
+              <div className="relative">
+                {/* Glow ring behind character */}
+                <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl scale-110" />
+                <img
+                  src="/bandit-character.svg"
+                  alt="Bandit the Raccoon"
+                  className="relative w-64 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.2)]"
+                />
+                {/* Speech bubble */}
+                <div className="absolute -top-6 -right-4 lg:-right-16 bg-[#39FF14] text-[#0A0A0A] text-xs font-black px-4 py-3 rounded-2xl rounded-bl-sm max-w-[180px] leading-snug shadow-lg">
+                  "Keep recyclables OUT of my dumpster."
+                  <div className="absolute bottom-0 left-6 translate-y-full w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-[#39FF14]" />
+                </div>
+              </div>
+            </div>
+
+            {/* Story */}
+            <div>
+              <div className="badge-green mb-4">Meet Bandit</div>
+              <h2 className="section-heading text-white mb-6">
+                Why does a raccoon run a recycling company?
+              </h2>
+              <div className="space-y-4 text-gray-400 leading-relaxed">
+                <p>
+                  Bandit has a problem. He and his crew depend on dumpsters. But when businesses skip proper recycling, their cardboard, plastic film, and scrap metal end up filling the dumpsters Bandit calls home — leaving no room for the actually useful stuff.
+                </p>
+                <p>
+                  Every bale your operation produces is a load of recyclable material that <span className="text-white font-semibold">doesn&apos;t</span> end up in a landfill, a dumpster, or the side of a road. It becomes a commodity. It has value. It feeds the circular economy — and it keeps Bandit&apos;s dumpsters clear.
+                </p>
+                <p>
+                  His mission: keep your baler running so recyclables stay where they belong. He&apos;s not doing it for the planet. He&apos;s doing it for the dumpsters. But hey — the result is the same.
+                </p>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/about" className="btn-ghost-green">
+                  Bandit&apos;s Full Story <ChevronRight size={16} />
+                </Link>
+                <Link href="/services/baler-repair" className="btn-secondary">
+                  Our Services
+                </Link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <div className="divider-green container-site" />
+
       {/* ── EMERGENCY CTA ─────────────────────────────────────────── */}
       <section className="py-20 bg-[#0A0A0A]">
         <div className="container-site">
