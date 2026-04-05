@@ -18,7 +18,14 @@ const NAV_LINKS = [
   { label: "Equipment", href: "/equipment" },
   { label: "Bale Wire", href: "/wire" },
   { label: "Service Area", href: "/service-area" },
-  { label: "Resources", href: "/blog" },
+  {
+    label: "Resources",
+    href: "/materials",
+    sub: [
+      { label: "Materials Glossary", href: "/materials" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
 ];
 
 export default function Nav() {
