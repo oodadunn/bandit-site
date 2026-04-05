@@ -23,6 +23,7 @@ const NAV_LINKS = [
     href: "/materials",
     sub: [
       { label: "Materials Glossary", href: "/materials" },
+      { label: "Baler Database", href: "/balers" },
       { label: "Blog", href: "/blog" },
     ],
   },
