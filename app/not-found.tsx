@@ -10,7 +10,7 @@ export default function NotFound() {
         <div className="relative inline-block mb-8">
           <div className="absolute inset-0 bg-[#39FF14]/5 rounded-full blur-3xl scale-110" />
           <img
-            src="/bandit-character.svg"
+            src="/bandit-face.png"
             alt="Bandit the confused raccoon"
             className="relative w-48 h-auto mx-auto drop-shadow-[0_0_40px_rgba(57,255,20,0.2)]"
           />
@@ -25,7 +25,7 @@ export default function NotFound() {
 
         {/* Bandit quote */}
         <div className="flex gap-3 items-start p-4 bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-xl mb-8 text-left">
-          <img src="/bandit-mark.svg" alt="Bandit" className="w-8 h-8 shrink-0 mt-0.5" />
+          <img src="/bandit-circle.png" alt="Bandit" className="w-8 h-8 shrink-0 mt-0.5" />
           <div>
             <div className="text-[#39FF14] text-xs font-mono font-bold mb-1">BANDIT SAYS</div>
             <p className="text-gray-300 text-sm leading-relaxed italic">

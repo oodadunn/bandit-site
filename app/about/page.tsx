@@ -84,7 +84,7 @@ export default function AboutPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-[#39FF14]/5 rounded-full blur-3xl scale-125" />
                 <img
-                  src="/bandit-character.svg"
+                  src="/bandit-face.png"
                   alt="Bandit the Raccoon mascot"
                   className="relative w-72 sm:w-80 h-auto drop-shadow-[0_0_80px_rgba(57,255,20,0.25)]"
                 />
@@ -118,7 +118,7 @@ export default function AboutPage() {
               {/* Raccoon interlude */}
               <div className="flex gap-4 items-start p-5 bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-xl">
                 <img
-                  src="/bandit-mark.svg"
+                  src="/bandit-circle.png"
                   alt="Bandit"
                   className="w-12 h-12 shrink-0 mt-1"
                 />
@@ -160,7 +160,7 @@ export default function AboutPage() {
               {/* Raccoon interlude 2 */}
               <div className="flex gap-4 items-start p-5 bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-xl">
                 <img
-                  src="/bandit-mark.svg"
+                  src="/bandit-circle.png"
                   alt="Bandit"
                   className="w-12 h-12 shrink-0 mt-1"
                 />

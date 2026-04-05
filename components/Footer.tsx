@@ -27,11 +27,11 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
               <img
-                src="/bandit-mark.svg"
+                src="/bandit-circle.png"
                 alt="Bandit"
                 width={36}
                 height={36}
-                className="w-9 h-9"
+                className="w-9 h-9 rounded-full"
               />
               <div>
                 <div className="text-2xl font-black text-white tracking-tighter leading-none group-hover:text-[#39FF14] transition-colors">BANDIT</div>

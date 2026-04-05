@@ -32,11 +32,11 @@ export default function Nav() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <img
-              src="/bandit-mark.svg"
+              src="/bandit-circle.png"
               alt="Bandit"
               width={32}
               height={32}
-              className="w-8 h-8 transition-all duration-200 group-hover:drop-shadow-[0_0_8px_rgba(57,255,20,0.6)]"
+              className="w-8 h-8 rounded-full transition-all duration-200 group-hover:drop-shadow-[0_0_8px_rgba(57,255,20,0.6)]"
             />
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-black text-white tracking-tighter group-hover:text-[#39FF14] transition-colors">

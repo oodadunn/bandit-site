@@ -189,9 +189,9 @@ export default async function HomePage() {
                 {/* Glow ring behind character */}
                 <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl scale-110" />
                 <img
-                  src="/bandit-character.svg"
+                  src="/bandit-face.png"
                   alt="Bandit the Raccoon"
-                  className="relative w-64 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.2)]"
+                  className="relative w-64 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
                 />
                 {/* Speech bubble */}
                 <div className="absolute -top-6 -right-4 lg:-right-16 bg-[#39FF14] text-[#0A0A0A] text-xs font-black px-4 py-3 rounded-2xl rounded-bl-sm max-w-[180px] leading-snug shadow-lg">
