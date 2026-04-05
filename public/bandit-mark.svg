@@ -1,46 +1,44 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none">
-  <!-- White head silhouette with ear bumps and jagged fur sides -->
-  <path fill="#FFFFFF" d="
-    M50,12
-    L37,7 L20,2 L26,20
-    L13,27
-    L10,38 L15,44 L9,52
-    L17,72
-    C25,86 38,93 50,93
-    C62,93 75,86 83,72
-    L91,52
-    L85,44 L90,38
-    L87,27
-    L74,20 L80,2 L63,7
-    Z
-  "/>
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" fill="none">
 
-  <!-- Inner ear triangles (dark cutouts) -->
-  <polygon fill="#0A0A0A" points="20,6 14,22 28,22"/>
-  <polygon fill="#0A0A0A" points="80,6 86,22 72,22"/>
+  <!-- Dark circular badge background -->
+  <circle cx="60" cy="60" r="59" fill="#0F0F0F"/>
 
-  <!-- Eye mask with center spike -->
-  <path fill="#0A0A0A" d="
-    M50,27
-    L44,36 L13,36
-    L9,42 L11,52
-    L19,58 L28,51 L36,61
-    L50,65
-    L64,61 L72,51 L81,58
-    L89,52 L91,42
-    L87,36 L56,36
-    Z
-  "/>
+  <!-- Green glow ring -->
+  <circle cx="60" cy="60" r="57" fill="none" stroke="#39FF14" stroke-width="1" opacity="0.4"/>
 
-  <!-- Left eye slit (white, within mask) -->
-  <polygon fill="#FFFFFF" points="19,48 32,42 37,49 24,55"/>
+  <!-- Fur texture ring (jagged polygon around face) -->
+  <polygon
+    points="60,34 65,40.3 72.3,35.7 74.5,42.9 83.1,40.6 82.2,47.9 91.2,48 87.3,54.5 95.5,57.1 89,62 95.5,66.9 87.3,69.5 91.2,76 82.2,76.1 83.1,83.4 74.5,81.1 72.3,88.3 65,83.7 60,90 55,83.7 47.7,88.3 45.5,81.1 36.9,83.4 37.8,76.1 28.8,76 32.7,69.5 24.5,66.9 31,62 24.5,57.1 32.7,54.5 28.8,48 37.8,47.9 36.9,40.6 45.5,42.9 47.7,35.7 55,40.3"
+    fill="#C8BAA0"/>
 
-  <!-- Right eye slit (white, within mask) -->
-  <polygon fill="#FFFFFF" points="81,48 68,42 63,49 76,55"/>
+  <!-- Left ear -->
+  <ellipse cx="45" cy="37" rx="13" ry="11" fill="#C4B49C"/>
+  <ellipse cx="45" cy="38" rx="8" ry="7" fill="#7A5C3E"/>
 
-  <!-- Muzzle (white circle) -->
-  <circle fill="#FFFFFF" cx="50" cy="77" r="15"/>
+  <!-- Right ear -->
+  <ellipse cx="75" cy="37" rx="13" ry="11" fill="#C4B49C"/>
+  <ellipse cx="75" cy="38" rx="8" ry="7" fill="#7A5C3E"/>
 
-  <!-- Nose dot (dark) -->
-  <ellipse fill="#0A0A0A" cx="50" cy="80" rx="5.5" ry="4.5"/>
+  <!-- Main face oval (wide, cream-colored) -->
+  <ellipse cx="60" cy="62" rx="30" ry="22" fill="#EDE3D0"/>
+
+  <!-- Dark eye mask spanning full face width -->
+  <path d="M30 52 Q60 45 90 52 L90 64 Q60 69 30 64 Z" fill="#111111"/>
+
+  <!-- Left eye white (angled inward like \) -->
+  <ellipse cx="44" cy="57" rx="9" ry="5.5" fill="#F5EFE0" transform="rotate(-14, 44, 57)"/>
+
+  <!-- Right eye white (angled inward like /) -->
+  <ellipse cx="76" cy="57" rx="9" ry="5.5" fill="#F5EFE0" transform="rotate(14, 76, 57)"/>
+
+  <!-- Eye pupils -->
+  <ellipse cx="44" cy="57" rx="3.5" ry="3" fill="#0A0A0A" transform="rotate(-14, 44, 57)"/>
+  <ellipse cx="76" cy="57" rx="3.5" ry="3" fill="#0A0A0A" transform="rotate(14, 76, 57)"/>
+
+  <!-- Muzzle (lower face) -->
+  <ellipse cx="60" cy="73" rx="16" ry="11" fill="#DDD0B8"/>
+
+  <!-- Heart-shaped nose -->
+  <path d="M60 72 C57 70.5 53 68 53 65 C53 62.5 55 61 57.5 62 C59 62.5 60 64 60 64 C60 64 61 62.5 62.5 62 C65 61 67 62.5 67 65 C67 68 63 70.5 60 72 Z" fill="#111111"/>
+
 </svg>

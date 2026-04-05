@@ -1,89 +1,70 @@
-<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" fill="none">
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" fill="none">
 
-  <!-- TAIL (behind body) -->
-  <path d="M148,200 C175,195 192,175 188,155 C184,135 168,128 155,138 C148,143 146,152 150,160 C154,168 162,168 165,162 C168,156 164,150 158,150" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.9"/>
-  <!-- Tail stripes -->
-  <path d="M148,200 C175,195 192,175 188,155 C184,135 168,128 155,138 C148,143 146,152 150,160 C154,168 162,168 165,162 C168,156 164,150 158,150" stroke="#0A0A0A" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 8" fill="none" opacity="0.6"/>
+  <!-- Dark circular badge background -->
+  <circle cx="120" cy="120" r="118" fill="#0F0F0F"/>
 
-  <!-- BODY -->
-  <ellipse cx="100" cy="185" rx="52" ry="58" fill="#FFFFFF"/>
-  <!-- Belly (lighter inner oval) -->
-  <ellipse cx="100" cy="192" rx="30" ry="36" fill="#E8E8E8" opacity="0.5"/>
+  <!-- Outer decorative ring -->
+  <circle cx="120" cy="120" r="115" fill="none" stroke="#39FF14" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="120" cy="120" r="110" fill="none" stroke="#39FF14" stroke-width="0.5" opacity="0.15"/>
 
-  <!-- LEFT ARM -->
-  <path d="M52,165 C38,160 28,150 30,138 C32,128 44,125 52,132" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2"/>
-  <!-- Left hand/paw -->
-  <circle cx="30" cy="138" r="10" fill="#FFFFFF"/>
-  <path d="M22,132 Q30,128 38,132" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- Fur texture ring (jagged polygon) -->
+  <polygon
+    points="120,68 130.1,80.7 144.6,71.4 149,85.9 166.3,81.1 164.4,95.7 182.4,96 174.5,109 190.9,114.3 178,124 190.9,133.7 174.5,139 182.4,152 164.4,152.3 166.3,166.9 149,162.1 144.6,176.6 130.1,167.3 120,180 109.9,167.3 95.4,176.6 91,162.1 73.7,166.9 75.6,152.3 57.6,152 65.5,139 49.1,133.7 62,124 49.1,114.3 65.5,109 57.6,96 75.6,95.7 73.7,81.1 91,85.9 95.4,71.4 109.9,80.7"
+    fill="#C0B298"/>
 
-  <!-- RIGHT ARM (holding something — a crushed can, raised) -->
-  <path d="M148,165 C162,158 172,145 168,133 C165,123 153,121 147,129" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2"/>
-  <!-- Right paw -->
-  <circle cx="170" cy="130" r="10" fill="#FFFFFF"/>
-  <!-- Thumbs-up on right paw for recycling -->
-  <path d="M163,125 Q170,120 177,125" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- Left ear (rounded, top-center area) -->
+  <ellipse cx="90" cy="76" rx="26" ry="22" fill="#BFAD93"/>
+  <ellipse cx="90" cy="78" rx="16" ry="14" fill="#7A5A38"/>
 
-  <!-- LEGS/FEET -->
-  <ellipse cx="82" cy="238" rx="18" ry="10" fill="#FFFFFF"/>
-  <ellipse cx="118" cy="238" rx="18" ry="10" fill="#FFFFFF"/>
-  <!-- Toe lines -->
-  <path d="M70,238 Q82,234 94,238" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-  <path d="M106,238 Q118,234 130,238" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- Right ear -->
+  <ellipse cx="150" cy="76" rx="26" ry="22" fill="#BFAD93"/>
+  <ellipse cx="150" cy="78" rx="16" ry="14" fill="#7A5A38"/>
 
-  <!-- NECK -->
-  <rect x="88" y="118" width="24" height="20" rx="8" fill="#FFFFFF"/>
+  <!-- Main face oval (wide, cream) -->
+  <ellipse cx="120" cy="128" rx="60" ry="45" fill="#EDE2CC"/>
 
-  <!-- HEAD (white silhouette with ear bumps) -->
-  <path fill="#FFFFFF" d="
-    M100,22
-    L87,17 L70,12 L74,30
-    L62,38
-    L58,52 L63,60 L57,70
-    L65,92
-    C72,108 85,116 100,116
-    C115,108 128,108 135,92
-    L143,70
-    L137,60 L142,52
-    L138,38
-    L126,30 L130,12 L113,17
-    Z
-  "/>
+  <!-- Cheek fur patches (subtle texture) -->
+  <ellipse cx="78" cy="138" rx="18" ry="14" fill="#D9CDB5" opacity="0.5"/>
+  <ellipse cx="162" cy="138" rx="18" ry="14" fill="#D9CDB5" opacity="0.5"/>
 
-  <!-- Inner ears (dark) -->
-  <polygon fill="#0A0A0A" points="70,16 64,32 78,32"/>
-  <polygon fill="#0A0A0A" points="130,16 136,32 122,32"/>
+  <!-- Dark eye mask (wide, angry, spans full face) -->
+  <path d="M62 108 Q120 94 178 108 L178 130 Q120 142 62 130 Z" fill="#111111"/>
 
-  <!-- Eye mask with center spike -->
-  <path fill="#0A0A0A" d="
-    M100,38
-    L94,47 L62,47
-    L58,54 L60,64
-    L68,70 L78,63 L86,74
-    L100,78
-    L114,74 L122,63 L132,70
-    L140,64 L142,54
-    L138,47 L106,47
-    Z
-  "/>
+  <!-- Left eye white (angled inward \) -->
+  <ellipse cx="90" cy="117" rx="18" ry="11" fill="#F5EFE0" transform="rotate(-14, 90, 117)"/>
 
-  <!-- Eye slits (white) -->
-  <polygon fill="#FFFFFF" points="65,59 78,53 82,60 69,66"/>
-  <polygon fill="#FFFFFF" points="135,59 122,53 118,60 131,66"/>
+  <!-- Right eye white (angled inward /) -->
+  <ellipse cx="150" cy="117" rx="18" ry="11" fill="#F5EFE0" transform="rotate(14, 150, 117)"/>
 
-  <!-- Muzzle (white) -->
-  <circle fill="#FFFFFF" cx="100" cy="96" r="18"/>
+  <!-- Eye pupils -->
+  <ellipse cx="90" cy="117" rx="7" ry="6" fill="#0A0A0A" transform="rotate(-14, 90, 117)"/>
+  <ellipse cx="150" cy="117" rx="7" ry="6" fill="#0A0A0A" transform="rotate(14, 150, 117)"/>
 
-  <!-- Nose (dark oval) -->
-  <ellipse fill="#0A0A0A" cx="100" cy="99" rx="6" ry="5"/>
+  <!-- Eye shine dots -->
+  <circle cx="86" cy="113" r="2.5" fill="white" opacity="0.7"/>
+  <circle cx="146" cy="113" r="2.5" fill="white" opacity="0.7"/>
 
-  <!-- Smile lines (smug grin) -->
-  <path d="M88,106 Q100,114 112,106" stroke="#0A0A0A" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Muzzle (lower face area) -->
+  <ellipse cx="120" cy="150" rx="34" ry="23" fill="#D9CBAF"/>
 
-  <!-- Recycling symbol on chest (green) -->
-  <text x="100" y="200" text-anchor="middle" font-size="28" fill="#39FF14" font-family="Arial" font-weight="bold">♻</text>
+  <!-- Heart-shaped nose -->
+  <path d="
+    M120 148
+    C115 146 107 142 107 136
+    C107 131 111 129 115.5 131
+    C117.5 131.8 120 134 120 134
+    C120 134 122.5 131.8 124.5 131
+    C129 129 133 131 133 136
+    C133 142 125 146 120 148 Z"
+    fill="#111111"/>
 
-  <!-- Green glow halo behind head -->
-  <circle cx="100" cy="65" r="62" fill="none" stroke="#39FF14" stroke-width="1" opacity="0.15"/>
-  <circle cx="100" cy="65" r="70" fill="none" stroke="#39FF14" stroke-width="0.5" opacity="0.08"/>
+  <!-- Smile lines / cheek lines (subtle) -->
+  <path d="M98 152 Q110 158 120 155 Q130 158 142 152" stroke="#B8A888" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Green recycling symbol at bottom of badge -->
+  <text x="120" y="210" text-anchor="middle" font-size="28" fill="#39FF14" font-family="Arial" font-weight="bold" opacity="0.7">♻</text>
+
+  <!-- Inner glow ring -->
+  <circle cx="120" cy="120" r="117" fill="none" stroke="#39FF14" stroke-width="0.5" opacity="0.08"/>
 
 </svg>
