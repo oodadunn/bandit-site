@@ -80,9 +80,9 @@ export default function Footer() {
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contact</h3>
             <ul className="space-y-3">
               <li>
-                <a href="tel:+18002263481" className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] transition-colors">
+                <a href="tel:+18004226348" className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] transition-colors">
                   <Phone size={14} />
-                  <span className="font-mono">1-800-BANDIT-1</span>
+                  <span className="font-mono">1-800-4BANDIT</span>
                 </a>
               </li>
               <li>

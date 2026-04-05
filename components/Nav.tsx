@@ -85,11 +85,11 @@ export default function Nav() {
           {/* Right side */}
           <div className="hidden lg:flex items-center gap-3">
             <a
-              href="tel:+1-800-BANDIT1"
+              href="tel:+18004226348"
               className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] transition-colors"
             >
               <Phone size={14} />
-              <span className="font-mono">1-800-BANDIT-1</span>
+              <span className="font-mono">1-800-4BANDIT</span>
             </a>
             <Link href="/quote" className="btn-primary text-xs px-4 py-2">
               Get a Quote
@@ -136,7 +136,7 @@ export default function Nav() {
             </div>
           ))}
           <div className="pt-3 flex flex-col gap-2">
-            <a href="tel:+1-800-BANDIT1" className="btn-secondary text-sm">
+            <a href="tel:+18004226348" className="btn-secondary text-sm">
               <Phone size={14} /> Call Us Now
             </a>
             <Link href="/quote" onClick={() => setOpen(false)} className="btn-primary text-sm">

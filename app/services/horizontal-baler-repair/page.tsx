@@ -84,8 +84,8 @@ export default function HorizontalBalerRepairPage() {
                 Two-ram, closed-door, open-end — we repair every type of horizontal baler used in industrial and high-volume recycling operations. Southeast-wide coverage, same-day emergency dispatch.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
-                <a href="tel:+18002263481" className="btn-primary">
-                  <Phone size={16} /> Call 1-800-BANDIT-1
+                <a href="tel:+18004226348" className="btn-primary">
+                  <Phone size={16} /> Call 1-800-4BANDIT
                 </a>
                 <Link href="/services/emergency-repair" className="btn-ghost-green">
                   Emergency Dispatch <ChevronRight size={16} />
@@ -196,7 +196,7 @@ export default function HorizontalBalerRepairPage() {
             ))}
           </div>
           <p className="text-center text-xs text-gray-600 mt-6">
-            Don't see your make? <a href="tel:+18002263481" className="text-[#39FF14] hover:underline">Call us</a> — we service virtually all commercial horizontal balers.
+            Don't see your make? <a href="tel:+18004226348" className="text-[#39FF14] hover:underline">Call us</a> — we service virtually all commercial horizontal balers.
           </p>
         </div>
       </section>
@@ -209,8 +209,8 @@ export default function HorizontalBalerRepairPage() {
             Horizontal baler downtime in a high-volume operation is expensive. We dispatch same-day across the Southeast.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="tel:+18002263481" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
-              <Phone size={18} /> Call 1-800-BANDIT-1
+            <a href="tel:+18004226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
+              <Phone size={18} /> Call 1-800-4BANDIT
             </a>
             <Link href="/services/preventive-maintenance" className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#0A0A0A] text-[#0A0A0A] font-bold rounded-md text-base hover:bg-[#0A0A0A] hover:text-[#39FF14] transition-colors">
               Explore PM Plans

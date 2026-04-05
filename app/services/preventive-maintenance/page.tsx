@@ -104,7 +104,7 @@ export default function PreventiveMaintenancePage() {
                 <Link href="#plans" className="btn-primary">
                   View PM Plans <ChevronRight size={16} />
                 </Link>
-                <a href="tel:+18002263481" className="btn-ghost-green">
+                <a href="tel:+18004226348" className="btn-ghost-green">
                   <Phone size={16} /> Talk to a Tech
                 </a>
               </div>
@@ -217,7 +217,7 @@ export default function PreventiveMaintenancePage() {
             ))}
           </div>
           <p className="text-center text-xs text-gray-600 mt-6">
-            Multi-unit, multi-location, and custom contracts available. <a href="tel:+18002263481" className="text-[#39FF14] hover:underline">Call us</a> to discuss.
+            Multi-unit, multi-location, and custom contracts available. <a href="tel:+18004226348" className="text-[#39FF14] hover:underline">Call us</a> to discuss.
           </p>
         </div>
       </section>
@@ -272,8 +272,8 @@ export default function PreventiveMaintenancePage() {
                 <Link href="/quote" className="btn-primary">
                   <DollarSign size={16} /> Get a PM Quote
                 </Link>
-                <a href="tel:+18002263481" className="btn-ghost-green">
-                  <Phone size={16} /> 1-800-BANDIT-1
+                <a href="tel:+18004226348" className="btn-ghost-green">
+                  <Phone size={16} /> 1-800-4BANDIT
                 </a>
               </div>
             </div>

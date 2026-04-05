@@ -70,7 +70,7 @@ export default function AboutPage() {
                 Bandit Recycling exists to keep baler infrastructure running across the Southeast US, so recyclable material ends up where it belongs: in bales, in commodity markets, and in the circular economy. Not in dumpsters, landfills, or the side of a road.
               </p>
               <div className="flex flex-wrap gap-3">
-                <a href="tel:+18002263481" className="btn-primary">
+                <a href="tel:+18004226348" className="btn-primary">
                   <Phone size={16} /> Talk to Our Team
                 </a>
                 <Link href="/services/baler-repair" className="btn-ghost-green">
@@ -278,8 +278,8 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:items-end">
-              <a href="tel:+18002263481" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
-                <Phone size={18} /> Call 1-800-BANDIT-1
+              <a href="tel:+18004226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
+                <Phone size={18} /> Call 1-800-4BANDIT
               </a>
               <Link href="/quote" className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#0A0A0A] text-[#0A0A0A] font-bold rounded-md text-base hover:bg-[#0A0A0A] hover:text-[#39FF14] transition-colors">
                 Get a Free Quote

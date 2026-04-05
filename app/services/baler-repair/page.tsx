@@ -72,8 +72,8 @@ export default function BalerRepairPage() {
                 Hydraulic failures, electrical faults, structural damage — our certified technicians fix it right the first time. Serving the Southeast with same-day emergency response.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
-                <a href="tel:+18002263481" className="btn-primary">
-                  <Phone size={16} /> Call 1-800-BANDIT-1
+                <a href="tel:+18004226348" className="btn-primary">
+                  <Phone size={16} /> Call 1-800-4BANDIT
                 </a>
                 <Link href="/services/emergency-repair" className="btn-ghost-green">
                   Emergency Repair <ChevronRight size={16} />
@@ -217,8 +217,8 @@ export default function BalerRepairPage() {
             Every hour offline costs you production. Call now and we'll dispatch a technician today.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="tel:+18002263481" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
-              <Phone size={18} /> Call 1-800-BANDIT-1
+            <a href="tel:+18004226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
+              <Phone size={18} /> Call 1-800-4BANDIT
             </a>
             <Link href="/services/preventive-maintenance" className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-[#0A0A0A] text-[#0A0A0A] font-bold rounded-md text-base hover:bg-[#0A0A0A] hover:text-[#39FF14] transition-colors">
               Prevent Future Downtime

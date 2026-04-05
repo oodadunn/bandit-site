@@ -6,7 +6,7 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Emergency Baler Repair — Same-Day Dispatch | Southeast US",
   description:
-    "24/7 emergency baler repair across the Southeast US. Same-day technician dispatch when your baler goes down. All makes and models. Call 1-800-BANDIT-1.",
+    "24/7 emergency baler repair across the Southeast US. Same-day technician dispatch when your baler goes down. All makes and models. Call 1-800-4BANDIT.",
   keywords: ["emergency baler repair", "baler down", "same day baler repair", "24 hour baler service", "emergency baler service Southeast"],
 };
 
@@ -20,7 +20,7 @@ const SE_STATES = [
 ];
 
 const WHAT_HAPPENS = [
-  { step: "01", time: "0–30 min", title: "You Call or Submit", desc: "Call 1-800-BANDIT-1 or submit the emergency form below. A real person answers 24/7." },
+  { step: "01", time: "0–30 min", title: "You Call or Submit", desc: "Call 1-800-4BANDIT or submit the emergency form below. A real person answers 24/7." },
   { step: "02", time: "30–60 min", title: "Dispatch Confirmed", desc: "We confirm the nearest available technician and provide an ETA. You'll get a text update." },
   { step: "03", time: "Same Day", title: "Technician On-Site", desc: "Our tech arrives with a fully stocked service vehicle and begins diagnosis immediately." },
   { step: "04", time: "Same Day", title: "Back Online", desc: "Most emergency repairs are completed same-day. We test the full cycle before leaving." },
@@ -76,7 +76,7 @@ export default function EmergencyRepairPage() {
 
               {/* Emergency phone CTA */}
               <a
-                href="tel:+18002263481"
+                href="tel:+18004226348"
                 className="flex items-center gap-4 p-5 bg-[#39FF14] rounded-xl hover:bg-[#22C55E] transition-colors group mb-6 max-w-sm"
               >
                 <div className="w-12 h-12 rounded-full bg-[#0A0A0A]/20 flex items-center justify-center shrink-0">
@@ -84,7 +84,7 @@ export default function EmergencyRepairPage() {
                 </div>
                 <div>
                   <div className="text-[#0A0A0A] text-xs font-semibold uppercase tracking-wider">Emergency Line — 24/7</div>
-                  <div className="text-[#0A0A0A] text-2xl font-black font-mono tracking-tight">1-800-BANDIT-1</div>
+                  <div className="text-[#0A0A0A] text-2xl font-black font-mono tracking-tight">1-800-4BANDIT</div>
                 </div>
               </a>
 
@@ -247,8 +247,8 @@ export default function EmergencyRepairPage() {
             <p className="text-gray-400 mb-8 max-w-md mx-auto">
               The sooner you call, the sooner we can get you back to production.
             </p>
-            <a href="tel:+18002263481" className="btn-primary text-base px-10 py-4">
-              <Phone size={18} /> 1-800-BANDIT-1
+            <a href="tel:+18004226348" className="btn-primary text-base px-10 py-4">
+              <Phone size={18} /> 1-800-4BANDIT
             </a>
             <p className="text-xs text-gray-600 mt-4">Available 24 hours a day, 7 days a week</p>
           </div>
