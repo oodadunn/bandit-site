@@ -60,8 +60,8 @@ export default function BalersPage() {
             <Link href="/quote" className="btn-ghost-green text-sm">
               Service Quote
             </Link>
-            <a href="tel:+18004226348" className="btn-ghost-green text-sm">
-              Call 1-800-4BANDIT
+            <a href="tel:+18574226348" className="btn-ghost-green text-sm">
+              Call 857-422-6348
             </a>
           </div>
 
@@ -130,7 +130,7 @@ export default function BalersPage() {
               <Link href="/quote" className="btn-primary text-sm">
                 Get a Quote
               </Link>
-              <a href="tel:+18004226348" className="btn-ghost-green text-sm">
+              <a href="tel:+18574226348" className="btn-ghost-green text-sm">
                 Call Now
               </a>
             </div>
@@ -160,8 +160,8 @@ export default function BalersPage() {
             <Link href="/quote" className="btn-ghost-green">
               Request a Service Quote →
             </Link>
-            <a href="tel:+18004226348" className="btn-ghost-green">
-              Call 1-800-4BANDIT
+            <a href="tel:+18574226348" className="btn-ghost-green">
+              Call 857-422-6348
             </a>
           </div>
         </div>

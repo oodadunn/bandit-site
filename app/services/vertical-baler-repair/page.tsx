@@ -68,8 +68,8 @@ export default function VerticalBalerRepairPage() {
                 We specialize in vertical baler repair for retail, grocery, and distribution operations across the Southeast. All makes and models — same-day emergency service available.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
-                <a href="tel:+18004226348" className="btn-primary">
-                  <Phone size={16} /> Call 1-800-4BANDIT
+                <a href="tel:+18574226348" className="btn-primary">
+                  <Phone size={16} /> Call 857-422-6348
                 </a>
                 <Link href="/services/emergency-repair" className="btn-ghost-green">
                   Emergency Dispatch <ChevronRight size={16} />
@@ -149,7 +149,7 @@ export default function VerticalBalerRepairPage() {
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-gray-600 mt-3">Don't see your make? <a href="tel:+18004226348" className="text-[#39FF14] hover:underline">Call us</a> — we service virtually all models.</p>
+              <p className="text-xs text-gray-600 mt-3">Don't see your make? <a href="tel:+18574226348" className="text-[#39FF14] hover:underline">Call us</a> — we service virtually all models.</p>
             </div>
           </div>
         </div>
@@ -182,8 +182,8 @@ export default function VerticalBalerRepairPage() {
         <div className="container-site text-center">
           <h2 className="text-3xl font-black text-[#0A0A0A] mb-4">Ready to get your vertical baler fixed?</h2>
           <p className="text-[#0A0A0A]/70 mb-8">Call now or submit a quote — same-day service available across the Southeast.</p>
-          <a href="tel:+18004226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
-            <Phone size={18} /> Call 1-800-4BANDIT
+          <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
+            <Phone size={18} /> Call 857-422-6348
           </a>
         </div>
       </section>

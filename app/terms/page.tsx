@@ -11,7 +11,7 @@ const EFFECTIVE_DATE = "April 4, 2026";
 const COMPANY = "Bandit Recycling LLC";
 const WEBSITE = "https://banditrecycling.com";
 const EMAIL = "service@banditrecycling.com";
-const PHONE = "1-800-4BANDIT";
+const PHONE = "857-422-6348";
 
 export default function TermsPage() {
   return (
@@ -153,7 +153,7 @@ export default function TermsPage() {
               <p>If you have any questions about these Terms of Service, please contact us:</p>
               <div className="mt-4 p-4 bg-[#111111] border border-[#1F2937] rounded-xl">
                 <p className="text-white font-semibold">{COMPANY}</p>
-                <p>Phone: <a href="tel:+18004226348" className="text-[#39FF14] hover:underline">{PHONE}</a></p>
+                <p>Phone: <a href="tel:+18574226348" className="text-[#39FF14] hover:underline">{PHONE}</a></p>
                 <p>Email: <a href={`mailto:${EMAIL}`} className="text-[#39FF14] hover:underline">{EMAIL}</a></p>
                 <p>Website: <a href={WEBSITE} className="text-[#39FF14] hover:underline">{WEBSITE}</a></p>
               </div>

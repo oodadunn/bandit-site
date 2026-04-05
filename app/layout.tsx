@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: "Bandit Recycling",
               description: "B2B baler repair, maintenance, and bale wire supply across the Southeast US.",
               url: "https://banditrecycling.com",
-              telephone: "+18004226348",
+              telephone: "+18574226348",
               email: "service@banditrecycling.com",
               areaServed: ["Georgia", "Florida", "Alabama", "South Carolina", "North Carolina", "Tennessee"],
               serviceType: ["Baler Repair", "Baler Maintenance", "Bale Wire Supply", "Equipment Leasing"],

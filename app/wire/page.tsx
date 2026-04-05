@@ -201,7 +201,7 @@ export default function WirePage() {
                 Auto-tie box wire, single loop, and double loop bale ties — matched to your baler model, delivered fast across the Southeast. From the team that fixes balers for a living.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
-                <a href="tel:+18004226348" className="btn-primary">
+                <a href="tel:+18574226348" className="btn-primary">
                   <Phone size={16} /> Get a Wire Quote
                 </a>
                 <Link href="#wire-types" className="btn-ghost-green">
@@ -381,7 +381,7 @@ export default function WirePage() {
 
           <p className="text-center text-gray-500 text-sm mt-8">
             Not sure which finish your operation needs?{" "}
-            <a href="tel:+18004226348" className="text-[#39FF14] hover:underline">
+            <a href="tel:+18574226348" className="text-[#39FF14] hover:underline">
               Call us
             </a>{" "}
             — we'll ask three questions and tell you exactly what to order.
@@ -515,10 +515,10 @@ export default function WirePage() {
               <div className="mt-10 p-5 bg-[#111] rounded-xl border border-white/10">
                 <p className="text-sm text-white/70 mb-1">Prefer to call?</p>
                 <a
-                  href="tel:+18004226348"
+                  href="tel:+18574226348"
                   className="text-2xl font-black text-[#39FF14] hover:underline"
                 >
-                  1-800-4BANDIT
+                  857-422-6348
                 </a>
                 <p className="text-gray-500 text-xs mt-1">Mon–Fri 7am–6pm ET · Sat 8am–2pm ET</p>
               </div>
@@ -546,7 +546,7 @@ export default function WirePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="tel:+18004226348"
+              href="tel:+18574226348"
               className="bg-[#0A0A0A] text-[#39FF14] font-bold px-8 py-4 rounded-full hover:bg-black transition-colors flex items-center gap-2"
             >
               <Phone size={16} /> Call Now

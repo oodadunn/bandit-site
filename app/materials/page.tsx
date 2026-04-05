@@ -105,8 +105,8 @@ export default function MaterialsPage() {
             <Link href="/wire" className="btn-ghost-green">
               Shop Bale Wire →
             </Link>
-            <a href="tel:+18004226348" className="btn-ghost-green">
-              Call 1-800-4BANDIT
+            <a href="tel:+18574226348" className="btn-ghost-green">
+              Call 857-422-6348
             </a>
           </div>
         </div>

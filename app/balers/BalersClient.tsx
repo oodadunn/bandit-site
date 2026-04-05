@@ -169,8 +169,8 @@ function BalerCard({ baler }: { baler: Baler }) {
         <Link href="/quote" className="flex-1 text-center text-xs font-bold py-2 px-3 rounded-lg bg-[#39FF14]/10 text-[#39FF14] border border-[#39FF14]/20 hover:bg-[#39FF14]/20 transition-colors">
           Get Service Quote
         </Link>
-        <a href="tel:+18004226348" className="flex-1 text-center text-xs font-bold py-2 px-3 rounded-lg bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white transition-colors">
-          Call 1-800-4BANDIT
+        <a href="tel:+18574226348" className="flex-1 text-center text-xs font-bold py-2 px-3 rounded-lg bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10 hover:text-white transition-colors">
+          Call 857-422-6348
         </a>
       </div>
     </div>
@@ -364,8 +364,8 @@ export default function BalersClient() {
           <p className="text-sm text-gray-600 mb-6">
             Don't see your baler? Call us — we service all makes and models.
           </p>
-          <a href="tel:+18004226348" className="btn-primary">
-            Call 1-800-4BANDIT
+          <a href="tel:+18574226348" className="btn-primary">
+            Call 857-422-6348
           </a>
         </div>
       ) : (
@@ -416,8 +416,8 @@ export default function BalersClient() {
           <Link href="/quote" className="btn-primary">
             Request a Service Quote
           </Link>
-          <a href="tel:+18004226348" className="btn-ghost-green">
-            Call 1-800-4BANDIT
+          <a href="tel:+18574226348" className="btn-ghost-green">
+            Call 857-422-6348
           </a>
           <Link href="/wire" className="btn-ghost-green">
             Browse All Wire Products

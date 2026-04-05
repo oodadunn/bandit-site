@@ -62,7 +62,7 @@ export default function QuoteForm({
       }).catch(() => {}); // non-blocking
     } catch {
       setStatus("error");
-      setErrorMsg("Something went wrong. Please call us directly at 1-800-4BANDIT.");
+      setErrorMsg("Something went wrong. Please call us directly at 857-422-6348.");
     }
   };
 
@@ -73,8 +73,8 @@ export default function QuoteForm({
         <h3 className="text-xl font-bold text-white mb-2">Quote Request Received!</h3>
         <p className="text-gray-400 text-sm">
           We&apos;ll contact you within 2 hours. For emergencies, call{" "}
-          <a href="tel:+18004226348" className="text-[#39FF14] hover:underline font-mono">
-            1-800-4BANDIT
+          <a href="tel:+18574226348" className="text-[#39FF14] hover:underline font-mono">
+            857-422-6348
           </a>
         </p>
       </div>

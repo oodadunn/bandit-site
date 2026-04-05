@@ -42,7 +42,7 @@ export default function NotFound() {
           <Link href="/services/baler-repair" className="btn-ghost-green">
             <Wrench size={16} /> Baler Repair
           </Link>
-          <a href="tel:+18004226348" className="btn-secondary">
+          <a href="tel:+18574226348" className="btn-secondary">
             <Phone size={16} /> Call Us
           </a>
         </div>

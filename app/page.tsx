@@ -248,8 +248,8 @@ export default async function HomePage() {
               Every hour of downtime costs you money. Call our emergency line and we&apos;ll dispatch a technician today.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="tel:+18004226348" className="btn-primary text-base px-8 py-4">
-                <Phone size={18} /> Call 1-800-4BANDIT
+              <a href="tel:+18574226348" className="btn-primary text-base px-8 py-4">
+                <Phone size={18} /> Call 857-422-6348
               </a>
               <Link href="/services/emergency-repair" className="btn-ghost-green text-base px-8 py-4">
                 Emergency Repair Info
