@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Clock, Tag, ArrowRight, Rss } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -41,7 +41,6 @@ interface Post {
 
 async function getPosts(): Promise<Post[]> {
   try {
-    const supabase = createClient();
     const { data, error } = await supabase
       .from("blog_posts")
       .select("id,slug,title,excerpt,category,tags,read_time,featured,published_at,author")

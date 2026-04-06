@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { markdownToHtml } from "@/lib/markdown";
 import { Clock, Tag, ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -22,7 +22,6 @@ interface Post {
 
 async function getPost(slug: string): Promise<Post | null> {
   try {
-    const supabase = createClient();
     const { data } = await supabase
       .from("blog_posts")
       .select("*")
@@ -37,7 +36,6 @@ async function getPost(slug: string): Promise<Post | null> {
 
 async function getRelated(category: string, currentSlug: string): Promise<Pick<Post, "slug" | "title" | "category" | "read_time" | "published_at">[]> {
   try {
-    const supabase = createClient();
     const { data } = await supabase
       .from("blog_posts")
       .select("slug,title,category,read_time,published_at")
