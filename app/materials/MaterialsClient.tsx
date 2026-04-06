@@ -4,6 +4,70 @@ import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp, X, BookOpen, Phone } from "lucide-react";
 import { MATERIALS, CATEGORY_META, SUBCATEGORIES, type Material, type MaterialCategory } from "./data";
 
+// Curated Unsplash/Wikimedia images per subcategory — shown in expanded panel
+const SUBCATEGORY_IMAGES: Record<string, string[]> = {
+  "Corrugated": [
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cardboard_recycling.jpg/480px-Cardboard_recycling.jpg",
+    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Mixed Paper": [
+    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Office Paper": [
+    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Newsprint": [
+    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Magazines & Coated": [
+    "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Premium Grades": [
+    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+  ],
+  "PET #1": [
+    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=480&q=75",
+  ],
+  "HDPE #2": [
+    "https://images.unsplash.com/photo-1601598851-27e6d7cf2ae7?auto=format&fit=crop&w=480&q=75",
+  ],
+  "LDPE #4": [
+    "https://images.unsplash.com/photo-1585155784229-aff921ccfa72?auto=format&fit=crop&w=480&q=75",
+  ],
+  "PP #5": [
+    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
+  ],
+  "PVC #3": [
+    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
+  ],
+  "PS #6": [
+    "https://images.unsplash.com/photo-1585155784229-aff921ccfa72?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Mixed": [
+    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Aluminum": [
+    "https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Copper": [
+    "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Brass & Red Metals": [
+    "https://images.unsplash.com/photo-1573163915922-d73cf7d3d9da?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Ferrous": [
+    "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Lead": [
+    "https://images.unsplash.com/photo-1619534055171-7e22e31b4419?auto=format&fit=crop&w=480&q=75",
+  ],
+  "Rubber": [
+    "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=480&q=75",
+  ],
+};
+
 const VALUE_COLORS: Record<string, string> = {
   high: "text-[#39FF14]",
   medium: "text-yellow-400",
@@ -22,11 +86,30 @@ const DIFF_COLOR: Record<string, string> = {
   Difficult: "text-red-400",
 };
 
+// Single image with graceful fallback on error
+function MaterialImage({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 function MaterialCard({ mat, isExpanded, onToggle }: {
   mat: Material;
   isExpanded: boolean;
   onToggle: () => void;
 }) {
+  // Prefer material-specific imageUrl, then fall back to subcategory images
+  const images: string[] = mat.imageUrl
+    ? [mat.imageUrl, ...(SUBCATEGORY_IMAGES[mat.subcategory] ?? []).slice(0, 1)]
+    : (SUBCATEGORY_IMAGES[mat.subcategory] ?? []);
+
   return (
     <div
       className={`rounded-xl border transition-all duration-200 overflow-hidden ${
@@ -78,6 +161,24 @@ function MaterialCard({ mat, isExpanded, onToggle }: {
       {/* Expanded detail panel */}
       {isExpanded && (
         <div className="border-t border-white/8 p-5 space-y-6">
+
+          {/* Photo gallery */}
+          {images.length > 0 && (
+            <div>
+              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">What It Looks Like</h4>
+              <div className={`grid gap-2 ${images.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
+                {images.slice(0, 2).map((src, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-lg overflow-hidden bg-[#0A0A0A] border border-white/5"
+                    style={{ aspectRatio: "4/3" }}
+                  >
+                    <MaterialImage src={src} alt={`${mat.commonName} example ${i + 1}`} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quick stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -190,7 +291,6 @@ export default function MaterialsClient() {
   const [activeCategory, setActiveCategory] = useState<MaterialCategory | "all">("all");
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [showKevinOnly, setShowKevinOnly] = useState(false);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();

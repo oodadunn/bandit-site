@@ -22,8 +22,21 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
+// Curated Unsplash photos per category — used when a post has no stored image_url
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Maintenance":         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=900&q=75",
+  "Equipment":           "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=900&q=75",
+  "Industry Tips":       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=75",
+  "Recycling Education": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=75",
+  "News":                "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=900&q=75",
+};
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=75";
+
 function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat] ?? "text-gray-400 bg-white/5 border-white/10";
+}
+function postImage(post: Post) {
+  return post.image_url || CATEGORY_IMAGES[post.category] || DEFAULT_IMAGE;
 }
 
 interface Post {
@@ -37,13 +50,14 @@ interface Post {
   featured: boolean;
   published_at: string;
   author: string;
+  image_url?: string;
 }
 
 async function getPosts(): Promise<Post[]> {
   try {
     const { data, error } = await supabase
       .from("blog_posts")
-      .select("id,slug,title,excerpt,category,tags,read_time,featured,published_at,author")
+      .select("id,slug,title,excerpt,category,tags,read_time,featured,published_at,author,image_url")
       .eq("status", "published")
       .order("published_at", { ascending: false });
     if (error) throw error;
@@ -53,7 +67,7 @@ async function getPosts(): Promise<Post[]> {
   }
 }
 
-export const revalidate = 300; // ISR: revalidate every 5 min
+export const revalidate = 300;
 
 export default async function BlogPage() {
   const posts = await getPosts();
@@ -102,33 +116,40 @@ export default async function BlogPage() {
                 <div className="mb-12 pt-10">
                   <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-4">Featured</p>
                   <Link href={`/blog/${featured.slug}`} className="group block">
-                    <div className="card-dark hover:border-[#39FF14]/30 transition-all p-8">
-                      <div className="flex flex-wrap items-center gap-3 mb-4">
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${categoryColor(featured.category)}`}>
-                          {featured.category}
-                        </span>
-                        <span className="text-xs text-gray-600 flex items-center gap-1">
-                          <Clock size={11} /> {featured.read_time} min read
-                        </span>
-                        <span className="text-xs text-gray-600">
-                          {new Date(featured.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-                        </span>
-                      </div>
-                      <h2 className="text-3xl font-black text-white mb-3 group-hover:text-[#39FF14] transition-colors leading-tight">
-                        {featured.title}
-                      </h2>
-                      <p className="text-gray-400 leading-relaxed mb-5 max-w-3xl">{featured.excerpt}</p>
-                      <div className="flex flex-wrap items-center justify-between gap-4">
-                        <div className="flex flex-wrap gap-1.5">
-                          {featured.tags.slice(0, 4).map((t) => (
-                            <span key={t} className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/8">
-                              {t}
-                            </span>
-                          ))}
+                    <div className="card-dark hover:border-[#39FF14]/30 transition-all overflow-hidden p-0">
+                      {/* Cover image */}
+                      <div
+                        className="w-full h-56 sm:h-72 bg-cover bg-center bg-[#111]"
+                        style={{ backgroundImage: `url(${postImage(featured)})` }}
+                      />
+                      <div className="p-8">
+                        <div className="flex flex-wrap items-center gap-3 mb-4">
+                          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${categoryColor(featured.category)}`}>
+                            {featured.category}
+                          </span>
+                          <span className="text-xs text-gray-600 flex items-center gap-1">
+                            <Clock size={11} /> {featured.read_time} min read
+                          </span>
+                          <span className="text-xs text-gray-600">
+                            {new Date(featured.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                          </span>
                         </div>
-                        <span className="text-sm font-bold text-[#39FF14] flex items-center gap-1 group-hover:gap-2 transition-all">
-                          Read article <ArrowRight size={14} />
-                        </span>
+                        <h2 className="text-3xl font-black text-white mb-3 group-hover:text-[#39FF14] transition-colors leading-tight">
+                          {featured.title}
+                        </h2>
+                        <p className="text-gray-400 leading-relaxed mb-5 max-w-3xl">{featured.excerpt}</p>
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                          <div className="flex flex-wrap gap-1.5">
+                            {featured.tags.slice(0, 4).map((t) => (
+                              <span key={t} className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/8">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                          <span className="text-sm font-bold text-[#39FF14] flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Read article <ArrowRight size={14} />
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -144,26 +165,33 @@ export default async function BlogPage() {
                   <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {rest.map((post) => (
                       <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
-                        <div className="card-dark h-full hover:border-[#39FF14]/20 transition-all flex flex-col">
-                          <div className="flex flex-wrap items-center gap-2 mb-3">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${categoryColor(post.category)}`}>
-                              {post.category}
-                            </span>
-                            <span className="text-[10px] text-gray-600 flex items-center gap-1">
-                              <Clock size={10} /> {post.read_time} min
-                            </span>
-                          </div>
-                          <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#39FF14] transition-colors leading-snug flex-1">
-                            {post.title}
-                          </h3>
-                          <p className="text-sm text-gray-400 leading-relaxed mb-4 line-clamp-3">{post.excerpt}</p>
-                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/8">
-                            <span className="text-[10px] text-gray-600">
-                              {new Date(post.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                            </span>
-                            <span className="text-xs font-semibold text-[#39FF14] flex items-center gap-1 group-hover:gap-1.5 transition-all">
-                              Read <ArrowRight size={12} />
-                            </span>
+                        <div className="card-dark h-full hover:border-[#39FF14]/20 transition-all flex flex-col overflow-hidden p-0">
+                          {/* Thumbnail */}
+                          <div
+                            className="w-full h-44 bg-cover bg-center bg-[#111] shrink-0"
+                            style={{ backgroundImage: `url(${postImage(post)})` }}
+                          />
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${categoryColor(post.category)}`}>
+                                {post.category}
+                              </span>
+                              <span className="text-[10px] text-gray-600 flex items-center gap-1">
+                                <Clock size={10} /> {post.read_time} min
+                              </span>
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#39FF14] transition-colors leading-snug flex-1">
+                              {post.title}
+                            </h3>
+                            <p className="text-sm text-gray-400 leading-relaxed mb-4 line-clamp-3">{post.excerpt}</p>
+                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/8">
+                              <span className="text-[10px] text-gray-600">
+                                {new Date(post.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                              </span>
+                              <span className="text-xs font-semibold text-[#39FF14] flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                                Read <ArrowRight size={12} />
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </Link>

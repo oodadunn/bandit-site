@@ -18,6 +18,21 @@ interface Post {
   published_at: string;
   seo_title: string | null;
   seo_description: string | null;
+  image_url: string | null;
+}
+
+// Curated Unsplash photos per category — fallback when no image_url stored
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Maintenance":         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=80",
+  "Equipment":           "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=1400&q=80",
+  "Industry Tips":       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+  "Recycling Education": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=80",
+  "News":                "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1400&q=80",
+};
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=80";
+
+function heroImage(post: Post) {
+  return post.image_url || CATEGORY_IMAGES[post.category] || DEFAULT_IMAGE;
 }
 
 async function getPost(slug: string): Promise<Post | null> {
@@ -34,11 +49,11 @@ async function getPost(slug: string): Promise<Post | null> {
   }
 }
 
-async function getRelated(category: string, currentSlug: string): Promise<Pick<Post, "slug" | "title" | "category" | "read_time" | "published_at">[]> {
+async function getRelated(category: string, currentSlug: string): Promise<Pick<Post, "slug" | "title" | "category" | "read_time" | "published_at" | "image_url">[]> {
   try {
     const { data } = await supabase
       .from("blog_posts")
-      .select("slug,title,category,read_time,published_at")
+      .select("slug,title,category,read_time,published_at,image_url")
       .eq("status", "published")
       .eq("category", category)
       .neq("slug", currentSlug)
@@ -62,6 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       type: "article",
       publishedTime: post.published_at,
       authors: [post.author],
+      images: post.image_url ? [{ url: post.image_url }] : [],
     },
   };
 }
@@ -92,9 +108,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <>
+      {/* ── HERO IMAGE ────────────────────────────────────────────────────── */}
+      <div
+        className="w-full h-72 sm:h-96 bg-cover bg-center bg-[#111] relative"
+        style={{ backgroundImage: `url(${heroImage(post)})` }}
+      >
+        {/* Dark gradient overlay so header text stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/30 via-transparent to-[#0A0A0A]" />
+      </div>
+
       {/* ── HEADER ────────────────────────────────────────────────────────── */}
-      <section className="relative bg-[#0A0A0A] overflow-hidden pt-24 pb-12 border-b border-white/8">
-        <div className="container-site relative max-w-3xl">
+      <section className="relative bg-[#0A0A0A] overflow-hidden pb-12 border-b border-white/8">
+        <div className="container-site relative max-w-3xl -mt-10">
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#39FF14] transition-colors mb-6">
             <ArrowLeft size={14} /> Back to Blog
           </Link>
@@ -163,16 +188,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <h2 className="text-xl font-black text-white mb-5">Related Articles</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {related.map((r) => (
-                  <Link key={r.slug} href={`/blog/${r.slug}`} className="group block card-dark hover:border-[#39FF14]/20 transition-all">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider mb-2 inline-block ${catColor(r.category)}`}>
-                      {r.category}
-                    </span>
-                    <h3 className="text-sm font-bold text-white group-hover:text-[#39FF14] transition-colors leading-snug mb-2">
-                      {r.title}
-                    </h3>
-                    <p className="text-xs text-[#39FF14] flex items-center gap-1 group-hover:gap-1.5 transition-all">
-                      Read article <ArrowRight size={11} />
-                    </p>
+                  <Link key={r.slug} href={`/blog/${r.slug}`} className="group block card-dark hover:border-[#39FF14]/20 transition-all overflow-hidden p-0">
+                    {/* Related post thumbnail */}
+                    <div
+                      className="w-full h-32 bg-cover bg-center bg-[#111]"
+                      style={{ backgroundImage: `url(${r.image_url || CATEGORY_IMAGES[r.category] || DEFAULT_IMAGE})` }}
+                    />
+                    <div className="p-4">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider mb-2 inline-block ${catColor(r.category)}`}>
+                        {r.category}
+                      </span>
+                      <h3 className="text-sm font-bold text-white group-hover:text-[#39FF14] transition-colors leading-snug mb-2">
+                        {r.title}
+                      </h3>
+                      <p className="text-xs text-[#39FF14] flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                        Read article <ArrowRight size={11} />
+                      </p>
+                    </div>
                   </Link>
                 ))}
               </div>
