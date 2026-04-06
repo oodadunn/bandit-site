@@ -22,34 +22,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
-// Keyword-based Unsplash embeds — each slug gets a unique keyword+seed combo
-// so posts in the same category still get different images, all visually relevant
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  "Maintenance":         ["baler+repair+maintenance", "hydraulic+press+maintenance", "industrial+machine+repair", "factory+equipment+service"],
-  "Equipment":           ["industrial+baler+compactor", "recycling+press+machine", "warehouse+baler+equipment", "heavy+machinery+industrial"],
-  "Industry Tips":       ["recycling+facility+operations", "cardboard+bales+warehouse", "waste+management+facility", "recycling+operations+workers", "industrial+recycling+plant"],
-  "Recycling Education": ["recycling+bins+sorting", "plastic+bottle+recycling+sort", "paper+recycling+green", "sustainable+recycling+bins"],
-  "News":                ["recycling+industry+business", "waste+management+news", "industrial+manufacturing+news", "scrap+metal+business"],
-};
-const DEFAULT_KEYWORD = "recycling+facility";
-
-// Consistent but varied: hash the slug to pick from the keyword pool
-function slugHash(slug: string, len: number): number {
-  let h = 0;
-  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) & 0x7fffffff;
-  return h % len;
-}
-
+// picsum.photos seed URLs — each slug gets its own consistent, unique photo.
+// No API key needed; same slug always returns the same image.
 function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat] ?? "text-gray-400 bg-white/5 border-white/10";
 }
 function postImage(post: Post): string {
   if (post.image_url) return post.image_url;
-  const pool = CATEGORY_KEYWORDS[post.category];
-  const keyword = pool?.length
-    ? pool[slugHash(post.slug, pool.length)]
-    : DEFAULT_KEYWORD;
-  return `https://source.unsplash.com/900x600/?${keyword}`;
+  return `https://picsum.photos/seed/${encodeURIComponent(post.slug)}/900/600`;
 }
 
 interface Post {
