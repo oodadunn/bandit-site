@@ -22,43 +22,18 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
-// Multiple curated Unsplash photos per category — slug hash picks one so every post looks different
-const CATEGORY_IMAGE_POOLS: Record<string, string[]> = {
-  "Maintenance": [
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1636955840493-f43a02bfa064?auto=format&fit=crop&w=900&q=75",
-  ],
-  "Equipment": [
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=75",
-  ],
-  "Industry Tips": [
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1560250097-0dc05329d0ea?auto=format&fit=crop&w=900&q=75",
-  ],
-  "Recycling Education": [
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1611284446314-60a58ac0debb?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1619462729265-e98e8de3c3f5?auto=format&fit=crop&w=900&q=75",
-  ],
-  "News": [
-    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?auto=format&fit=crop&w=900&q=75",
-    "https://images.unsplash.com/photo-1453738773917-9c3eff1db985?auto=format&fit=crop&w=900&q=75",
-  ],
+// Keyword-based Unsplash embeds — each slug gets a unique keyword+seed combo
+// so posts in the same category still get different images, all visually relevant
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  "Maintenance":         ["baler+repair+maintenance", "hydraulic+press+maintenance", "industrial+machine+repair", "factory+equipment+service"],
+  "Equipment":           ["industrial+baler+compactor", "recycling+press+machine", "warehouse+baler+equipment", "heavy+machinery+industrial"],
+  "Industry Tips":       ["recycling+facility+operations", "cardboard+bales+warehouse", "waste+management+facility", "recycling+operations+workers", "industrial+recycling+plant"],
+  "Recycling Education": ["recycling+bins+sorting", "plastic+bottle+recycling+sort", "paper+recycling+green", "sustainable+recycling+bins"],
+  "News":                ["recycling+industry+business", "waste+management+news", "industrial+manufacturing+news", "scrap+metal+business"],
 };
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=900&q=75";
+const DEFAULT_KEYWORD = "recycling+facility";
 
-// Consistent but varied: hash the slug to pick from the pool
+// Consistent but varied: hash the slug to pick from the keyword pool
 function slugHash(slug: string, len: number): number {
   let h = 0;
   for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) & 0x7fffffff;
@@ -70,9 +45,11 @@ function categoryColor(cat: string) {
 }
 function postImage(post: Post): string {
   if (post.image_url) return post.image_url;
-  const pool = CATEGORY_IMAGE_POOLS[post.category];
-  if (!pool?.length) return DEFAULT_IMAGE;
-  return pool[slugHash(post.slug, pool.length)];
+  const pool = CATEGORY_KEYWORDS[post.category];
+  const keyword = pool?.length
+    ? pool[slugHash(post.slug, pool.length)]
+    : DEFAULT_KEYWORD;
+  return `https://source.unsplash.com/900x600/?${keyword}`;
 }
 
 interface Post {

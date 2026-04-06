@@ -4,84 +4,84 @@ import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp, X, BookOpen, Phone } from "lucide-react";
 import { MATERIALS, CATEGORY_META, SUBCATEGORIES, type Material, type MaterialCategory } from "./data";
 
-// Curated images per subcategory — shown in expanded panel
-// Using Wikimedia Commons (CC licensed, reliable hotlinking) + verified Unsplash IDs
+// Keyword-based Unsplash source URLs — each entry returns a photo matching
+// those exact search terms, so corrugated shows cardboard, copper shows wire, etc.
 const SUBCATEGORY_IMAGES: Record<string, string[]> = {
   "Corrugated": [
-    "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1610547189313-1fbea2dcd059?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?corrugated+cardboard+boxes",
+    "https://source.unsplash.com/480x360/?cardboard+bales+recycling+warehouse",
   ],
   "Mixed Paper": [
-    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?mixed+paper+recycling+pile",
+    "https://source.unsplash.com/480x360/?paper+waste+sorting+recycling",
   ],
   "Office Paper": [
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?office+paper+white+stack",
+    "https://source.unsplash.com/480x360/?paper+documents+office+white",
   ],
   "Newsprint": [
-    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?newspaper+stack+pile+print",
+    "https://source.unsplash.com/480x360/?old+newspapers+recycling+pile",
   ],
   "Magazines & Coated": [
-    "https://images.unsplash.com/photo-1512850183-6d7990f42385?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?magazines+colorful+glossy+pile",
+    "https://source.unsplash.com/480x360/?glossy+magazine+stack+reading",
   ],
   "Premium Grades": [
-    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?clean+white+copy+paper+office",
+    "https://source.unsplash.com/480x360/?premium+white+paper+printing",
   ],
   "PET #1": [
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1592621385612-4d7129426394?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?plastic+bottles+recycling+clear+PET",
+    "https://source.unsplash.com/480x360/?crushed+plastic+bottles+waste",
   ],
   "HDPE #2": [
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?milk+jug+plastic+container+HDPE",
+    "https://source.unsplash.com/480x360/?plastic+bottles+jugs+containers",
   ],
   "LDPE #4": [
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?plastic+bags+film+wrap+LDPE",
+    "https://source.unsplash.com/480x360/?plastic+film+stretch+wrap+roll",
   ],
   "PP #5": [
-    "https://images.unsplash.com/photo-1592621385612-4d7129426394?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?plastic+food+containers+polypropylene",
+    "https://source.unsplash.com/480x360/?plastic+yogurt+container+cap+PP",
   ],
   "PVC #3": [
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?PVC+pipe+plumbing+plastic",
+    "https://source.unsplash.com/480x360/?vinyl+siding+pipe+material",
   ],
   "PS #6": [
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?styrofoam+foam+cups+polystyrene",
+    "https://source.unsplash.com/480x360/?foam+packaging+peanuts+box",
   ],
   "Mixed": [
-    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1611284446314-60a58ac0debb?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?mixed+plastic+waste+sorting",
+    "https://source.unsplash.com/480x360/?plastic+recycling+facility+bins",
   ],
   "Aluminum": [
-    "https://images.unsplash.com/photo-1505408419849-4fd3df76e08f?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?aluminum+cans+crushed+recycling",
+    "https://source.unsplash.com/480x360/?aluminium+scrap+metal+bales",
   ],
   "Copper": [
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?copper+wire+scrap+electrical",
+    "https://source.unsplash.com/480x360/?copper+pipes+fittings+plumbing",
   ],
   "Brass & Red Metals": [
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?brass+fittings+valves+metal",
+    "https://source.unsplash.com/480x360/?bronze+brass+copper+alloy+scrap",
   ],
   "Ferrous": [
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?steel+scrap+metal+pile+industrial",
+    "https://source.unsplash.com/480x360/?iron+scrap+metal+recycling+yard",
   ],
   "Lead": [
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?lead+acid+battery+car+recycling",
+    "https://source.unsplash.com/480x360/?old+batteries+automotive+scrap",
   ],
   "Rubber": [
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
+    "https://source.unsplash.com/480x360/?rubber+tires+pile+scrap+used",
+    "https://source.unsplash.com/480x360/?used+tires+rubber+recycling+stack",
   ],
 };
 
