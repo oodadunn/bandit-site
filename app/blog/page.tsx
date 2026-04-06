@@ -22,14 +22,23 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
-// picsum.photos seed URLs — each slug gets its own consistent, unique photo.
-// No API key needed; same slug always returns the same image.
+// AI-generated category fallback images (Imagen 4, stored in Supabase Storage).
+// Used when a post has no image_url set; slug-seeded picsum is the final fallback.
+const IMG_BASE = "https://cerozvtggvwixeyqcgkz.supabase.co/storage/v1/object/public/site-images";
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Maintenance":         `${IMG_BASE}/blog-maintenance.png`,
+  "Equipment":           `${IMG_BASE}/blog-equipment.png`,
+  "Industry Tips":       `${IMG_BASE}/blog-industry-tips.png`,
+  "News":                `${IMG_BASE}/blog-industry-news.png`,
+  "Recycling Education": `${IMG_BASE}/blog-recycling-education.png`,
+};
+
 function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat] ?? "text-gray-400 bg-white/5 border-white/10";
 }
 function postImage(post: Post): string {
   if (post.image_url) return post.image_url;
-  return `https://picsum.photos/seed/${encodeURIComponent(post.slug)}/900/600`;
+  return CATEGORY_IMAGES[post.category] ?? `https://picsum.photos/seed/${encodeURIComponent(post.slug)}/900/600`;
 }
 
 interface Post {

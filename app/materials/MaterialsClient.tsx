@@ -4,28 +4,29 @@ import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp, X, BookOpen, Phone } from "lucide-react";
 import { MATERIALS, CATEGORY_META, SUBCATEGORIES, type Material, type MaterialCategory } from "./data";
 
-// picsum.photos seed URLs — consistent unique photo per subcategory, no API key needed.
-// Seeds use short descriptive strings so each subcategory always gets the same image.
+// AI-generated images stored in Supabase Storage (generated via Imagen 4).
+// Subcategories without a dedicated image fall back to picsum seeds.
+const IMG = (f: string) => `https://cerozvtggvwixeyqcgkz.supabase.co/storage/v1/object/public/site-images/${f}`;
 const SUBCATEGORY_IMAGES: Record<string, string[]> = {
-  "Corrugated":        ["https://picsum.photos/seed/corrugated-a/480/360", "https://picsum.photos/seed/corrugated-b/480/360"],
-  "Mixed Paper":       ["https://picsum.photos/seed/mixed-paper-a/480/360", "https://picsum.photos/seed/mixed-paper-b/480/360"],
-  "Office Paper":      ["https://picsum.photos/seed/office-paper-a/480/360", "https://picsum.photos/seed/office-paper-b/480/360"],
-  "Newsprint":         ["https://picsum.photos/seed/newsprint-a/480/360", "https://picsum.photos/seed/newsprint-b/480/360"],
-  "Magazines & Coated":["https://picsum.photos/seed/magazines-a/480/360", "https://picsum.photos/seed/magazines-b/480/360"],
-  "Premium Grades":    ["https://picsum.photos/seed/premium-paper-a/480/360", "https://picsum.photos/seed/premium-paper-b/480/360"],
-  "PET #1":            ["https://picsum.photos/seed/pet-plastic-a/480/360", "https://picsum.photos/seed/pet-plastic-b/480/360"],
-  "HDPE #2":           ["https://picsum.photos/seed/hdpe-plastic-a/480/360", "https://picsum.photos/seed/hdpe-plastic-b/480/360"],
-  "LDPE #4":           ["https://picsum.photos/seed/ldpe-plastic-a/480/360", "https://picsum.photos/seed/ldpe-plastic-b/480/360"],
-  "PP #5":             ["https://picsum.photos/seed/pp-plastic-a/480/360", "https://picsum.photos/seed/pp-plastic-b/480/360"],
-  "PVC #3":            ["https://picsum.photos/seed/pvc-plastic-a/480/360", "https://picsum.photos/seed/pvc-plastic-b/480/360"],
-  "PS #6":             ["https://picsum.photos/seed/ps-plastic-a/480/360", "https://picsum.photos/seed/ps-plastic-b/480/360"],
-  "Mixed":             ["https://picsum.photos/seed/mixed-plastic-a/480/360", "https://picsum.photos/seed/mixed-plastic-b/480/360"],
-  "Aluminum":          ["https://picsum.photos/seed/aluminum-metal-a/480/360", "https://picsum.photos/seed/aluminum-metal-b/480/360"],
-  "Copper":            ["https://picsum.photos/seed/copper-metal-a/480/360", "https://picsum.photos/seed/copper-metal-b/480/360"],
-  "Brass & Red Metals":["https://picsum.photos/seed/brass-metal-a/480/360", "https://picsum.photos/seed/brass-metal-b/480/360"],
-  "Ferrous":           ["https://picsum.photos/seed/ferrous-steel-a/480/360", "https://picsum.photos/seed/ferrous-steel-b/480/360"],
-  "Lead":              ["https://picsum.photos/seed/lead-battery-a/480/360", "https://picsum.photos/seed/lead-battery-b/480/360"],
-  "Rubber":            ["https://picsum.photos/seed/rubber-tires-a/480/360", "https://picsum.photos/seed/rubber-tires-b/480/360"],
+  "Corrugated":        [IMG("material-corrugated.png")],
+  "Mixed Paper":       [IMG("material-mixed-paper.png")],
+  "Office Paper":      [IMG("material-office-paper.png")],
+  "Newsprint":         [IMG("material-newsprint.png")],
+  "Magazines & Coated":[IMG("material-magazines.png")],
+  "Premium Grades":    [IMG("material-premium-paper.png")],
+  "PET #1":            [IMG("material-pet-plastic.png")],
+  "HDPE #2":           [IMG("material-hdpe-plastic.png")],
+  "LDPE #4":           [IMG("material-ldpe-film.png")],
+  "PP #5":             ["https://picsum.photos/seed/pp-plastic-a/480/360"],
+  "PVC #3":            ["https://picsum.photos/seed/pvc-plastic-a/480/360"],
+  "PS #6":             ["https://picsum.photos/seed/ps-plastic-a/480/360"],
+  "Mixed":             [IMG("material-mixed-plastic.png")],
+  "Aluminum":          [IMG("material-aluminum.png")],
+  "Copper":            [IMG("material-copper.png")],
+  "Brass & Red Metals":[IMG("material-brass.png")],
+  "Ferrous":           [IMG("material-ferrous.png")],
+  "Lead":              ["https://picsum.photos/seed/lead-battery-a/480/360"],
+  "Rubber":            ["https://picsum.photos/seed/rubber-tires-a/480/360"],
 };
 
 const VALUE_COLORS: Record<string, string> = {
