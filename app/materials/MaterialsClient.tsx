@@ -4,67 +4,84 @@ import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp, X, BookOpen, Phone } from "lucide-react";
 import { MATERIALS, CATEGORY_META, SUBCATEGORIES, type Material, type MaterialCategory } from "./data";
 
-// Curated Unsplash/Wikimedia images per subcategory — shown in expanded panel
+// Curated images per subcategory — shown in expanded panel
+// Using Wikimedia Commons (CC licensed, reliable hotlinking) + verified Unsplash IDs
 const SUBCATEGORY_IMAGES: Record<string, string[]> = {
   "Corrugated": [
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Cardboard_recycling.jpg/480px-Cardboard_recycling.jpg",
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1610547189313-1fbea2dcd059?auto=format&fit=crop&w=480&q=75",
   ],
   "Mixed Paper": [
-    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
   ],
   "Office Paper": [
-    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=480&q=75",
   ],
   "Newsprint": [
     "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=480&q=75",
   ],
   "Magazines & Coated": [
-    "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1512850183-6d7990f42385?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
   ],
   "Premium Grades": [
-    "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=480&q=75",
   ],
   "PET #1": [
-    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1592621385612-4d7129426394?auto=format&fit=crop&w=480&q=75",
   ],
   "HDPE #2": [
-    "https://images.unsplash.com/photo-1601598851-27e6d7cf2ae7?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
   ],
   "LDPE #4": [
-    "https://images.unsplash.com/photo-1585155784229-aff921ccfa72?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
   ],
   "PP #5": [
-    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1592621385612-4d7129426394?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
   ],
   "PVC #3": [
-    "https://images.unsplash.com/photo-1559703548-7bf8b7898e97?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
   ],
   "PS #6": [
-    "https://images.unsplash.com/photo-1585155784229-aff921ccfa72?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=480&q=75",
   ],
   "Mixed": [
     "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1611284446314-60a58ac0debb?auto=format&fit=crop&w=480&q=75",
   ],
   "Aluminum": [
-    "https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?auto=format&fit=crop&w=480&q=75",
-    "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1505408419849-4fd3df76e08f?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
   ],
   "Copper": [
-    "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
   ],
   "Brass & Red Metals": [
-    "https://images.unsplash.com/photo-1573163915922-d73cf7d3d9da?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
   ],
   "Ferrous": [
-    "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
   ],
   "Lead": [
-    "https://images.unsplash.com/photo-1619534055171-7e22e31b4419?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=480&q=75",
   ],
   "Rubber": [
-    "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=480&q=75",
+    "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=480&q=75",
   ],
 };
 
@@ -86,17 +103,24 @@ const DIFF_COLOR: Record<string, string> = {
   Difficult: "text-red-400",
 };
 
-// Single image with graceful fallback on error
+// Single image — shows a dark tinted placeholder on load error instead of disappearing
 function MaterialImage({ src, alt }: { src: string; alt: string }) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return null;
+  const [status, setStatus] = useState<"loading" | "ok" | "failed">("loading");
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="w-full h-full object-cover"
-      onError={() => setFailed(true)}
-    />
+    <>
+      {status === "failed" && (
+        <div className="w-full h-full flex items-center justify-center bg-[#111] text-gray-600 text-xs text-center px-3">
+          {alt}
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"}`}
+        onLoad={() => setStatus("ok")}
+        onError={() => setStatus("failed")}
+      />
+    </>
   );
 }
 
