@@ -293,7 +293,7 @@ export default async function HomePage() {
 
           <div className="grid lg:grid-cols-5 gap-10 items-center">
             <div className="lg:col-span-3">
-              <USMap className="w-full" />
+              <USMap className="w-full h-[400px] lg:h-[500px]" />
             </div>
             <div className="lg:col-span-2 space-y-4">
               <div className="card-dark">

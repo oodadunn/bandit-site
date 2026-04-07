@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ size = 16 }: { size?: number }) {
   const [isLight, setIsLight] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -47,9 +47,9 @@ export default function ThemeToggle() {
       className="p-2 rounded-md transition-all duration-200 hover:bg-[var(--green-bg)]"
     >
       {isLight ? (
-        <Moon size={16} className="text-[var(--text-secondary)] hover:text-[var(--green-accent)]" />
+        <Moon size={size} className="text-[var(--text-secondary)] hover:text-[var(--green-accent)]" />
       ) : (
-        <Sun size={16} className="text-gray-400 hover:text-[#39FF14]" />
+        <Sun size={size} className="text-gray-400 hover:text-[#39FF14]" />
       )}
     </button>
   );

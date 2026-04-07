@@ -69,7 +69,7 @@ export default function Nav() {
               >
                 <Link
                   href={link.href}
-                  className="px-4 py-2 text-sm text-gray-300 hover:text-white font-medium transition-colors rounded-md hover:bg-white/5"
+                  className="px-3 py-2 text-xs text-gray-300 hover:text-white font-medium transition-colors rounded-md hover:bg-white/5"
                 >
                   {link.label}
                 </Link>
@@ -93,15 +93,23 @@ export default function Nav() {
           </nav>
 
           {/* Right side */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-3">
             <a
               href="tel:+18574226348"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] transition-colors"
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#39FF14] transition-colors"
             >
               <Phone size={14} />
               <span className="font-mono">857-422-6348</span>
             </a>
-            <ThemeToggle />
+            <ThemeToggle size={14} />
+            <Link href="/quote" className="btn-primary text-xs px-4 py-2">
+              Get a Quote
+            </Link>
+          </div>
+
+          {/* Right side for lg (without phone) */}
+          <div className="hidden lg:flex xl:hidden items-center gap-2">
+            <ThemeToggle size={14} />
             <Link href="/quote" className="btn-primary text-xs px-4 py-2">
               Get a Quote
             </Link>
