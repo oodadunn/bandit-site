@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Find your baler by make and model. Harmony, Harris, International Baler, Maren, Bramidan, Marathon, Bollegraaf, and more. Wire compatibility, specs, and Bandit repair services for every baler.",
   keywords: [
     "baler database", "baler wire guide", "baler compatibility", "Harmony baler wire",
-    "Harris baler specs", "International Baler wire", "baler repair Southeast US",
+    "Harris baler specs", "International Baler wire", "baler repair nationwide",
     "vertical baler wire", "horizontal baler wire", "auto-tie box wire", "single loop bale ties",
     "double loop bale ties", "baler maintenance", "baler specs guide",
   ],
@@ -49,7 +49,7 @@ export default function BalersPage() {
           <p className="text-lg text-gray-400 max-w-2xl mb-8 leading-relaxed">
             Database of baler makes, models, specs, and wire compatibility. Find your exact machine,
             get the wire spec it needs, and connect with Bandit for repair, maintenance, or a new unit —
-            all makes and models, Southeast US.
+            all makes and models, nationwide.
           </p>
 
           {/* Quick Links */}
@@ -150,8 +150,8 @@ export default function BalersPage() {
             Ready to order wire or book a service call?
           </h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-            Southeast US baler experts — repair, PM, wire supply, and equipment sales. All makes and models.
-            Same-day emergency service in GA, FL, AL, SC, NC, and TN.
+            Nationwide baler experts — repair, PM, wire supply, and equipment sales. All makes and models.
+            Same-day emergency service available.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/wire" className="btn-primary">

@@ -39,7 +39,7 @@ export default function PrivacyPage() {
 
             <Section title="1. Who We Are">
               <p>
-                {COMPANY} (&ldquo;Bandit,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates the website at <strong>{WEBSITE}</strong> and provides baler repair, preventive maintenance, equipment sales and leasing, and bale wire supply services in the Southeast United States.
+                {COMPANY} (&ldquo;Bandit,&rdquo; &ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) operates the website at <strong>{WEBSITE}</strong> and provides baler repair, preventive maintenance, equipment sales and leasing, and bale wire supply services in the United States.
               </p>
               <p>
                 This Privacy Policy describes how we collect, use, disclose, and protect personal information we receive from individuals who visit our Site, submit forms, or communicate with us.

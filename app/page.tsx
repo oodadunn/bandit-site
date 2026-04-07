@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Phone, Wrench, Shield, Zap, Package, ChevronRight, MapPin, Clock, CheckCircle } from "lucide-react";
 import QuoteForm from "@/components/QuoteForm";
+import USMap from "@/components/USMap";
 import { getSiteStats, getServiceAreas } from "@/lib/supabase";
 
 const SERVICES = [
@@ -25,14 +26,14 @@ const SERVICES = [
   {
     icon: Package,
     title: "Bale Wire Supply",
-    desc: "Single loop, double loop, black annealed, and galvanized. Bulk pricing for Southeast distributors.",
+    desc: "Single loop, double loop, black annealed, and galvanized. Bulk pricing with nationwide shipping.",
     href: "/wire",
   },
 ];
 
 const STATS_FALLBACK = [
   { stat_key: "repairs_completed", stat_value: 500, display_label: "Repairs Completed" },
-  { stat_key: "states_served", stat_value: 6, display_label: "States Served" },
+  { stat_key: "states_served", stat_value: 50, display_label: "States Served" },
   { stat_key: "avg_response_hours", stat_value: 4, display_label: "Avg Response (hrs)" },
 ];
 
@@ -46,7 +47,7 @@ const TESTIMONIALS = [
   {
     quote: "We switched our wire supplier to Bandit and cut costs by 18%. Same-day shipping on in-stock items is a game changer.",
     name: "Lisa K.",
-    company: "Southeast Recycling Co.",
+    company: "National Recycling Co.",
     state: "FL",
   },
   {
@@ -54,6 +55,24 @@ const TESTIMONIALS = [
     name: "Derek R.",
     company: "Manufacturing Plant",
     state: "TN",
+  },
+  {
+    quote: "We're in Ohio and expected slow response times — Bandit had someone on-site next morning. Impressed doesn't cover it.",
+    name: "Rachel M.",
+    company: "Midwest Fulfillment Center",
+    state: "OH",
+  },
+  {
+    quote: "Bandit handles all three of our West Coast facilities. One contract, one number to call. Makes my job easy.",
+    name: "James P.",
+    company: "Pacific Distribution Group",
+    state: "CA",
+  },
+  {
+    quote: "We needed an emergency repair in rural Texas on a Saturday. Bandit dispatched someone within hours. That's unheard of.",
+    name: "Hector G.",
+    company: "Industrial Recycling Solutions",
+    state: "TX",
   },
 ];
 
@@ -82,7 +101,7 @@ export default async function HomePage() {
             <div>
               <div className="badge-green mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#39FF14] mr-2 animate-pulse" />
-                Southeast US — 24/7 Emergency Service
+                Nationwide Service — 24/7 Emergency Dispatch
               </div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight mb-6">
@@ -91,7 +110,7 @@ export default async function HomePage() {
               </h1>
 
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Same-day baler repair and preventive maintenance across the Southeast. All makes and models. Emergency dispatch available around the clock.
+                Same-day baler repair and preventive maintenance in all 50 states. All makes and models. Emergency dispatch available around the clock.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-10">
@@ -105,7 +124,7 @@ export default async function HomePage() {
 
               {/* Trust signals */}
               <div className="flex flex-wrap gap-4">
-                {["24/7 Emergency Dispatch", "All Makes & Models", "Southeast US Coverage", "Licensed & Insured"].map((t) => (
+                {["24/7 Emergency Dispatch", "All Makes & Models", "All 50 States", "Licensed & Insured"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}
@@ -262,60 +281,48 @@ export default async function HomePage() {
       {/* ── SERVICE AREA ──────────────────────────────────────────── */}
       <section className="py-24 bg-[#050505]">
         <div className="container-site">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="badge-green mb-4">Coverage Map</div>
-              <h2 className="section-heading text-white mb-4">
-                Serving the Southeast, State by State
-              </h2>
-              <p className="text-gray-400 mb-8">
-                Regional technician network across all major metros. We dispatch from within your state — not from across the country.
-              </p>
-              <div className="grid grid-cols-2 gap-3 mb-8">
-                {(serviceAreas.length > 0 ? serviceAreas : [
-                  { state: "Georgia", state_code: "GA", cities: ["Atlanta", "Savannah"] },
-                  { state: "Florida", state_code: "FL", cities: ["Jacksonville", "Miami"] },
-                  { state: "Alabama", state_code: "AL", cities: ["Birmingham", "Montgomery"] },
-                  { state: "South Carolina", state_code: "SC", cities: ["Columbia", "Charleston"] },
-                  { state: "North Carolina", state_code: "NC", cities: ["Charlotte", "Raleigh"] },
-                  { state: "Tennessee", state_code: "TN", cities: ["Nashville", "Memphis"] },
-                ]).map((a) => (
-                  <Link
-                    key={a.state_code}
-                    href={`/service-area/${a.state.toLowerCase().replace(" ", "-")}`}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-[#111111] border border-[#1F2937] hover:border-[#39FF14]/30 transition-all group"
-                  >
-                    <div className="text-xs font-mono font-bold text-[#39FF14] w-7">{a.state_code}</div>
-                    <div>
-                      <div className="text-xs font-semibold text-white">{a.state}</div>
-                      <div className="text-[10px] text-gray-500">{a.cities.slice(0, 2).join(", ")}</div>
+          <div className="text-center mb-14">
+            <div className="badge-green mb-4">Coverage Map</div>
+            <h2 className="section-heading text-white mb-4">
+              Nationwide Coverage, Local Technicians
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Bandit services all 50 states with local technicians dispatched from within your region — not from across the country. Hover over any state to see coverage.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-10 items-center">
+            <div className="lg:col-span-3">
+              <USMap className="w-full" />
+            </div>
+            <div className="lg:col-span-2 space-y-4">
+              <div className="card-dark">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock size={16} className="text-[#39FF14]" />
+                  <span className="text-sm font-semibold text-white">Response Time Guarantee</span>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { type: "Emergency Dispatch", time: "Same day", color: "text-[#39FF14]" },
+                    { type: "Urgent Service", time: "Within 24 hours", color: "text-yellow-400" },
+                    { type: "Standard Repair", time: "Within 48 hours", color: "text-blue-400" },
+                    { type: "Maintenance Visit", time: "Scheduled", color: "text-gray-300" },
+                  ].map((r) => (
+                    <div key={r.type} className="flex items-center justify-between py-3 border-b border-[#1F2937] last:border-0">
+                      <span className="text-sm text-gray-400">{r.type}</span>
+                      <span className={`text-sm font-bold ${r.color}`}>{r.time}</span>
                     </div>
-                    <ChevronRight size={12} className="ml-auto text-gray-600 group-hover:text-[#39FF14] transition-colors" />
-                  </Link>
-                ))}
+                  ))}
+                </div>
               </div>
-              <Link href="/service-area" className="btn-ghost-green inline-flex">
+              <div className="card-dark text-center">
+                <div className="text-4xl font-black text-[#39FF14] font-mono mb-1">50</div>
+                <div className="text-sm text-gray-400 mb-3">States Covered</div>
+                <p className="text-xs text-gray-500">Local technicians in every state, dispatched from within your region for fastest response times.</p>
+              </div>
+              <Link href="/service-area" className="btn-ghost-green inline-flex w-full justify-center">
                 <MapPin size={14} /> View Full Service Area
               </Link>
-            </div>
-            <div className="card-dark">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={16} className="text-[#39FF14]" />
-                <span className="text-sm font-semibold text-white">Response Time Guarantee</span>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { type: "Emergency Dispatch", time: "Same day", color: "text-[#39FF14]" },
-                  { type: "Urgent Service", time: "Within 24 hours", color: "text-yellow-400" },
-                  { type: "Standard Repair", time: "Within 48 hours", color: "text-blue-400" },
-                  { type: "Maintenance Visit", time: "Scheduled", color: "text-gray-300" },
-                ].map((r) => (
-                  <div key={r.type} className="flex items-center justify-between py-3 border-b border-[#1F2937] last:border-0">
-                    <span className="text-sm text-gray-400">{r.type}</span>
-                    <span className={`text-sm font-bold ${r.color}`}>{r.time}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -326,7 +333,7 @@ export default async function HomePage() {
         <div className="container-site">
           <div className="text-center mb-14">
             <div className="badge-green mb-4">Customer Stories</div>
-            <h2 className="section-heading text-white">Trusted by Operations Teams Across the Southeast</h2>
+            <h2 className="section-heading text-white">Trusted by Operations Teams Nationwide</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {TESTIMONIALS.map((t, i) => (

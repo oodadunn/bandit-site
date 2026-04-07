@@ -41,7 +41,7 @@ export default function TermsPage() {
 
             <Section title="2. Services">
               <p>
-                Bandit Recycling provides baler repair and maintenance services, equipment sales and leasing, bale wire supply, and related recycling industry services in the Southeast United States. Specific terms applicable to individual service agreements will be set forth in separate written contracts or service orders.
+                Bandit Recycling provides baler repair and maintenance services, equipment sales and leasing, bale wire supply, and related recycling industry services in the United States. Specific terms applicable to individual service agreements will be set forth in separate written contracts or service orders.
               </p>
             </Section>
 

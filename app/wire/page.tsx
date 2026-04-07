@@ -4,13 +4,13 @@ import { Phone, Package, ChevronRight, CheckCircle, Truck, RefreshCw, Shield, Za
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Bale Wire Supply — Box Wire, Single & Double Loop | Southeast US",
+  title: "Bale Wire Supply — Box Wire, Single & Double Loop | Nationwide Delivery",
   description:
-    "Auto-tie box wire, single loop, and double loop bale ties for vertical and horizontal balers. Black annealed and galvanized. Delivered fast across the Southeast. Get a quote today.",
+    "Auto-tie box wire, single loop, and double loop bale ties for vertical and horizontal balers. Black annealed and galvanized. Delivered fast nationwide. Get a quote today.",
   keywords: [
-    "bale wire", "baling wire Southeast", "auto-tie box wire", "single loop bale ties",
+    "bale wire", "baling wire nationwide", "auto-tie box wire", "single loop bale ties",
     "double loop bale ties", "black annealed baling wire", "galvanized bale wire",
-    "baling wire Georgia", "baling wire Florida", "recycling wire supply",
+    "baling wire supply", "recycling wire supply",
   ],
 };
 
@@ -126,8 +126,8 @@ const WHY_BANDIT = [
   },
   {
     icon: Truck,
-    title: "Fast Southeast Delivery",
-    body: "Regional distribution means you're not waiting a week for a pallet. Most Southeast orders ship same or next business day.",
+    title: "Fast Nationwide Delivery",
+    body: "Regional distribution means you're not waiting a week for a pallet. Most orders ship same or next business day.",
   },
   {
     icon: RefreshCw,
@@ -165,8 +165,8 @@ const FAQS = [
     a: "We sell by the box (50 lb or 100 lb) with no strict minimums for new customers. Volume pricing starts at half-pallet quantities. For standing accounts, we can set up monthly delivery schedules with pallet-level pricing.",
   },
   {
-    q: "Do you ship outside the Southeast?",
-    a: "Our primary focus is the Southeast US where we offer the fastest delivery and best pricing. We can quote freight for other regions — contact us and we'll see what we can do.",
+    q: "How fast is delivery?",
+    a: "We ship nationwide from regional distribution hubs. Most orders ship same or next business day with delivery in 1-3 business days depending on your location.",
   },
   {
     q: "Can I get wire delivered when you service my baler?",
@@ -198,7 +198,7 @@ export default function WirePage() {
                 <span className="text-[#39FF14]">Your Baler.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Auto-tie box wire, single loop, and double loop bale ties — matched to your baler model, delivered fast across the Southeast. From the team that fixes balers for a living.
+                Auto-tie box wire, single loop, and double loop bale ties — matched to your baler model, delivered fast nationwide. From the team that fixes balers for a living.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -249,7 +249,7 @@ export default function WirePage() {
           <div className="flex flex-wrap justify-center gap-x-10 gap-y-3 text-sm text-gray-400">
             {[
               "✓ Baler-matched wire recommendations",
-              "✓ Same/next-day Southeast shipping",
+              "✓ Same/next-day nationwide shipping",
               "✓ Volume & pallet pricing",
               "✓ Compatibility guarantee",
               "✓ Bundle with PM service visits",

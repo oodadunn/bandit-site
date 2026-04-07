@@ -4,10 +4,10 @@ import { Phone, Wrench, CheckCircle, ChevronRight, Clock, Shield, Zap, AlertTria
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Baler Repair Service — All Makes & Models | Southeast US",
+  title: "Baler Repair Service — All Makes & Models | Nationwide",
   description:
-    "Professional baler repair for vertical and horizontal balers across the Southeast US. Hydraulic, electrical, and structural repairs. Same-day emergency dispatch available.",
-  keywords: ["baler repair", "baler repair Southeast US", "vertical baler repair", "horizontal baler repair", "hydraulic baler repair", "baler service Georgia Florida"],
+    "Professional baler repair for vertical and horizontal balers nationwide. Hydraulic, electrical, and structural repairs. Same-day emergency dispatch available.",
+  keywords: ["baler repair", "baler repair nationwide", "vertical baler repair", "horizontal baler repair", "hydraulic baler repair", "baler service"],
 };
 
 const MAKES = [
@@ -69,7 +69,7 @@ export default function BalerRepairPage() {
                 <span className="text-[#39FF14]">Any Make or Model.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Hydraulic failures, electrical faults, structural damage — our certified technicians fix it right the first time. Serving the Southeast with same-day emergency response.
+                Hydraulic failures, electrical faults, structural damage — our certified technicians fix it right the first time. Serving all 50 states with same-day emergency response.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">

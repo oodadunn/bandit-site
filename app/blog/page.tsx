@@ -6,10 +6,10 @@ import { Clock, Tag, ArrowRight, Rss } from "lucide-react";
 export const metadata: Metadata = {
   title: "Blog — Baler Tips, Recycling Industry News | Bandit Recycling",
   description:
-    "Baler maintenance guides, recycling industry tips, wire selection help, and Southeast US recycling news from the Bandit Recycling team.",
+    "Baler maintenance guides, recycling industry tips, wire selection help, and nationwide recycling news from the Bandit Recycling team.",
   keywords: [
     "baler maintenance tips", "recycling industry news", "bale wire guide",
-    "baler repair tips", "OCC recycling", "Southeast recycling",
+    "baler repair tips", "OCC recycling", "nationwide recycling",
     "baler troubleshooting", "recycling operations",
   ],
 };
@@ -22,23 +22,34 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
-// AI-generated category fallback images (Imagen 4, stored in Supabase Storage).
-// Used when a post has no image_url set; slug-seeded picsum is the final fallback.
-const IMG_BASE = "https://cerozvtggvwixeyqcgkz.supabase.co/storage/v1/object/public/site-images";
-const CATEGORY_IMAGES: Record<string, string> = {
-  "Maintenance":         `${IMG_BASE}/blog-maintenance.png`,
-  "Equipment":           `${IMG_BASE}/blog-equipment.png`,
-  "Industry Tips":       `${IMG_BASE}/blog-industry-tips.png`,
-  "News":                `${IMG_BASE}/blog-industry-news.png`,
-  "Recycling Education": `${IMG_BASE}/blog-recycling-education.png`,
+// Keyword-based Unsplash embeds — each slug gets a unique keyword+seed combo
+// so posts in the same category still get different images, all visually relevant
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  "Maintenance":         ["baler+repair+maintenance", "hydraulic+press+maintenance", "industrial+machine+repair", "factory+equipment+service"],
+  "Equipment":           ["industrial+baler+compactor", "recycling+press+machine", "warehouse+baler+equipment", "heavy+machinery+industrial"],
+  "Industry Tips":       ["recycling+facility+operations", "cardboard+bales+warehouse", "waste+management+facility", "recycling+operations+workers", "industrial+recycling+plant"],
+  "Recycling Education": ["recycling+bins+sorting", "plastic+bottle+recycling+sort", "paper+recycling+green", "sustainable+recycling+bins"],
+  "News":                ["recycling+industry+business", "waste+management+news", "industrial+manufacturing+news", "scrap+metal+business"],
 };
+const DEFAULT_KEYWORD = "recycling+facility";
+
+// Consistent but varied: hash the slug to pick from the keyword pool
+function slugHash(slug: string, len: number): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) & 0x7fffffff;
+  return h % len;
+}
 
 function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat] ?? "text-gray-400 bg-white/5 border-white/10";
 }
 function postImage(post: Post): string {
   if (post.image_url) return post.image_url;
-  return CATEGORY_IMAGES[post.category] ?? `https://picsum.photos/seed/${encodeURIComponent(post.slug)}/900/600`;
+  const pool = CATEGORY_KEYWORDS[post.category];
+  const keyword = pool?.length
+    ? pool[slugHash(post.slug, pool.length)]
+    : DEFAULT_KEYWORD;
+  return `https://source.unsplash.com/900x600/?${keyword}`;
 }
 
 interface Post {
@@ -98,7 +109,7 @@ export default async function BlogPage() {
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl leading-relaxed">
             Baler maintenance tips, wire selection guides, recycling commodity education,
-            and operational advice for Southeast US recycling operations.
+            and operational advice for recycling operations nationwide.
           </p>
         </div>
       </section>
@@ -209,7 +220,7 @@ export default async function BlogPage() {
             <p className="text-3xl mb-3">🦝</p>
             <h2 className="text-2xl font-black text-white mb-2">Need baler service or wire today?</h2>
             <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
-              We cover the full Southeast US. Same-day emergency service available.
+              We cover all 50 states. Same-day emergency service available.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/quote" className="btn-primary">Get a Service Quote</Link>

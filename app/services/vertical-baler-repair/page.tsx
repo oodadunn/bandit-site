@@ -4,10 +4,10 @@ import { Phone, CheckCircle, ChevronRight, Package, Users, Building2 } from "luc
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Vertical Baler Repair Service | Southeast US",
+  title: "Vertical Baler Repair Service | Nationwide",
   description:
-    "Expert vertical baler repair for retail, grocery, and distribution operations across the Southeast US. All makes and models. Same-day emergency service available.",
-  keywords: ["vertical baler repair", "cardboard baler repair", "retail baler service", "vertical baler service Southeast", "baler repair Georgia Florida"],
+    "Expert vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models. Same-day emergency service available.",
+  keywords: ["vertical baler repair", "cardboard baler repair", "retail baler service", "vertical baler service nationwide", "baler repair"],
 };
 
 const INDUSTRIES = [
@@ -65,7 +65,7 @@ export default function VerticalBalerRepairPage() {
                 <span className="text-[#39FF14]">Back Up Today.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                We specialize in vertical baler repair for retail, grocery, and distribution operations across the Southeast. All makes and models — same-day emergency service available.
+                We specialize in vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models — same-day emergency service available.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -181,7 +181,7 @@ export default function VerticalBalerRepairPage() {
       <section className="py-20 bg-[#39FF14]">
         <div className="container-site text-center">
           <h2 className="text-3xl font-black text-[#0A0A0A] mb-4">Ready to get your vertical baler fixed?</h2>
-          <p className="text-[#0A0A0A]/70 mb-8">Call now or submit a quote — same-day service available across the Southeast.</p>
+          <p className="text-[#0A0A0A]/70 mb-8">Call now or submit a quote — same-day service available nationwide.</p>
           <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
             <Phone size={18} /> Call 857-422-6348
           </a>

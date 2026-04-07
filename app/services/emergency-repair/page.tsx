@@ -4,10 +4,10 @@ import { Phone, AlertTriangle, CheckCircle, Clock, Zap, MapPin } from "lucide-re
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Emergency Baler Repair — Same-Day Dispatch | Southeast US",
+  title: "Emergency Baler Repair — Same-Day Dispatch | Nationwide",
   description:
-    "24/7 emergency baler repair across the Southeast US. Same-day technician dispatch when your baler goes down. All makes and models. Call 857-422-6348.",
-  keywords: ["emergency baler repair", "baler down", "same day baler repair", "24 hour baler service", "emergency baler service Southeast"],
+    "24/7 emergency baler repair nationwide. Same-day technician dispatch when your baler goes down. All makes and models. Call 857-422-6348.",
+  keywords: ["emergency baler repair", "baler down", "same day baler repair", "24 hour baler service", "emergency baler service nationwide"],
 };
 
 const SE_STATES = [
@@ -68,7 +68,7 @@ export default function EmergencyRepairPage() {
               </h1>
 
               <p className="text-xl text-gray-300 mb-4 font-semibold">
-                Same-day emergency repair across the Southeast US.
+                Same-day emergency repair nationwide.
               </p>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
                 Every hour your baler is offline, you're losing money. Our technicians are on-call around the clock, dispatched within hours — not days.
@@ -89,7 +89,7 @@ export default function EmergencyRepairPage() {
               </a>
 
               <div className="flex flex-wrap gap-4">
-                {["24/7 Real-Person Answer", "Same-Day Dispatch", "Southeast US Only", "All Makes & Models"].map((t) => (
+                {["24/7 Real-Person Answer", "Same-Day Dispatch", "All 50 States", "All Makes & Models"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}

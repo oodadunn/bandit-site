@@ -11,6 +11,47 @@
     --bandit-green-muted: #22C55E;
     --bandit-grey: #6B7280;
     --bandit-grey-light: #F3F4F6;
+
+    /* Theme tokens — dark mode (default) */
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #050505;
+    --bg-card: #111111;
+    --bg-input: #1A1A1A;
+    --bg-nav: rgba(10, 10, 10, 0.95);
+    --border-default: #1F2937;
+    --border-input: #374151;
+    --text-primary: #FFFFFF;
+    --text-secondary: #9CA3AF;  /* gray-400 */
+    --text-tertiary: #6B7280;   /* gray-500 */
+    --text-muted: #4B5563;      /* gray-600 */
+    --green-accent: #39FF14;
+    --green-glow: rgba(57, 255, 20, 0.4);
+    --green-bg: rgba(57, 255, 20, 0.1);
+    --green-border: rgba(57, 255, 20, 0.2);
+    --green-dark: #0A0A0A;       /* text on green bg */
+
+    color-scheme: dark;
+  }
+
+  html.light {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F3F4F6;
+    --bg-card: #F9FAFB;
+    --bg-input: #F3F4F6;
+    --bg-nav: rgba(255, 255, 255, 0.95);
+    --border-default: #E5E7EB;
+    --border-input: #D1D5DB;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-tertiary: #6B7280;
+    --text-muted: #9CA3AF;
+    --green-accent: #16A34A;      /* darker green for light bg readability */
+    --green-glow: rgba(22, 163, 74, 0.3);
+    --green-bg: rgba(22, 163, 74, 0.08);
+    --green-border: rgba(22, 163, 74, 0.2);
+    --green-dark: #FFFFFF;
+
+    color-scheme: light;
   }
 
   html {
@@ -18,9 +59,10 @@
   }
 
   body {
-    background-color: var(--bandit-black);
-    color: white;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   * {
@@ -31,17 +73,35 @@
 @layer components {
   /* Primary CTA — Electric Green */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#39FF14] text-[#0A0A0A] font-bold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-[#22C55E] hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-bold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
+    background-color: var(--green-accent);
+    color: var(--green-dark);
+  }
+  .btn-primary:hover {
+    filter: brightness(0.85);
+    box-shadow: 0 0 20px var(--green-glow);
   }
 
-  /* Secondary CTA — outlined white */
+  /* Secondary CTA — outlined */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-white text-white font-semibold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-white hover:text-[#0A0A0A] active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
+  }
+  .btn-secondary:hover {
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
   }
 
   /* Ghost green outlined */
   .btn-ghost-green {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#39FF14] text-[#39FF14] font-semibold rounded-md text-sm tracking-wide transition-all duration-200 hover:bg-[#39FF14] hover:text-[#0A0A0A] active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
+    border: 1px solid var(--green-accent);
+    color: var(--green-accent);
+  }
+  .btn-ghost-green:hover {
+    background-color: var(--green-accent);
+    color: var(--green-dark);
   }
 
   /* Section container */
@@ -51,27 +111,45 @@
 
   /* Form input */
   .input-field {
-    @apply w-full bg-[#1A1A1A] border border-[#374151] text-white placeholder-gray-500 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-[#39FF14] focus:ring-1 focus:ring-[#39FF14] transition-colors;
+    @apply w-full rounded-md px-4 py-3 text-sm focus:outline-none transition-colors;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+    color: var(--text-primary);
+  }
+  .input-field::placeholder {
+    color: var(--text-tertiary);
+  }
+  .input-field:focus {
+    border-color: var(--green-accent);
+    box-shadow: 0 0 0 1px var(--green-accent);
   }
 
   /* Form label */
   .input-label {
-    @apply block text-sm font-medium text-gray-300 mb-1.5;
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--text-secondary);
   }
 
   /* Card on dark background */
   .card-dark {
-    @apply bg-[#111111] border border-[#1F2937] rounded-xl p-6;
+    @apply rounded-xl p-6;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-default);
   }
 
   /* Card on grey background */
   .card-grey {
-    @apply bg-[#F3F4F6] text-[#0A0A0A] rounded-xl p-6;
+    @apply rounded-xl p-6;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
   }
 
   /* Green accent badge */
   .badge-green {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium bg-[#39FF14]/10 text-[#39FF14] border border-[#39FF14]/20;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium;
+    background-color: var(--green-bg);
+    color: var(--green-accent);
+    border: 1px solid var(--green-border);
   }
 
   /* Section heading */
@@ -81,6 +159,99 @@
 
   /* Divider line */
   .divider-green {
-    @apply h-px bg-gradient-to-r from-transparent via-[#39FF14] to-transparent my-16;
+    @apply h-px my-16;
+    background: linear-gradient(to right, transparent, var(--green-accent), transparent);
   }
+}
+
+/* ─── LIGHT MODE OVERRIDES ───────────────────────────────────────────────
+   These selectors target the hardcoded Tailwind colors used throughout
+   page files and flip them for light mode without editing every .tsx file.
+   ────────────────────────────────────────────────────────────────────── */
+
+html.light {
+  /* ── Background overrides ── */
+  & .bg-\[\#0A0A0A\] { background-color: var(--bg-primary) !important; }
+  & .bg-\[\#050505\] { background-color: var(--bg-secondary) !important; }
+  & .bg-\[\#111111\] { background-color: var(--bg-card) !important; }
+  & .bg-\[\#1A1A1A\] { background-color: var(--bg-input) !important; }
+  & .bg-\[\#0A0A0A\]\/95 { background-color: var(--bg-nav) !important; }
+
+  /* ── Text color overrides ── */
+  & .text-white { color: var(--text-primary) !important; }
+  & .text-gray-300 { color: var(--text-secondary) !important; }
+  & .text-gray-400 { color: var(--text-secondary) !important; }
+  & .text-gray-500 { color: var(--text-tertiary) !important; }
+  & .text-gray-600 { color: var(--text-muted) !important; }
+
+  /* ── Green accent overrides ── */
+  & .text-\[\#39FF14\] { color: var(--green-accent) !important; }
+  & .bg-\[\#39FF14\] { background-color: var(--green-accent) !important; }
+  & .border-\[\#39FF14\] { border-color: var(--green-accent) !important; }
+  & .bg-\[\#39FF14\]\/5 { background-color: rgba(22, 163, 74, 0.05) !important; }
+  & .bg-\[\#39FF14\]\/10 { background-color: var(--green-bg) !important; }
+  & .bg-\[\#39FF14\]\/20 { background-color: rgba(22, 163, 74, 0.15) !important; }
+  & .border-\[\#39FF14\]\/20 { border-color: var(--green-border) !important; }
+  & .border-\[\#39FF14\]\/30 { border-color: rgba(22, 163, 74, 0.25) !important; }
+  & .border-\[\#39FF14\]\/40 { border-color: rgba(22, 163, 74, 0.3) !important; }
+
+  /* ── Border overrides ── */
+  & .border-\[\#1F2937\] { border-color: var(--border-default) !important; }
+  & .border-\[\#374151\] { border-color: var(--border-input) !important; }
+  & .divide-\[\#22C55E\] { --tw-divide-color: var(--green-accent) !important; }
+
+  /* ── Green banner section — stays green but text adjusts ── */
+  & .bg-\[\#39FF14\] .text-\[\#0A0A0A\] { color: #FFFFFF !important; }
+  & .bg-\[\#39FF14\] .text-\[\#0A0A0A\]\/70 { color: rgba(255, 255, 255, 0.8) !important; }
+
+  /* ── Nav and header ── */
+  & header { border-bottom-color: var(--border-default) !important; }
+  & footer { border-top-color: var(--border-default) !important; }
+
+  /* ── Images — keep mascot visible ── */
+  & img.drop-shadow-\[0_0_60px_rgba\(57\,255\,20\,0\.3\)\] {
+    filter: drop-shadow(0 0 40px rgba(22, 163, 74, 0.2)) !important;
+  }
+
+  /* ── Green glow effects — soften for light mode ── */
+  & .blur-\[120px\], & .blur-\[150px\], & .blur-3xl {
+    opacity: 0.3 !important;
+  }
+
+  /* ── Grid pattern — darken for light bg ── */
+  & .opacity-\[0\.03\] {
+    opacity: 0.04 !important;
+    filter: invert(1) !important;
+  }
+
+  /* ── Placeholder text in inputs ── */
+  & .placeholder-gray-500::placeholder { color: var(--text-tertiary) !important; }
+
+  /* ── Hover states ── */
+  & .hover\:bg-white\/5:hover { background-color: rgba(0, 0, 0, 0.04) !important; }
+  & .hover\:text-white:hover { color: var(--text-primary) !important; }
+  & .hover\:text-\[\#39FF14\]:hover { color: var(--green-accent) !important; }
+  & .hover\:border-\[\#39FF14\]\/30:hover { border-color: rgba(22, 163, 74, 0.25) !important; }
+  & .hover\:border-\[\#39FF14\]\/40:hover { border-color: rgba(22, 163, 74, 0.3) !important; }
+  & .hover\:bg-black:hover { background-color: #111827 !important; }
+
+  /* ── Pulse dot stays green ── */
+  & .bg-\[\#39FF14\].animate-pulse { background-color: var(--green-accent) !important; }
+
+  /* ── Font mono green elements ── */
+  & .font-mono.text-\[\#39FF14\] { color: var(--green-accent) !important; }
+
+  /* ── Select / option styling ── */
+  & select option { background-color: var(--bg-card); color: var(--text-primary); }
+
+  /* ── Error states stay red ── */
+  & .bg-red-900\/20 { background-color: rgba(220, 38, 38, 0.08) !important; }
+  & .border-red-800\/40 { border-color: rgba(220, 38, 38, 0.2) !important; }
+  & .text-red-300, & .text-red-400 { color: #DC2626 !important; }
+}
+
+/* ── Smooth transition for theme switching ── */
+html.light *,
+html:not(.light) * {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }

@@ -4,10 +4,10 @@ import { Phone, Shield, CheckCircle, ChevronRight, Calendar, TrendingDown, Dolla
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Baler Preventive Maintenance Plans | Southeast US",
+  title: "Baler Preventive Maintenance Plans | Nationwide",
   description:
-    "Scheduled baler maintenance plans designed to eliminate unplanned downtime. Monthly, bi-monthly, and quarterly PM programs for Southeast US operations.",
-  keywords: ["baler preventive maintenance", "baler PM plan", "baler maintenance contract", "scheduled baler service", "baler maintenance Southeast US"],
+    "Scheduled baler maintenance plans designed to eliminate unplanned downtime. Monthly, bi-monthly, and quarterly PM programs nationwide.",
+  keywords: ["baler preventive maintenance", "baler PM plan", "baler maintenance contract", "scheduled baler service", "baler maintenance nationwide"],
 };
 
 const PLANS = [
@@ -109,7 +109,7 @@ export default function PreventiveMaintenancePage() {
                 </a>
               </div>
               <div className="flex flex-wrap gap-4">
-                {["Eliminate Unplanned Downtime", "Written Reports Every Visit", "Dedicated Technician", "Southeast US Coverage"].map((t) => (
+                {["Eliminate Unplanned Downtime", "Written Reports Every Visit", "Dedicated Technician", "Nationwide Coverage"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}

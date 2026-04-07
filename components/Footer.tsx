@@ -9,13 +9,13 @@ const SERVICES = [
   { label: "Bale Wire Supply", href: "/wire" },
 ];
 
-const STATES = [
-  { label: "Georgia", href: "/service-area/georgia" },
-  { label: "Florida", href: "/service-area/florida" },
-  { label: "Alabama", href: "/service-area/alabama" },
-  { label: "South Carolina", href: "/service-area/south-carolina" },
-  { label: "North Carolina", href: "/service-area/north-carolina" },
-  { label: "Tennessee", href: "/service-area/tennessee" },
+const COVERAGE = [
+  { label: "All 50 States", href: "/service-area" },
+  { label: "Southeast", href: "/service-area#southeast" },
+  { label: "Northeast", href: "/service-area#northeast" },
+  { label: "Midwest", href: "/service-area#midwest" },
+  { label: "West", href: "/service-area#west" },
+  { label: "Become a Partner", href: "/partners" },
 ];
 
 export default function Footer() {
@@ -39,7 +39,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Automated B2B recycling partner. Baler repair, preventive maintenance, and bale wire supply across the Southeast US.
+              Automated B2B recycling partner. Baler repair, preventive maintenance, and bale wire supply nationwide across all 50 states.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#39FF14]/10 border border-[#39FF14]/20 rounded-full">
               <span className="w-2 h-2 rounded-full bg-[#39FF14] animate-pulse" />
@@ -65,7 +65,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Service Area</h3>
             <ul className="space-y-2">
-              {STATES.map((s) => (
+              {COVERAGE.map((s) => (
                 <li key={s.href}>
                   <Link href={s.href} className="text-sm text-gray-400 hover:text-white transition-colors">
                     {s.label}
@@ -94,7 +94,7 @@ export default function Footer() {
               <li>
                 <div className="flex items-start gap-2 text-sm text-gray-400">
                   <MapPin size={14} className="mt-0.5 shrink-0" />
-                  <span>Southeast US<br />GA · FL · AL · SC · NC · TN</span>
+                  <span>Nationwide Coverage<br />All 50 States</span>
                 </div>
               </li>
             </ul>

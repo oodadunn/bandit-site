@@ -5,7 +5,7 @@ import { Phone, CheckCircle, ChevronRight, Wrench, Shield, Package, Zap } from "
 export const metadata: Metadata = {
   title: "About Bandit Recycling — Why a Raccoon Runs a Recycling Company",
   description:
-    "Meet Bandit — the recycling-obsessed raccoon behind Southeast US's fastest baler repair and maintenance service. Our story, mission, and why we exist.",
+    "Meet Bandit — the recycling-obsessed raccoon behind America's fastest nationwide baler repair and maintenance service. Our story, mission, and why we exist.",
 };
 
 const VALUES = [
@@ -67,7 +67,7 @@ export default function AboutPage() {
                 Turns out, raccoons are the original recycling advocates — just for completely selfish reasons.
               </p>
               <p className="text-gray-400 leading-relaxed mb-8">
-                Bandit Recycling exists to keep baler infrastructure running across the Southeast US, so recyclable material ends up where it belongs: in bales, in commodity markets, and in the circular economy. Not in dumpsters, landfills, or the side of a road.
+                Bandit Recycling exists to keep baler infrastructure running across all 50 states, so recyclable material ends up where it belongs: in bales, in commodity markets, and in the circular economy. Not in dumpsters, landfills, or the side of a road.
               </p>
               <div className="flex flex-wrap gap-3">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -108,7 +108,7 @@ export default function AboutPage() {
                 <div className="text-[#39FF14] text-xs font-mono font-bold mb-3 uppercase tracking-widest">The Problem</div>
                 <h3 className="text-white font-bold text-lg mb-3">Recyclables belong in bales. Not dumpsters.</h3>
                 <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                  Across the Southeast US, billions of pounds of recyclable material — cardboard, plastic film, aluminum, OCC — end up in landfills or general waste streams every year. Not because businesses don't care, but because their equipment fails.
+                  Across the United States, billions of pounds of recyclable material — cardboard, plastic film, aluminum, OCC — end up in landfills or general waste streams every year. Not because businesses don't care, but because their equipment fails.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed">
                   A baler that's down isn't a maintenance problem. It's an environmental one. Cardboard piles up in back rooms, gets thrown in dumpsters, ends up in landfills. That's a downstream failure that starts with a hydraulic pump and a slow response time.
@@ -138,7 +138,7 @@ export default function AboutPage() {
                   We&apos;re a B2B baler lifecycle service company. That means we repair broken balers, prevent future breakdowns through scheduled maintenance, supply the bale wire you need to keep running, and sell or lease equipment to operations that need to start baling or upgrade.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                  We operate across six states in the Southeast US — Georgia, Florida, Alabama, South Carolina, North Carolina, and Tennessee — with technicians dispatched from within your state, not from a hub three hours away.
+                  We operate across all 50 states with local technicians dispatched from within your region — not from a hub across the country. Whether you&apos;re in Atlanta or Anchorage, Bandit gets someone on-site fast.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed">
                   Our customers are retail distribution centers, grocery chains, manufacturing plants, fulfillment centers, recycling facilities, and any other operation that produces significant recyclable waste and depends on baling equipment to manage it.
@@ -153,7 +153,7 @@ export default function AboutPage() {
                   Recycling doesn&apos;t happen by itself. It happens because someone&apos;s baler is running, someone&apos;s wire didn&apos;t run out, and someone showed up same-day when the hydraulic pump gave out at 3am before a big shipment.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  We&apos;re building the infrastructure layer that makes recycling reliable — starting with repair and maintenance, expanding into equipment sales, and eventually into a commodity marketplace that connects recyclers with buyers across the region. One bale at a time.
+                  We&apos;re building the infrastructure layer that makes recycling reliable — repair, maintenance, equipment, and eventually a commodity marketplace that connects recyclers with buyers across the country. One bale at a time.
                 </p>
               </div>
 
@@ -228,17 +228,20 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="badge-green mb-4">Where We Operate</div>
-              <h2 className="section-heading text-white mb-4">Southeast US — all six states</h2>
+              <h2 className="section-heading text-white mb-4">All 50 States. Local Technicians Everywhere.</h2>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                We maintain technician networks in Georgia, Florida, Alabama, South Carolina, North Carolina, and Tennessee. When you call for emergency service, we dispatch from within your state — not from across the region.
+                Bandit maintains a nationwide network of local technicians in every state. When you call for emergency service, we dispatch from within your region — not from across the country.
               </p>
               <p className="text-gray-400 mb-8 leading-relaxed">
-                National scaling is on the roadmap. For now, we&apos;re going deep in the Southeast — building the technician depth and parts inventory to deliver on our response time promises before expanding.
+                From our roots in the Southeast to coast-to-coast coverage, we&apos;ve built the technician depth and parts inventory to deliver on our response time promises everywhere.
               </p>
-              <div className="grid grid-cols-3 gap-2">
-                {["GA", "FL", "AL", "SC", "NC", "TN"].map((s) => (
-                  <div key={s} className="card-dark text-center py-3 hover:border-[#39FF14]/30 transition-colors">
-                    <span className="text-sm font-black text-[#39FF14] font-mono">{s}</span>
+              <div className="grid grid-cols-4 gap-2">
+                {["SE", "NE", "MW", "W"].map((r) => (
+                  <div key={r} className="card-dark text-center py-3 hover:border-[#39FF14]/30 transition-colors">
+                    <span className="text-sm font-black text-[#39FF14] font-mono">{r}</span>
+                    <div className="text-[10px] text-gray-500 mt-0.5">
+                      {r === "SE" ? "Southeast" : r === "NE" ? "Northeast" : r === "MW" ? "Midwest" : "West"}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -249,7 +252,7 @@ export default function AboutPage() {
               {[
                 { label: "Emergency Response", value: "Same Day", sub: "Technician on-site, not just a callback" },
                 { label: "Baler Makes Serviced", value: "All", sub: "Vertical, horizontal, every major brand" },
-                { label: "States Covered", value: "6", sub: "GA · FL · AL · SC · NC · TN" },
+                { label: "States Covered", value: "50", sub: "Nationwide — all 50 states" },
                 { label: "Wire Gauges Stocked", value: "All", sub: "Single loop, double loop, black & galvanized" },
               ].map((s) => (
                 <div key={s.label} className="card-dark flex items-center justify-between">

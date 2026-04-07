@@ -4,10 +4,10 @@ import { Phone, CheckCircle, ChevronRight, Factory, Recycle, Truck } from "lucid
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Horizontal Baler Repair Service | Southeast US",
+  title: "Horizontal Baler Repair Service | Nationwide",
   description:
-    "Expert horizontal baler repair for industrial, manufacturing, and recycling operations across the Southeast US. Two-ram, closed-door, and auto-tie balers. Same-day dispatch.",
-  keywords: ["horizontal baler repair", "two ram baler repair", "industrial baler repair", "horizontal baler service Southeast", "auto-tie baler repair"],
+    "Expert horizontal baler repair for industrial, manufacturing, and recycling operations nationwide. Two-ram, closed-door, and auto-tie balers. Same-day dispatch.",
+  keywords: ["horizontal baler repair", "two ram baler repair", "industrial baler repair", "horizontal baler service nationwide", "auto-tie baler repair"],
 };
 
 const INDUSTRIES = [
@@ -81,7 +81,7 @@ export default function HorizontalBalerRepairPage() {
                 <span className="text-[#39FF14]">Done Right.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Two-ram, closed-door, open-end — we repair every type of horizontal baler used in industrial and high-volume recycling operations. Southeast-wide coverage, same-day emergency dispatch.
+                Two-ram, closed-door, open-end — we repair every type of horizontal baler used in industrial and high-volume recycling operations. Nationwide coverage, same-day emergency dispatch.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -92,7 +92,7 @@ export default function HorizontalBalerRepairPage() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-4">
-                {["All Horizontal Types", "Two-Ram & Single-Ram", "24/7 Emergency", "Southeast US"].map((t) => (
+                {["All Horizontal Types", "Two-Ram & Single-Ram", "24/7 Emergency", "All 50 States"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}
@@ -206,7 +206,7 @@ export default function HorizontalBalerRepairPage() {
         <div className="container-site text-center">
           <h2 className="text-3xl font-black text-[#0A0A0A] mb-4">Industrial baler issue? Call now.</h2>
           <p className="text-[#0A0A0A]/70 mb-8 max-w-md mx-auto">
-            Horizontal baler downtime in a high-volume operation is expensive. We dispatch same-day across the Southeast.
+            Horizontal baler downtime in a high-volume operation is expensive. We dispatch same-day nationwide.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">

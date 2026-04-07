@@ -7,10 +7,10 @@ import { MATERIALS, CATEGORY_META } from "./data";
 export const metadata: Metadata = {
   title: "Recyclable Materials Glossary — ISRI Grades & Specs | Bandit Recycling",
   description:
-    "Complete guide to recyclable materials: ISRI codes, specifications, value ranges, common sources, and end buyers for fiber, plastics, and metals. Reference for Southeast US recyclers.",
+    "Complete guide to recyclable materials: ISRI codes, specifications, value ranges, common sources, and end buyers for fiber, plastics, and metals. Reference for recyclers nationwide.",
   keywords: [
     "ISRI scrap specifications", "recyclable materials guide", "OCC grade", "copper scrap grades",
-    "baling wire materials", "recyclables glossary", "scrap metal grades Southeast",
+    "baling wire materials", "recyclables glossary", "scrap metal grades",
     "paper recycling grades", "plastic recycling codes", "ReMA specifications",
   ],
 };

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, Phone } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_LINKS = [
   {
@@ -18,6 +19,7 @@ const NAV_LINKS = [
   { label: "Equipment", href: "/equipment" },
   { label: "Bale Wire", href: "/wire" },
   { label: "Service Area", href: "/service-area" },
+  { label: "Partners", href: "/partners" },
   {
     label: "Resources",
     href: "/materials",
@@ -99,6 +101,7 @@ export default function Nav() {
               <Phone size={14} />
               <span className="font-mono">857-422-6348</span>
             </a>
+            <ThemeToggle />
             <Link href="/quote" className="btn-primary text-xs px-4 py-2">
               Get a Quote
             </Link>
@@ -144,6 +147,10 @@ export default function Nav() {
             </div>
           ))}
           <div className="pt-3 flex flex-col gap-2">
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="text-xs text-gray-400">Theme</span>
+              <ThemeToggle />
+            </div>
             <a href="tel:+18574226348" className="btn-secondary text-sm">
               <Phone size={14} /> Call Us Now
             </a>
