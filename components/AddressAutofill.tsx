@@ -38,7 +38,7 @@ export default function AddressAutofill({
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sessionToken = useRef(crypto.randomUUID());
 
   // Close dropdown on outside click
