@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { submitLead, type LeadFormType } from "@/lib/supabase";
 import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import AddressAutofill from "./AddressAutofill";
 
 const EQUIPMENT_TYPES = [
   "Vertical Baler",
@@ -10,18 +11,6 @@ const EQUIPMENT_TYPES = [
   "Closed-Door Baler",
   "Two-Ram Baler",
   "Other / Not Sure",
-];
-
-const US_STATES = [
-  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
-  "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho",
-  "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana",
-  "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
-  "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
-  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
-  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-  "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
-  "Washington", "West Virginia", "Wisconsin", "Wyoming"
 ];
 
 interface QuoteFormProps {
@@ -45,11 +34,13 @@ export default function QuoteForm({
 }: QuoteFormProps) {
   const [form, setForm] = useState<{
     name: string; company: string; email: string; phone: string;
-    state: string; equipment_type: string; issue_description: string;
+    address: string; state: string; city: string;
+    equipment_type: string; issue_description: string;
     urgency: "emergency" | "urgent" | "standard";
   }>({
     name: "", company: "", email: "", phone: "",
-    state: "", equipment_type: "", issue_description: "", urgency: "standard",
+    address: "", state: "", city: "",
+    equipment_type: "", issue_description: "", urgency: "standard",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -122,12 +113,22 @@ export default function QuoteForm({
             <input name="email" type="email" value={form.email} onChange={handleChange}
               placeholder="john@company.com" className="input-field" />
           </div>
-          <div>
-            <label className="input-label">State *</label>
-            <select name="state" required value={form.state} onChange={handleChange} className="input-field">
-              <option value="">Select state...</option>
-              {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
+          <div className={compact ? "sm:col-span-2" : ""}>
+            <label className="input-label">Service Address *</label>
+            <AddressAutofill
+              value={form.address}
+              onChange={(val) => setForm((prev) => ({ ...prev, address: val }))}
+              onSelect={(parts) =>
+                setForm((prev) => ({
+                  ...prev,
+                  address: parts.full_address,
+                  state: parts.state,
+                  city: parts.city,
+                }))
+              }
+              required
+              placeholder="123 Main St, City, State..."
+            />
           </div>
           {showEquipment && (
             <div>

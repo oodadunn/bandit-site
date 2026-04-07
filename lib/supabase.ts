@@ -21,6 +21,7 @@ export interface Lead {
   company?: string;
   email?: string;
   phone?: string;
+  address?: string;
   state?: string;
   city?: string;
   equipment_type?: string;
