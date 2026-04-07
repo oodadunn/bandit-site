@@ -12,7 +12,17 @@ const EQUIPMENT_TYPES = [
   "Other / Not Sure",
 ];
 
-const SE_STATES = ["Georgia", "Florida", "Alabama", "South Carolina", "North Carolina", "Tennessee", "Other"];
+const US_STATES = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
+  "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho",
+  "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana",
+  "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+  "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+  "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia",
+  "Washington", "West Virginia", "Wisconsin", "Wyoming"
+];
 
 interface QuoteFormProps {
   formType?: LeadFormType;
@@ -116,7 +126,7 @@ export default function QuoteForm({
             <label className="input-label">State *</label>
             <select name="state" required value={form.state} onChange={handleChange} className="input-field">
               <option value="">Select state...</option>
-              {SE_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           {showEquipment && (
