@@ -95,6 +95,15 @@ export default async function HomePage() {
         />
         {/* Green glow top-right */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#39FF14]/5 rounded-full blur-[120px] pointer-events-none" />
+        {/* Baler wireframe background */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          <img
+            src="/vertical-baler.png"
+            alt=""
+            className="w-[700px] h-auto opacity-[0.15] select-none"
+            aria-hidden="true"
+          />
+        </div>
 
         <div className="container-site relative py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
