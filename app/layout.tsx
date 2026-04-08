@@ -63,8 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main className="pt-16">{children}</main>
         <Footer />
-        <div dangerouslySetInnerHTML={{ __html: '<elevenlabs-convai agent-id="18cf0d02e86318dd0be08c4d6bc32da4a69e389f67e1f5fd43baf64fc37e7d45"></elevenlabs-convai>' }} />
-        <Script src="https://elevenlabs.io/convai-widget/index.js" strategy="afterInteractive" />
+        <div dangerouslySetInnerHTML={{ __html: '<elevenlabs-convai agent-id="agent_4701kndtkt4cer3tpb4333c9ytmc"></elevenlabs-convai>' }} />
+        <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" strategy="afterInteractive" />
       </body>
     </html>
   );
