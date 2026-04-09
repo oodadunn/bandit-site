@@ -65,6 +65,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <div dangerouslySetInnerHTML={{ __html: '<elevenlabs-convai agent-id="agent_4701kndtkt4cer3tpb4333c9ytmc"></elevenlabs-convai>' }} />
         <Script src="https://unpkg.com/@elevenlabs/convai-widget-embed" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-4BHC1SFHYB"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-4BHC1SFHYB');`}
+        </Script>
       </body>
     </html>
   );
