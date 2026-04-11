@@ -14,6 +14,12 @@ import {
   ChevronDown,
   ChevronUp,
   Eye,
+  Building2,
+  ArrowLeft,
+  DollarSign,
+  Wrench,
+  MapPin,
+  Mail,
 } from "lucide-react";
 
 interface Lead {
@@ -71,7 +77,32 @@ interface AnalyticsSummary {
   };
 }
 
-type TabType = "overview" | "leads" | "calls" | "traffic";
+type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic";
+
+interface AccountListItem {
+  id: string;
+  name: string;
+  domain: string | null;
+  account_type: string | null;
+  tier: string | null;
+  city: string | null;
+  state: string | null;
+  primary_phone: string | null;
+  owner_email: string | null;
+  last_activity_at: string | null;
+  created_at: string;
+  deal_stats: { open_count: number; open_value: number; total_count: number };
+}
+
+interface AccountDetail {
+  account: any;
+  contacts: any[];
+  equipment: any[];
+  deals: any[];
+  leads: any[];
+  jobs: any[];
+  activity: any[];
+}
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -92,6 +123,15 @@ export default function AdminDashboard() {
 
   // Search/filter
   const [leadsSearchType, setLeadsSearchType] = useState("all");
+
+  // Accounts state
+  const [accounts, setAccounts] = useState<AccountListItem[]>([]);
+  const [accountsLoading, setAccountsLoading] = useState(false);
+  const [accountsSearch, setAccountsSearch] = useState("");
+  const [accountsType, setAccountsType] = useState("all");
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(null);
+  const [accountDetailLoading, setAccountDetailLoading] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -181,6 +221,56 @@ export default function AdminDashboard() {
     };
     loadAnalytics();
   }, [isAuthenticated]);
+
+  // Load accounts when tab is opened
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== "accounts" || selectedAccountId) return;
+    const loadAccounts = async () => {
+      setAccountsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (accountsSearch) params.set("q", accountsSearch);
+        if (accountsType && accountsType !== "all") params.set("type", accountsType);
+        const response = await fetch(`/api/admin/accounts?${params.toString()}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAccounts(data);
+        }
+      } catch (err) {
+        console.error("Failed to load accounts:", err);
+      } finally {
+        setAccountsLoading(false);
+      }
+    };
+    loadAccounts();
+  }, [isAuthenticated, activeTab, accountsSearch, accountsType, selectedAccountId]);
+
+  // Load account detail when one is selected
+  useEffect(() => {
+    if (!selectedAccountId) {
+      setAccountDetail(null);
+      return;
+    }
+    const loadDetail = async () => {
+      setAccountDetailLoading(true);
+      try {
+        const response = await fetch(`/api/admin/accounts/${selectedAccountId}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAccountDetail(data);
+        }
+      } catch (err) {
+        console.error("Failed to load account detail:", err);
+      } finally {
+        setAccountDetailLoading(false);
+      }
+    };
+    loadDetail();
+  }, [selectedAccountId]);
 
   const handleLogout = async () => {
     try {
@@ -397,7 +487,7 @@ export default function AdminDashboard() {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-8">
-            {(["overview", "leads", "calls", "traffic"] as const).map((tab) => (
+            {(["overview", "accounts", "leads", "calls", "traffic"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -569,6 +659,551 @@ export default function AdminDashboard() {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ACCOUNTS TAB */}
+        {activeTab === "accounts" && !selectedAccountId && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div
+                className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md border"
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  borderColor: "var(--border-default)",
+                }}
+              >
+                <Search size={18} style={{ color: "var(--text-secondary)" }} />
+                <input
+                  type="text"
+                  placeholder="Search accounts by name, domain, city..."
+                  value={accountsSearch}
+                  onChange={(e) => setAccountsSearch(e.target.value)}
+                  className="flex-1 bg-transparent outline-none text-sm"
+                  style={{ color: "var(--text-primary)" }}
+                />
+              </div>
+              <select
+                value={accountsType}
+                onChange={(e) => setAccountsType(e.target.value)}
+                className="px-3 py-2 rounded-md border font-semibold text-sm cursor-pointer"
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  borderColor: "var(--border-default)",
+                  color: "var(--text-primary)",
+                }}
+              >
+                <option value="all">All Types</option>
+                <option value="prospect">Prospects</option>
+                <option value="customer">Customers</option>
+                <option value="partner">Partners</option>
+                <option value="vendor">Vendors</option>
+                <option value="lost">Lost</option>
+              </select>
+            </div>
+
+            <div
+              className="rounded-lg border overflow-hidden"
+              style={{
+                backgroundColor: "var(--bg-card)",
+                borderColor: "var(--border-default)",
+              }}
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr
+                      style={{
+                        backgroundColor: "var(--bg-primary)",
+                        borderBottom: `1px solid var(--border-default)`,
+                      }}
+                    >
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Account
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Type
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Tier
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Location
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Open Deals
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Pipeline
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-semibold"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        Last Activity
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {accountsLoading ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-6 py-8 text-center"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          Loading accounts...
+                        </td>
+                      </tr>
+                    ) : accounts.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-6 py-12 text-center"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          <Building2
+                            size={32}
+                            className="mx-auto mb-3"
+                            style={{ color: "var(--text-secondary)" }}
+                            opacity={0.5}
+                          />
+                          No accounts yet. New leads will auto-create accounts.
+                        </td>
+                      </tr>
+                    ) : (
+                      accounts.map((acc) => (
+                        <tr
+                          key={acc.id}
+                          onClick={() => setSelectedAccountId(acc.id)}
+                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                          style={{
+                            borderBottom: `1px solid var(--border-default)`,
+                          }}
+                        >
+                          <td className="px-6 py-4">
+                            <div
+                              className="font-semibold text-sm"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {acc.name}
+                            </div>
+                            {acc.domain && (
+                              <div
+                                className="text-xs"
+                                style={{ color: "var(--text-tertiary)" }}
+                              >
+                                {acc.domain}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-xs">
+                            <span
+                              className="px-2 py-1 rounded-md font-semibold capitalize"
+                              style={{
+                                backgroundColor: "var(--green-bg)",
+                                color: "var(--green-accent)",
+                              }}
+                            >
+                              {acc.account_type || "—"}
+                            </span>
+                          </td>
+                          <td
+                            className="px-6 py-4 text-sm font-mono"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {acc.tier || "—"}
+                          </td>
+                          <td
+                            className="px-6 py-4 text-sm"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {[acc.city, acc.state].filter(Boolean).join(", ") || "—"}
+                          </td>
+                          <td
+                            className="px-6 py-4 text-sm font-semibold"
+                            style={{ color: "var(--text-primary)" }}
+                          >
+                            {acc.deal_stats.open_count}
+                          </td>
+                          <td
+                            className="px-6 py-4 text-sm"
+                            style={{ color: "var(--green-accent)" }}
+                          >
+                            {acc.deal_stats.open_value > 0
+                              ? `$${acc.deal_stats.open_value.toLocaleString()}`
+                              : "—"}
+                          </td>
+                          <td
+                            className="px-6 py-4 text-xs"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {acc.last_activity_at
+                              ? formatDate(acc.last_activity_at)
+                              : formatDate(acc.created_at)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ACCOUNT DETAIL */}
+        {activeTab === "accounts" && selectedAccountId && (
+          <div className="space-y-6">
+            <button
+              onClick={() => setSelectedAccountId(null)}
+              className="flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              <ArrowLeft size={16} />
+              Back to accounts
+            </button>
+
+            {accountDetailLoading || !accountDetail ? (
+              <p style={{ color: "var(--text-secondary)" }}>Loading account...</p>
+            ) : (
+              <>
+                {/* Header */}
+                <div
+                  className="rounded-lg border p-6"
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    borderColor: "var(--border-default)",
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2
+                        className="text-2xl font-bold mb-1"
+                        style={{ color: "var(--text-primary)" }}
+                      >
+                        {accountDetail.account.name}
+                      </h2>
+                      <div
+                        className="flex items-center gap-3 text-sm"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        {accountDetail.account.domain && (
+                          <span>{accountDetail.account.domain}</span>
+                        )}
+                        {accountDetail.account.primary_phone && (
+                          <span>{accountDetail.account.primary_phone}</span>
+                        )}
+                        {(accountDetail.account.city || accountDetail.account.state) && (
+                          <span className="flex items-center gap-1">
+                            <MapPin size={12} />
+                            {[accountDetail.account.city, accountDetail.account.state]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-xs px-3 py-1 rounded-md font-semibold capitalize"
+                        style={{
+                          backgroundColor: "var(--green-bg)",
+                          color: "var(--green-accent)",
+                        }}
+                      >
+                        {accountDetail.account.account_type || "prospect"}
+                      </span>
+                      <span
+                        className="text-xs px-3 py-1 rounded-md font-semibold font-mono"
+                        style={{
+                          backgroundColor: "var(--bg-primary)",
+                          color: "var(--text-primary)",
+                          border: `1px solid var(--border-default)`,
+                        }}
+                      >
+                        Tier {accountDetail.account.tier || "C"}
+                      </span>
+                    </div>
+                  </div>
+                  {accountDetail.account.notes && (
+                    <p
+                      className="text-sm mt-2 pt-3 border-t"
+                      style={{
+                        color: "var(--text-secondary)",
+                        borderColor: "var(--border-default)",
+                      }}
+                    >
+                      {accountDetail.account.notes}
+                    </p>
+                  )}
+                </div>
+
+                {/* Two-column: Deals + Contacts/Equipment */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Deals */}
+                  <div
+                    className="rounded-lg border p-6"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border-default)",
+                    }}
+                  >
+                    <h3
+                      className="font-bold mb-4 flex items-center gap-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      <DollarSign size={18} />
+                      Deals ({accountDetail.deals.length})
+                    </h3>
+                    {accountDetail.deals.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                        No deals yet
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {accountDetail.deals.map((d: any) => (
+                          <div
+                            key={d.id}
+                            className="p-3 rounded-md border"
+                            style={{
+                              backgroundColor: "var(--bg-primary)",
+                              borderColor: "var(--border-default)",
+                            }}
+                          >
+                            <div className="flex items-start justify-between mb-1">
+                              <p
+                                className="text-sm font-semibold"
+                                style={{ color: "var(--text-primary)" }}
+                              >
+                                {d.name}
+                              </p>
+                              <span
+                                className="text-xs px-2 py-0.5 rounded-md font-semibold capitalize"
+                                style={{
+                                  backgroundColor: "var(--green-bg)",
+                                  color: "var(--green-accent)",
+                                }}
+                              >
+                                {d.stage}
+                              </span>
+                            </div>
+                            <div
+                              className="flex items-center gap-3 text-xs"
+                              style={{ color: "var(--text-secondary)" }}
+                            >
+                              <span className="capitalize">
+                                {d.deal_type?.replace(/_/g, " ")}
+                              </span>
+                              {d.amount_usd && <span>${Number(d.amount_usd).toLocaleString()}</span>}
+                              <span>{formatDate(d.created_at)}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Contacts */}
+                  <div
+                    className="rounded-lg border p-6"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border-default)",
+                    }}
+                  >
+                    <h3
+                      className="font-bold mb-4 flex items-center gap-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      <Users size={18} />
+                      Contacts ({accountDetail.contacts.length})
+                    </h3>
+                    {accountDetail.contacts.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                        No contacts yet
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {accountDetail.contacts.map((c: any) => (
+                          <div
+                            key={c.id}
+                            className="p-3 rounded-md border"
+                            style={{
+                              backgroundColor: "var(--bg-primary)",
+                              borderColor: "var(--border-default)",
+                            }}
+                          >
+                            <p
+                              className="text-sm font-semibold"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {c.full_name ||
+                                [c.first_name, c.last_name].filter(Boolean).join(" ") ||
+                                "Unknown"}
+                              {c.is_primary && (
+                                <span
+                                  className="ml-2 text-xs"
+                                  style={{ color: "var(--green-accent)" }}
+                                >
+                                  (primary)
+                                </span>
+                              )}
+                            </p>
+                            {c.title && (
+                              <p
+                                className="text-xs"
+                                style={{ color: "var(--text-tertiary)" }}
+                              >
+                                {c.title}
+                              </p>
+                            )}
+                            <div
+                              className="flex items-center gap-3 text-xs mt-1"
+                              style={{ color: "var(--text-secondary)" }}
+                            >
+                              {c.email && (
+                                <span className="flex items-center gap-1">
+                                  <Mail size={12} />
+                                  {c.email}
+                                </span>
+                              )}
+                              {c.phone && (
+                                <span className="flex items-center gap-1">
+                                  <Phone size={12} />
+                                  {c.phone}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Equipment */}
+                  <div
+                    className="rounded-lg border p-6"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border-default)",
+                    }}
+                  >
+                    <h3
+                      className="font-bold mb-4 flex items-center gap-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      <Wrench size={18} />
+                      Equipment ({accountDetail.equipment.length})
+                    </h3>
+                    {accountDetail.equipment.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                        No equipment on file
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {accountDetail.equipment.map((e: any) => (
+                          <div
+                            key={e.id}
+                            className="p-3 rounded-md border"
+                            style={{
+                              backgroundColor: "var(--bg-primary)",
+                              borderColor: "var(--border-default)",
+                            }}
+                          >
+                            <p
+                              className="text-sm font-semibold"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {[e.make, e.model].filter(Boolean).join(" ") || "Baler"}
+                            </p>
+                            <div
+                              className="flex items-center gap-3 text-xs mt-1"
+                              style={{ color: "var(--text-secondary)" }}
+                            >
+                              {e.baler_type && (
+                                <span className="capitalize">{e.baler_type}</span>
+                              )}
+                              {e.serial_number && <span>SN: {e.serial_number}</span>}
+                              {e.status && (
+                                <span className="capitalize">{e.status.replace(/_/g, " ")}</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity feed */}
+                  <div
+                    className="rounded-lg border p-6"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border-default)",
+                    }}
+                  >
+                    <h3
+                      className="font-bold mb-4 flex items-center gap-2"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      <Activity size={18} />
+                      Activity
+                    </h3>
+                    {accountDetail.activity.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                        No activity yet
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {accountDetail.activity.slice(0, 8).map((a: any) => (
+                          <div
+                            key={a.id}
+                            className="p-2 rounded-md text-xs"
+                            style={{
+                              backgroundColor: "var(--bg-primary)",
+                              color: "var(--text-secondary)",
+                            }}
+                          >
+                            <span
+                              className="font-semibold capitalize"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {a.activity_type}
+                            </span>
+                            {a.notes && <span> — {a.notes}</span>}
+                            <div
+                              className="text-xs mt-0.5"
+                              style={{ color: "var(--text-tertiary)" }}
+                            >
+                              {formatDate(a.created_at)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
