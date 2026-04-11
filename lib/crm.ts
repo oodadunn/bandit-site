@@ -170,26 +170,27 @@ function dealNameForLead(lead: Lead): string {
 export interface ConvertResult {
   account_id: string;
   contact_id: string | null;
-  deal_id: string;
+  deal_id: string | null;
   account_created: boolean;
   contact_created: boolean;
 }
 
 export async function convertLeadToAccount(lead: Lead & { id: string }): Promise<ConvertResult> {
   const sb = getSupabaseAdmin();
+  const isPartner = lead.form_type === "partner";
 
-  // Skip if already converted
+  // Skip if already converted (partners have no deal, so only check account)
   const { data: existingLead } = await sb
     .from("leads")
     .select("account_id, contact_id, deal_id")
     .eq("id", lead.id)
     .single();
 
-  if (existingLead?.deal_id && existingLead.account_id) {
+  if (existingLead?.account_id && (isPartner || existingLead.deal_id)) {
     return {
       account_id: existingLead.account_id as string,
       contact_id: (existingLead.contact_id as string) || null,
-      deal_id: existingLead.deal_id as string,
+      deal_id: (existingLead.deal_id as string) || null,
       account_created: false,
       contact_created: false,
     };
@@ -233,8 +234,9 @@ export async function convertLeadToAccount(lead: Lead & { id: string }): Promise
         billing_address: lead.address,
         city: lead.city,
         state: lead.state,
-        account_type: "prospect",
-        source: "website_lead",
+        account_type: isPartner ? "partner" : "prospect",
+        source: isPartner ? "partner_application" : "website_lead",
+        notes: isPartner ? lead.issue_description || null : null,
         first_touch_at: lead.created_at || new Date().toISOString(),
         last_activity_at: new Date().toISOString(),
       })
@@ -302,24 +304,27 @@ export async function convertLeadToAccount(lead: Lead & { id: string }): Promise
     await sb.from("contacts").update({ account_id: account.id }).eq("id", contact.id);
   }
 
-  // ---------- 3. Create deal ----------
-  const { data: dealRow, error: dealErr } = await sb
-    .from("deals")
-    .insert({
-      account_id: account.id,
-      contact_id: contact?.id ?? null,
-      lead_id: lead.id,
-      name: dealNameForLead(lead),
-      deal_type: dealTypeForForm(lead.form_type),
-      stage: "new",
-      probability: lead.urgency === "emergency" ? 60 : 25,
-      source: lead.form_type,
-      notes: lead.issue_description || null,
-    })
-    .select("*")
-    .single();
-  if (dealErr) throw dealErr;
-  const deal = dealRow as Deal;
+  // ---------- 3. Create deal (skipped for partner applications) ----------
+  let dealId: string | null = null;
+  if (!isPartner) {
+    const { data: dealRow, error: dealErr } = await sb
+      .from("deals")
+      .insert({
+        account_id: account.id,
+        contact_id: contact?.id ?? null,
+        lead_id: lead.id,
+        name: dealNameForLead(lead),
+        deal_type: dealTypeForForm(lead.form_type),
+        stage: "new",
+        probability: lead.urgency === "emergency" ? 60 : 25,
+        source: lead.form_type,
+        notes: lead.issue_description || null,
+      })
+      .select("id")
+      .single();
+    if (dealErr) throw dealErr;
+    dealId = (dealRow as { id: string }).id;
+  }
 
   // ---------- 4. Backlink the lead ----------
   await sb
@@ -327,27 +332,30 @@ export async function convertLeadToAccount(lead: Lead & { id: string }): Promise
     .update({
       account_id: account.id,
       contact_id: contact?.id ?? null,
-      deal_id: deal.id,
+      deal_id: dealId,
       converted_at: new Date().toISOString(),
     })
     .eq("id", lead.id);
 
   // ---------- 5. Activity log ----------
+  const activityNote = isPartner
+    ? `Partner application received → ${accountCreated ? "new" : "existing"} partner account "${account.name}"`
+    : accountCreated
+    ? `Auto-converted lead → new account "${account.name}"`
+    : `Auto-converted lead → existing account "${account.name}"`;
   await sb.from("lead_activity").insert({
     lead_id: lead.id,
     account_id: account.id,
-    deal_id: deal.id,
+    deal_id: dealId,
     activity_type: "created",
-    notes: accountCreated
-      ? `Auto-converted lead → new account "${account.name}"`
-      : `Auto-converted lead → existing account "${account.name}"`,
+    notes: activityNote,
     performed_by: "system",
   });
 
   return {
     account_id: account.id,
     contact_id: contact?.id ?? null,
-    deal_id: deal.id,
+    deal_id: dealId,
     account_created: accountCreated,
     contact_created: contactCreated,
   };

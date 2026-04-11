@@ -11,7 +11,8 @@ export type LeadFormType =
   | "emergency"
   | "maintenance"
   | "wire_quote"
-  | "equipment";
+  | "equipment"
+  | "partner";
 
 export interface Lead {
   id?: string;
