@@ -27,6 +27,18 @@ export default function MaterialsPage() {
     <>
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative bg-[#0A0A0A] overflow-hidden pt-24 pb-16">
+        {/* Background video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none"
+        >
+          <source src="/videos/materials-hero.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-[#0A0A0A]/60" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
