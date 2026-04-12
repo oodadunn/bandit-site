@@ -58,6 +58,7 @@ interface AnalyticsData {
 }
 
 interface AnalyticsSummary {
+  ga4_connected?: boolean;
   daily: AnalyticsData[];
   summary: {
     last7: {
