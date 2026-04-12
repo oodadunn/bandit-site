@@ -14,6 +14,7 @@ const NAV_LINKS = [
       { label: "Preventive Maintenance", href: "/services/preventive-maintenance" },
       { label: "Vertical Balers", href: "/services/vertical-baler-repair" },
       { label: "Horizontal Balers", href: "/services/horizontal-baler-repair" },
+      { label: "Site Survey Form", href: "/site-survey" },
     ],
   },
   { label: "Equipment", href: "/equipment" },

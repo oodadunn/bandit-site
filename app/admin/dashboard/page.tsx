@@ -77,7 +77,7 @@ interface AnalyticsSummary {
   };
 }
 
-type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic" | "partners";
+type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic" | "partners" | "surveys";
 
 interface AccountListItem {
   id: string;
@@ -166,6 +166,11 @@ export default function AdminDashboard() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const [partnerDetail, setPartnerDetail] = useState<PartnerDetail | null>(null);
   const [partnerDetailLoading, setPartnerDetailLoading] = useState(false);
+
+  // Surveys state
+  const [surveys, setSurveys] = useState<any[]>([]);
+  const [surveysLoading, setSurveysLoading] = useState(false);
+  const [selectedSurveyId, setSelectedSurveyId] = useState<string | null>(null);
 
   // Check auth on mount
   useEffect(() => {
@@ -357,6 +362,26 @@ export default function AdminDashboard() {
     };
     loadDetail();
   }, [selectedPartnerId]);
+
+  // Load surveys when tab is opened
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== "surveys") return;
+    const loadSurveys = async () => {
+      setSurveysLoading(true);
+      try {
+        const response = await fetch("/api/admin/surveys", { credentials: "include" });
+        if (response.ok) {
+          const data = await response.json();
+          setSurveys(data.surveys || []);
+        }
+      } catch (err) {
+        console.error("Failed to load surveys:", err);
+      } finally {
+        setSurveysLoading(false);
+      }
+    };
+    loadSurveys();
+  }, [isAuthenticated, activeTab]);
 
   const handleLogout = async () => {
     try {
@@ -618,7 +643,7 @@ export default function AdminDashboard() {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-8">
-            {(["overview", "accounts", "leads", "calls", "traffic", "partners"] as const).map((tab) => (
+            {(["overview", "accounts", "leads", "calls", "traffic", "partners", "surveys"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1614,11 +1639,14 @@ export default function AdminDashboard() {
               >
                 <BarChart3 size={48} className="mx-auto mb-4" style={{ color: "var(--text-secondary)" }} opacity={0.5} />
                 <h3 className="font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
-                  No Traffic Data Yet
+                  {analytics?.ga4_connected === false
+                    ? "GA4 API Not Connected"
+                    : "No Traffic Data Yet"}
                 </h3>
                 <p style={{ color: "var(--text-secondary)" }} className="text-sm">
-                  Analytics data will appear here once the Google Analytics 4 pipeline
-                  is running and collecting data from your website.
+                  {analytics?.ga4_connected === false
+                    ? "Set GA4_SERVICE_ACCOUNT_BASE64 and GA4_PROPERTY_ID in Vercel env vars to connect your Google Analytics data."
+                    : "Analytics data will appear here once Google Analytics has collected enough data."}
                 </p>
               </div>
             ) : (
@@ -1866,6 +1894,209 @@ export default function AdminDashboard() {
         )}
 
         {/* PARTNER DETAIL */}
+        {/* SURVEYS TAB */}
+        {activeTab === "surveys" && !selectedSurveyId && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>Site Surveys</h2>
+              <span className="badge-green">{surveys.length} total</span>
+            </div>
+
+            {surveysLoading ? (
+              <p style={{ color: "var(--text-secondary)" }}>Loading surveys...</p>
+            ) : surveys.length === 0 ? (
+              <p style={{ color: "var(--text-secondary)" }}>No surveys submitted yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {surveys.map((s: any) => (
+                  <div
+                    key={s.id}
+                    onClick={() => setSelectedSurveyId(s.id)}
+                    className="p-4 rounded-lg border cursor-pointer hover:border-[#39FF14]/30 transition-colors"
+                    style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                            {s.requestor_company || s.requestor_name}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full capitalize" style={{
+                            backgroundColor: s.status === "submitted" ? "rgba(234, 179, 8, 0.1)" : s.status === "reviewed" ? "rgba(59, 130, 246, 0.1)" : s.status === "scheduled" ? "var(--green-bg)" : "rgba(107, 114, 128, 0.1)",
+                            color: s.status === "submitted" ? "#EAB308" : s.status === "reviewed" ? "#3B82F6" : s.status === "scheduled" ? "var(--green-accent)" : "var(--text-secondary)",
+                          }}>
+                            {s.status}
+                          </span>
+                        </div>
+                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                          {s.service_type?.replace(/_/g, " ")} &middot; {s.site_address}
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>
+                          {s.requestor_name} &middot; {s.requestor_phone}
+                          {s.preferred_date && ` \u00b7 Preferred: ${s.preferred_date}`}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                          {formatDate(s.created_at)}
+                        </span>
+                        <div className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>
+                          {(s.photos_equipment?.length || 0) + (s.photos_access?.length || 0) + (s.photos_electrical?.length || 0) + (s.photos_facility?.length || 0)} photos
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "surveys" && selectedSurveyId && (() => {
+          const s = surveys.find((sv: any) => sv.id === selectedSurveyId);
+          if (!s) return null;
+          const allPhotos = [
+            ...(s.photos_equipment || []).map((url: string) => ({ url, cat: "Equipment" })),
+            ...(s.photos_access || []).map((url: string) => ({ url, cat: "Access" })),
+            ...(s.photos_electrical || []).map((url: string) => ({ url, cat: "Electrical" })),
+            ...(s.photos_facility || []).map((url: string) => ({ url, cat: "Facility" })),
+          ];
+          return (
+            <div className="space-y-6">
+              <button
+                onClick={() => setSelectedSurveyId(null)}
+                className="flex items-center gap-1 text-sm hover:underline"
+                style={{ color: "var(--green-accent)" }}
+              >
+                <ArrowLeft size={14} /> Back to Surveys
+              </button>
+
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+                    {s.requestor_company || s.requestor_name}
+                  </h2>
+                  <p className="text-sm capitalize" style={{ color: "var(--text-secondary)" }}>
+                    {s.service_type?.replace(/_/g, " ")} &middot; {s.equipment_type?.replace(/_/g, " ") || "No equipment specified"}
+                  </p>
+                </div>
+                <select
+                  value={s.status}
+                  onChange={async (e) => {
+                    const newStatus = e.target.value;
+                    await fetch("/api/admin/surveys", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      credentials: "include",
+                      body: JSON.stringify({ id: s.id, status: newStatus }),
+                    });
+                    setSurveys((prev: any[]) => prev.map((sv: any) => sv.id === s.id ? { ...sv, status: newStatus } : sv));
+                  }}
+                  className="input-field text-sm w-auto"
+                >
+                  <option value="submitted">Submitted</option>
+                  <option value="reviewed">Reviewed</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Contact */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Contact</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>{s.requestor_name} {s.requestor_company && `(${s.requestor_company})`}</p>
+                    <p style={{ color: "var(--text-secondary)" }}>{s.requestor_phone} {s.requestor_email && `\u00b7 ${s.requestor_email}`}</p>
+                    {s.onsite_contact_name && s.onsite_contact_name !== s.requestor_name && (
+                      <p className="mt-2" style={{ color: "var(--text-secondary)" }}>On-site: {s.onsite_contact_name} &middot; {s.onsite_contact_phone} {s.onsite_contact_role && `(${s.onsite_contact_role})`}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Location & Access</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>{s.site_address}</p>
+                    <p style={{ color: "var(--text-secondary)" }}>
+                      Floor: {s.floor_level} &middot; Dock: {s.dock_access ? "Yes" : "No"} &middot; Security: {s.gate_or_security ? "Yes" : "No"}
+                    </p>
+                    {s.gate_details && <p style={{ color: "var(--text-secondary)" }}>Gate: {s.gate_details}</p>}
+                    {s.dock_details && <p style={{ color: "var(--text-secondary)" }}>Dock: {s.dock_details}</p>}
+                  </div>
+                </div>
+
+                {/* Clearance */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Clearance</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>
+                      Choke: {s.choke_width_inches && s.choke_height_inches ? `${s.choke_width_inches}" W x ${s.choke_height_inches}" H` : "Not measured"}
+                    </p>
+                    <p style={{ color: "var(--text-secondary)" }}>Ceiling: {s.ceiling_height_feet ? `${s.ceiling_height_feet} ft` : "Not measured"}</p>
+                    {s.path_description && <p style={{ color: "var(--text-secondary)" }}>Path: {s.path_description}</p>}
+                  </div>
+                </div>
+
+                {/* Electrical */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Electrical</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>
+                      {[s.electrical_voltage, s.electrical_phase, s.electrical_amperage].filter(Boolean).join(" / ") || "Unknown"}
+                    </p>
+                    <p style={{ color: "var(--text-secondary)" }}>
+                      Disconnect: {s.disconnect_in_place ? "In place" : "Not in place"}
+                      {s.electrical_distance_ft && ` \u00b7 ${s.electrical_distance_ft} ft from panel`}
+                    </p>
+                    {s.electrical_notes && <p style={{ color: "var(--text-secondary)" }}>Notes: {s.electrical_notes}</p>}
+                  </div>
+                </div>
+
+                {/* Resources */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>On-Site Resources</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>
+                      Forklift: {s.forklift_available ? `Yes (${s.forklift_capacity_lbs || "?"} lbs)` : "None"}
+                    </p>
+                    {s.other_equipment && <p style={{ color: "var(--text-secondary)" }}>Other: {s.other_equipment}</p>}
+                    {s.hazardous_materials && <p className="text-red-400">Hazmat: {s.hazmat_details || "Yes"}</p>}
+                  </div>
+                </div>
+
+                {/* Schedule & Notes */}
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Schedule & Notes</h3>
+                  <div className="space-y-1 text-sm">
+                    <p style={{ color: "var(--text-primary)" }}>
+                      {s.preferred_date || "No date"} &middot; {s.preferred_time_window || "Anytime"}
+                    </p>
+                    {s.work_description && <p style={{ color: "var(--text-secondary)" }}>Work: {s.work_description}</p>}
+                    {s.special_instructions && <p style={{ color: "var(--text-secondary)" }}>Special: {s.special_instructions}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Photos */}
+              {allPhotos.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--green-accent)" }}>Photos ({allPhotos.length})</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {allPhotos.map((p: any, i: number) => (
+                      <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="group relative aspect-square rounded-lg overflow-hidden border" style={{ borderColor: "var(--border-default)" }}>
+                        <img src={p.url} alt={`${p.cat} photo ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        <span className="absolute bottom-0 left-0 right-0 text-xs text-center py-1 bg-black/70 text-white">{p.cat}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {activeTab === "partners" && selectedPartnerId && (
           <div className="space-y-6">
             <button onClick={() => setSelectedPartnerId(null)}
