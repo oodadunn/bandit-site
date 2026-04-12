@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       company: body.company_name,
       email: body.email,
       phone: body.phone,
-      state: body.states || null,
+      state: body.states || undefined,
       issue_description: details,
     };
 
