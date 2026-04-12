@@ -77,7 +77,7 @@ interface AnalyticsSummary {
   };
 }
 
-type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic";
+type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic" | "partners";
 
 interface AccountListItem {
   id: string;
@@ -102,6 +102,29 @@ interface AccountDetail {
   leads: any[];
   jobs: any[];
   activity: any[];
+}
+
+interface Partner {
+  id: string;
+  created_at: string;
+  company_name: string;
+  contact_name: string;
+  phone: string;
+  email: string;
+  state: string;
+  coverage_states: string[];
+  service_types: string[];
+  pipeline_stage: string;
+  tier: string;
+  avg_rating: number;
+  review_count: number;
+  last_contact_at: string | null;
+}
+
+interface PartnerDetail {
+  partner: any;
+  pricing: any[];
+  reviews: any[];
 }
 
 export default function AdminDashboard() {
@@ -132,6 +155,17 @@ export default function AdminDashboard() {
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [accountDetail, setAccountDetail] = useState<AccountDetail | null>(null);
   const [accountDetailLoading, setAccountDetailLoading] = useState(false);
+
+  // Partners state
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [partnersLoading, setPartnersLoading] = useState(false);
+  const [partnersSearch, setPartnersSearch] = useState("");
+  const [partnersState, setPartnersState] = useState("all");
+  const [partnersPipelineStage, setPartnersPipelineStage] = useState("all");
+  const [partnersTier, setPartnersTier] = useState("all");
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
+  const [partnerDetail, setPartnerDetail] = useState<PartnerDetail | null>(null);
+  const [partnerDetailLoading, setPartnerDetailLoading] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
@@ -272,6 +306,58 @@ export default function AdminDashboard() {
     loadDetail();
   }, [selectedAccountId]);
 
+  // Load partners when tab is opened
+  useEffect(() => {
+    if (!isAuthenticated || activeTab !== "partners" || selectedPartnerId) return;
+    const loadPartners = async () => {
+      setPartnersLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (partnersSearch) params.set("q", partnersSearch);
+        if (partnersState && partnersState !== "all") params.set("state", partnersState);
+        if (partnersPipelineStage && partnersPipelineStage !== "all") params.set("stage", partnersPipelineStage);
+        if (partnersTier && partnersTier !== "all") params.set("tier", partnersTier);
+        const response = await fetch(`/api/admin/partners?${params.toString()}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPartners(data);
+        }
+      } catch (err) {
+        console.error("Failed to load partners:", err);
+      } finally {
+        setPartnersLoading(false);
+      }
+    };
+    loadPartners();
+  }, [isAuthenticated, activeTab, partnersSearch, partnersState, partnersPipelineStage, partnersTier, selectedPartnerId]);
+
+  // Load partner detail
+  useEffect(() => {
+    if (!selectedPartnerId) {
+      setPartnerDetail(null);
+      return;
+    }
+    const loadDetail = async () => {
+      setPartnerDetailLoading(true);
+      try {
+        const response = await fetch(`/api/admin/partners/${selectedPartnerId}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPartnerDetail(data);
+        }
+      } catch (err) {
+        console.error("Failed to load partner detail:", err);
+      } finally {
+        setPartnerDetailLoading(false);
+      }
+    };
+    loadDetail();
+  }, [selectedPartnerId]);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/admin/auth", {
@@ -400,6 +486,51 @@ export default function AdminDashboard() {
     }
   };
 
+  const getPipelineStageColor = (stage: string) => {
+    switch (stage?.toLowerCase()) {
+      case "prospect": return "#6B7280";
+      case "contacted": return "#F59E0B";
+      case "interested": return "#3B82F6";
+      case "verified": return "#8B5CF6";
+      case "compliant": return "#06B6D4";
+      case "rate_card": return "#EC4899";
+      case "active": return "var(--green-accent)";
+      case "inactive": return "#EF4444";
+      default: return "var(--text-secondary)";
+    }
+  };
+
+  const getTierColor = (tier: string) => {
+    switch (tier?.toLowerCase()) {
+      case "gold": return "#FFD700";
+      case "silver": return "#C0C0C0";
+      case "bronze": return "#CD7F32";
+      case "probation": return "#EF4444";
+      case "unrated": return "#6B7280";
+      default: return "var(--text-secondary)";
+    }
+  };
+
+  const updatePartner = async (id: string, updates: any) => {
+    try {
+      const response = await fetch(`/api/admin/partners/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(updates),
+      });
+      if (response.ok) {
+        const updated = await response.json();
+        if (partnerDetail) {
+          setPartnerDetail({ ...partnerDetail, partner: updated });
+        }
+        setPartners((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+      }
+    } catch (err) {
+      console.error("Failed to update partner:", err);
+    }
+  };
+
   // KPI Card Component
   const KPICard = ({
     label,
@@ -487,7 +618,7 @@ export default function AdminDashboard() {
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-8">
-            {(["overview", "accounts", "leads", "calls", "traffic"] as const).map((tab) => (
+            {(["overview", "accounts", "leads", "calls", "traffic", "partners"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1595,6 +1726,329 @@ export default function AdminDashboard() {
                       </div>
                     ) : (
                       <p style={{ color: "var(--text-secondary)" }}>No source data</p>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {/* PARTNERS TAB */}
+        {activeTab === "partners" && !selectedPartnerId && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="flex gap-4 flex-wrap items-end">
+              <div className="flex-1" style={{ minWidth: "200px" }}>
+                <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-secondary)" }}>Search Partners</label>
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-3" style={{ color: "var(--text-secondary)" }} />
+                  <input
+                    type="text"
+                    placeholder="Search by company name..."
+                    value={partnersSearch}
+                    onChange={(e) => setPartnersSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-md border text-sm"
+                    style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)", color: "var(--text-primary)" }}
+                  />
+                </div>
+              </div>
+              <div style={{ minWidth: "140px" }}>
+                <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-secondary)" }}>State</label>
+                <select value={partnersState} onChange={(e) => setPartnersState(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md border text-sm"
+                  style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)", color: "var(--text-primary)" }}>
+                  <option value="all">All States</option>
+                  {["TX","AL","NC","GA","FL","OH","CA","NY","MS","VA","IL","MI","NV","OK","TN","AR","LA","SC","MO","KY","CO","ND","AZ","PA","IN","WA","MA","NJ","WI","OR","MN"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ minWidth: "140px" }}>
+                <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-secondary)" }}>Pipeline Stage</label>
+                <select value={partnersPipelineStage} onChange={(e) => setPartnersPipelineStage(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md border text-sm"
+                  style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)", color: "var(--text-primary)" }}>
+                  <option value="all">All Stages</option>
+                  {["prospect","contacted","interested","verified","compliant","rate_card","active","inactive"].map((s) => (
+                    <option key={s} value={s}>{s.replace(/_/g," ")}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ minWidth: "120px" }}>
+                <label className="text-xs font-semibold mb-2 block" style={{ color: "var(--text-secondary)" }}>Tier</label>
+                <select value={partnersTier} onChange={(e) => setPartnersTier(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md border text-sm"
+                  style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)", color: "var(--text-primary)" }}>
+                  <option value="all">All Tiers</option>
+                  {["gold","silver","bronze","probation","unrated"].map((t) => (
+                    <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Pipeline KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+              {["prospect","contacted","interested","verified","compliant","rate_card","active","inactive"].map((stage) => {
+                const count = partners.filter((p) => p.pipeline_stage === stage).length;
+                return (
+                  <div key={stage} className="p-4 rounded-lg border text-center cursor-pointer hover:opacity-80"
+                    onClick={() => setPartnersPipelineStage(partnersPipelineStage === stage ? "all" : stage)}
+                    style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)", borderLeftWidth: "3px", borderLeftColor: getPipelineStageColor(stage) }}>
+                    <p className="text-xs font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>
+                      {stage.replace(/_/g, " ").replace(/^\w/, (c: string) => c.toUpperCase())}
+                    </p>
+                    <p className="text-xl font-bold" style={{ color: getPipelineStageColor(stage) }}>{count}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Partners Table */}
+            <div className="rounded-lg border overflow-hidden" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr style={{ backgroundColor: "var(--bg-primary)", borderBottom: "1px solid var(--border-default)" }}>
+                      {["Company","Contact","Phone","State","Coverage","Services","Stage","Tier","Rating"].map((h) => (
+                        <th key={h} className="px-4 py-3 text-left text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {partnersLoading ? (
+                      <tr><td colSpan={9} className="px-6 py-8 text-center" style={{ color: "var(--text-secondary)" }}>Loading partners...</td></tr>
+                    ) : partners.length === 0 ? (
+                      <tr><td colSpan={9} className="px-6 py-12 text-center" style={{ color: "var(--text-secondary)" }}>
+                        <Building2 size={32} className="mx-auto mb-3" style={{ color: "var(--text-secondary)" }} />No partners found
+                      </td></tr>
+                    ) : (
+                      partners.map((partner) => (
+                        <tr key={partner.id} onClick={() => setSelectedPartnerId(partner.id)}
+                          className="cursor-pointer hover:opacity-80 transition-opacity"
+                          style={{ borderBottom: "1px solid var(--border-default)" }}>
+                          <td className="px-4 py-3">
+                            <div className="font-semibold text-xs" style={{ color: "var(--text-primary)" }}>{partner.company_name}</div>
+                            {partner.email && <div className="text-xs" style={{ color: "var(--text-secondary)" }}>{partner.email}</div>}
+                          </td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--text-secondary)" }}>{partner.contact_name || "—"}</td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--text-secondary)" }}>{partner.phone || "—"}</td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--text-secondary)" }}>{partner.state || "—"}</td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+                            {partner.coverage_states?.length > 0 ? partner.coverage_states.join(", ") : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+                            {partner.service_types?.length > 0 ? partner.service_types.map((s: string) => s.replace(/_/g," ")).join(", ") : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-xs">
+                            <span className="px-2 py-1 rounded-md font-semibold"
+                              style={{ backgroundColor: `${getPipelineStageColor(partner.pipeline_stage)}20`, color: getPipelineStageColor(partner.pipeline_stage) }}>
+                              {partner.pipeline_stage.replace(/_/g, " ")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-xs">
+                            <span className="px-2 py-1 rounded-md font-semibold"
+                              style={{ backgroundColor: `${getTierColor(partner.tier)}20`, color: getTierColor(partner.tier) }}>
+                              {partner.tier || "unrated"}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-xs" style={{ color: "var(--green-accent)" }}>
+                            {partner.avg_rating > 0 ? `${Number(partner.avg_rating).toFixed(1)}★ (${partner.review_count})` : "—"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PARTNER DETAIL */}
+        {activeTab === "partners" && selectedPartnerId && (
+          <div className="space-y-6">
+            <button onClick={() => setSelectedPartnerId(null)}
+              className="flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+              style={{ color: "var(--text-secondary)" }}>
+              <ArrowLeft size={16} /> Back to partners
+            </button>
+
+            {partnerDetailLoading || !partnerDetail ? (
+              <p style={{ color: "var(--text-secondary)" }}>Loading partner...</p>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>{partnerDetail.partner.company_name}</h2>
+                      <div className="flex items-center gap-3 text-sm flex-wrap" style={{ color: "var(--text-secondary)" }}>
+                        {partnerDetail.partner.contact_name && <span>{partnerDetail.partner.contact_name}</span>}
+                        {partnerDetail.partner.phone && <span>{partnerDetail.partner.phone}</span>}
+                        {partnerDetail.partner.email && <span>{partnerDetail.partner.email}</span>}
+                        {partnerDetail.partner.city && <span className="flex items-center gap-1"><MapPin size={12} />{partnerDetail.partner.city}, {partnerDetail.partner.state}</span>}
+                      </div>
+                      {partnerDetail.partner.alt_contact_name && (
+                        <div className="text-xs mt-2" style={{ color: "var(--text-secondary)" }}>
+                          Alt: {partnerDetail.partner.alt_contact_name} {partnerDetail.partner.alt_contact_phone && `(${partnerDetail.partner.alt_contact_phone})`}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select value={partnerDetail.partner.pipeline_stage}
+                        onChange={(e) => updatePartner(partnerDetail.partner.id, { pipeline_stage: e.target.value })}
+                        className="text-xs px-3 py-1 rounded-md font-semibold border"
+                        style={{ backgroundColor: `${getPipelineStageColor(partnerDetail.partner.pipeline_stage)}20`, color: getPipelineStageColor(partnerDetail.partner.pipeline_stage), borderColor: getPipelineStageColor(partnerDetail.partner.pipeline_stage) }}>
+                        {["prospect","contacted","interested","verified","compliant","rate_card","active","inactive"].map((s) => (
+                          <option key={s} value={s}>{s.replace(/_/g," ")}</option>
+                        ))}
+                      </select>
+                      <select value={partnerDetail.partner.tier || "unrated"}
+                        onChange={(e) => updatePartner(partnerDetail.partner.id, { tier: e.target.value })}
+                        className="text-xs px-3 py-1 rounded-md font-semibold border"
+                        style={{ backgroundColor: `${getTierColor(partnerDetail.partner.tier)}20`, color: getTierColor(partnerDetail.partner.tier), borderColor: getTierColor(partnerDetail.partner.tier) }}>
+                        {["unrated","gold","silver","bronze","probation"].map((t) => (
+                          <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  {partnerDetail.partner.avg_rating > 0 && (
+                    <div className="flex items-center gap-4 mt-2 pt-3 border-t" style={{ borderColor: "var(--border-default)" }}>
+                      <span className="text-sm font-semibold" style={{ color: "var(--green-accent)" }}>
+                        {Number(partnerDetail.partner.avg_rating).toFixed(1)}★ avg
+                      </span>
+                      <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{partnerDetail.partner.review_count} reviews</span>
+                    </div>
+                  )}
+                  {partnerDetail.partner.notes && (
+                    <p className="text-sm mt-2 pt-3 border-t" style={{ color: "var(--text-secondary)", borderColor: "var(--border-default)" }}>
+                      {partnerDetail.partner.notes}
+                    </p>
+                  )}
+                </div>
+
+                {/* Compliance Checklist */}
+                <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                  <h3 className="font-bold mb-4" style={{ color: "var(--text-primary)" }}>Compliance Status</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                      { label: "W9 On File", value: partnerDetail.partner.w9_on_file },
+                      { label: "NDA Signed", value: partnerDetail.partner.nda_signed },
+                      { label: "Insurance Verified", value: partnerDetail.partner.insurance_verified },
+                      { label: "Rate Card Received", value: partnerDetail.partner.rate_card_received },
+                      { label: "Insurance Current", value: partnerDetail.partner.insurance_expiration ? new Date(partnerDetail.partner.insurance_expiration) > new Date() : false },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.value ? "var(--green-accent)" : "#EF4444" }} />
+                        <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {partnerDetail.partner.insurance_provider && (
+                    <div className="mt-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+                      Insurance: {partnerDetail.partner.insurance_provider}
+                      {partnerDetail.partner.insurance_expiration && ` (expires ${partnerDetail.partner.insurance_expiration})`}
+                    </div>
+                  )}
+                </div>
+
+                {/* Two-column grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Services */}
+                  <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                    <h3 className="font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                      <Wrench size={18} /> Services
+                    </h3>
+                    {!partnerDetail.partner.service_types?.length ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No services listed — needs verification</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {partnerDetail.partner.service_types.map((s: string) => (
+                          <span key={s} className="px-3 py-1 rounded-md text-xs font-semibold capitalize"
+                            style={{ backgroundColor: "var(--green-bg)", color: "var(--green-accent)" }}>
+                            {s.replace(/_/g, " ")}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Coverage */}
+                  <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                    <h3 className="font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                      <MapPin size={18} /> Coverage ({partnerDetail.partner.coverage_states?.length || 0} states)
+                    </h3>
+                    {!partnerDetail.partner.coverage_states?.length ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No coverage listed</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {partnerDetail.partner.coverage_states.map((s: string) => (
+                          <span key={s} className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-secondary)" }}>{s}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                    <h3 className="font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                      <DollarSign size={18} /> Pricing ({partnerDetail.pricing.length})
+                    </h3>
+                    {partnerDetail.pricing.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No pricing on file</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {partnerDetail.pricing.map((p: any) => (
+                          <div key={p.id} className="p-3 rounded-md border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-default)" }}>
+                            <div className="flex items-start justify-between mb-1">
+                              <p className="text-sm font-semibold capitalize" style={{ color: "var(--text-primary)" }}>
+                                {p.pricing_type.replace(/_/g, " ")}
+                              </p>
+                              <span style={{ color: "var(--green-accent)" }} className="font-semibold">${Number(p.amount_usd).toLocaleString()}</span>
+                            </div>
+                            <div className="text-xs flex gap-3 flex-wrap" style={{ color: "var(--text-secondary)" }}>
+                              {p.unit_description && <span>{p.unit_description}</span>}
+                              {p.expires_date && <span>Expires: {p.expires_date}</span>}
+                              {p.steel_index_reference && <span>Steel index: ${p.steel_index_reference}/ton</span>}
+                              {p.is_current && <span style={{ color: "var(--green-accent)" }} className="font-semibold">Current</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Reviews */}
+                  <div className="rounded-lg border p-6" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-default)" }}>
+                    <h3 className="font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                      <Users size={18} /> Reviews ({partnerDetail.reviews.length})
+                    </h3>
+                    {partnerDetail.reviews.length === 0 ? (
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>No reviews yet</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {partnerDetail.reviews.slice(0, 10).map((r: any) => (
+                          <div key={r.id} className="p-3 rounded-md border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-default)" }}>
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold" style={{ color: "var(--green-accent)" }}>{r.overall_rating}★</span>
+                                <span className="text-xs px-2 py-0.5 rounded-md" style={{ backgroundColor: "var(--bg-card)", color: "var(--text-secondary)" }}>{r.review_type.replace(/_/g," ")}</span>
+                              </div>
+                              <span className="text-xs" style={{ color: "var(--text-secondary)" }}>{formatDate(r.created_at)}</span>
+                            </div>
+                            {r.feedback && <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{r.feedback}</p>}
+                            {(r.quality_rating || r.timeliness_rating || r.communication_rating) && (
+                              <div className="flex gap-3 mt-2 text-xs" style={{ color: "var(--text-secondary)" }}>
+                                {r.quality_rating && <span>Quality: {r.quality_rating}★</span>}
+                                {r.timeliness_rating && <span>Timeliness: {r.timeliness_rating}★</span>}
+                                {r.communication_rating && <span>Communication: {r.communication_rating}★</span>}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
