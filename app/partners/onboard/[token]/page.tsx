@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
+import USMap from './USMap';
 
 // Legal text constants
 const NDA_TEXT = `MUTUAL NONDISCLOSURE AGREEMENT
@@ -98,7 +99,8 @@ interface PartnerData {
 
 interface SignatureData {
   signature: string;
-  signer_name: string;
+  signer_first_name: string;
+  signer_last_name: string;
   signer_title: string;
 }
 
@@ -130,6 +132,7 @@ interface BankingData {
 }
 
 // US States and SVG path data
+// All US states array (kept for use in Select All button)
 const US_STATES = [
   'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
   'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
@@ -137,59 +140,6 @@ const US_STATES = [
   'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
   'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
 ];
-
-const US_STATE_PATHS: Record<string, { name: string; d: string }> = {
-  'AL': { name: 'Alabama', d: 'M628,466 L628,528 L612,544 L618,552 L630,548 L636,528 L644,524 L644,466Z' },
-  'AK': { name: 'Alaska', d: 'M161,485 L183,485 L183,498 L193,498 L193,510 L175,519 L161,519Z' },
-  'AZ': { name: 'Arizona', d: 'M205,432 L205,508 L175,528 L175,505 L140,505 L140,432Z' },
-  'AR': { name: 'Arkansas', d: 'M556,452 L618,452 L618,502 L556,502Z' },
-  'CA': { name: 'California', d: 'M46,280 L100,280 L130,340 L140,432 L140,505 L100,505 L60,460 L46,390Z' },
-  'CO': { name: 'Colorado', d: 'M240,320 L370,320 L370,400 L240,400Z' },
-  'CT': { name: 'Connecticut', d: 'M832,230 L858,220 L866,240 L844,252 L832,245Z' },
-  'DE': { name: 'Delaware', d: 'M800,320 L816,310 L820,340 L804,348Z' },
-  'FL': { name: 'Florida', d: 'M636,528 L722,516 L756,544 L760,600 L730,640 L700,640 L680,604 L652,568 L636,544Z' },
-  'GA': { name: 'Georgia', d: 'M644,466 L720,466 L722,516 L636,528 L636,466Z' },
-  'HI': { name: 'Hawaii', d: 'M260,545 L280,540 L296,550 L285,560 L265,558Z' },
-  'ID': { name: 'Idaho', d: 'M160,140 L210,130 L220,180 L240,240 L200,280 L160,260Z' },
-  'IL': { name: 'Illinois', d: 'M580,260 L616,260 L620,300 L636,360 L620,400 L580,410 L570,360 L570,300Z' },
-  'IN': { name: 'Indiana', d: 'M620,260 L660,260 L664,340 L660,400 L620,400Z' },
-  'IA': { name: 'Iowa', d: 'M480,240 L570,240 L580,260 L570,300 L480,300Z' },
-  'KS': { name: 'Kansas', d: 'M370,360 L510,360 L510,420 L370,420Z' },
-  'KY': { name: 'Kentucky', d: 'M610,380 L710,370 L730,400 L660,400 L620,400Z' },
-  'LA': { name: 'Louisiana', d: 'M556,502 L618,502 L618,560 L600,580 L568,570 L556,540Z' },
-  'ME': { name: 'Maine', d: 'M860,100 L890,80 L900,120 L880,170 L860,160Z' },
-  'MD': { name: 'Maryland', d: 'M740,310 L800,300 L816,310 L800,340 L780,340 L740,330Z' },
-  'MA': { name: 'Massachusetts', d: 'M832,210 L880,200 L890,216 L858,220 L832,230Z' },
-  'MI': { name: 'Michigan', d: 'M600,140 L640,130 L680,160 L690,220 L660,260 L620,260 L610,220 L620,180Z' },
-  'MN': { name: 'Minnesota', d: 'M440,100 L530,100 L530,200 L480,240 L440,240Z' },
-  'MS': { name: 'Mississippi', d: 'M580,452 L618,452 L618,540 L600,552 L580,540Z' },
-  'MO': { name: 'Missouri', d: 'M510,340 L580,340 L580,410 L556,452 L510,420Z' },
-  'MT': { name: 'Montana', d: 'M220,100 L370,100 L370,180 L240,200 L220,180Z' },
-  'NE': { name: 'Nebraska', d: 'M330,280 L480,280 L480,340 L370,340 L330,320Z' },
-  'NV': { name: 'Nevada', d: 'M100,230 L160,200 L200,280 L205,432 L140,432 L100,340Z' },
-  'NH': { name: 'New Hampshire', d: 'M852,120 L870,115 L870,170 L860,200 L848,190 L852,150Z' },
-  'NJ': { name: 'New Jersey', d: 'M808,256 L824,248 L830,280 L816,310 L800,300 L808,270Z' },
-  'NM': { name: 'New Mexico', d: 'M205,432 L310,420 L320,520 L205,520 L205,508Z' },
-  'NY': { name: 'New York', d: 'M740,170 L832,160 L838,190 L832,230 L808,256 L780,260 L740,230Z' },
-  'NC': { name: 'North Carolina', d: 'M660,400 L790,380 L810,400 L770,420 L680,440 L660,430Z' },
-  'ND': { name: 'North Dakota', d: 'M370,100 L480,100 L480,180 L370,180Z' },
-  'OH': { name: 'Ohio', d: 'M660,260 L720,250 L740,310 L710,370 L660,360 L660,300Z' },
-  'OK': { name: 'Oklahoma', d: 'M370,400 L510,400 L510,460 L420,460 L370,440Z' },
-  'OR': { name: 'Oregon', d: 'M46,140 L160,120 L160,220 L100,230 L46,230Z' },
-  'PA': { name: 'Pennsylvania', d: 'M716,240 L808,230 L808,280 L740,300 L716,280Z' },
-  'RI': { name: 'Rhode Island', d: 'M858,224 L872,220 L872,238 L862,242Z' },
-  'SC': { name: 'South Carolina', d: 'M680,440 L740,420 L770,460 L720,466 L688,454Z' },
-  'SD': { name: 'South Dakota', d: 'M370,180 L480,180 L480,260 L370,270Z' },
-  'TN': { name: 'Tennessee', d: 'M580,410 L710,400 L710,440 L580,452Z' },
-  'TX': { name: 'Texas', d: 'M310,440 L420,440 L510,460 L556,452 L556,540 L540,600 L480,640 L400,620 L340,570 L310,520Z' },
-  'UT': { name: 'Utah', d: 'M200,240 L270,230 L280,320 L240,320 L240,400 L200,400Z' },
-  'VT': { name: 'Vermont', d: 'M836,130 L856,120 L856,190 L838,200 L832,170Z' },
-  'VA': { name: 'Virginia', d: 'M690,360 L790,340 L810,370 L790,380 L710,400 L690,380Z' },
-  'WA': { name: 'Washington', d: 'M70,60 L180,50 L180,140 L160,140 L70,140Z' },
-  'WV': { name: 'West Virginia', d: 'M710,310 L740,300 L750,340 L730,370 L710,360Z' },
-  'WI': { name: 'Wisconsin', d: 'M530,120 L600,130 L610,200 L570,240 L530,240Z' },
-  'WY': { name: 'Wyoming', d: 'M220,180 L370,180 L370,280 L240,280 L220,260Z' },
-};
 
 const SERVICE_OPTIONS = [
   { id: 'baler_repair', label: 'Baler Repair' },
@@ -214,21 +164,19 @@ export default function PartnerOnboardPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isDrawingRef = useRef(false);
 
-  // Tooltip state for map
-  const [hoveredState, setHoveredState] = useState<string | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
   // Step data states
   const [nda, setNda] = useState<SignatureData>({
     signature: '',
-    signer_name: '',
+    signer_first_name: '',
+    signer_last_name: '',
     signer_title: '',
   });
   const [ndaRead, setNdaRead] = useState(false);
 
   const [msa, setMsa] = useState<SignatureData>({
     signature: '',
-    signer_name: '',
+    signer_first_name: '',
+    signer_last_name: '',
     signer_title: '',
   });
   const [msaRead, setMsaRead] = useState(false);
@@ -431,7 +379,8 @@ export default function PartnerOnboardPage() {
 
     if (step === 2) {
       if (!ndaRead) errors.nda_read = 'You must read and agree to the NDA';
-      if (!nda.signer_name.trim()) errors.nda_name = 'Signer name is required';
+      if (!nda.signer_first_name.trim()) errors.nda_first = 'First name is required';
+      if (!nda.signer_last_name.trim()) errors.nda_last = 'Last name is required';
       if (!nda.signer_title.trim()) errors.nda_title = 'Signer title is required';
       const canvas = canvasRef.current;
       const hasDrawing = canvas ? (() => { const ctx = canvas.getContext('2d'); if (!ctx) return false; const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data; return pixels.some((v, i) => i % 4 === 3 && v > 0); })() : false;
@@ -440,7 +389,8 @@ export default function PartnerOnboardPage() {
 
     if (step === 3) {
       if (!msaRead) errors.msa_read = 'You must read and agree to the MSA';
-      if (!msa.signer_name.trim()) errors.msa_name = 'Signer name is required';
+      if (!msa.signer_first_name.trim()) errors.msa_first = 'First name is required';
+      if (!msa.signer_last_name.trim()) errors.msa_last = 'Last name is required';
       if (!msa.signer_title.trim()) errors.msa_title = 'Signer title is required';
       const canvas = canvasRef.current;
       const hasDrawing = canvas ? (() => { const ctx = canvas.getContext('2d'); if (!ctx) return false; const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data; return pixels.some((v, i) => i % 4 === 3 && v > 0); })() : false;
@@ -519,12 +469,12 @@ export default function PartnerOnboardPage() {
       if (currentStep === 2) {
         const canvas = canvasRef.current;
         const sig = canvas ? canvas.toDataURL('image/png') : nda.signature;
-        stepData = { ...nda, signature: sig };
+        stepData = { ...nda, signature: sig, signer_name: `${nda.signer_first_name} ${nda.signer_last_name}`.trim() };
         stepName = 'nda';
       } else if (currentStep === 3) {
         const canvas = canvasRef.current;
         const sig = canvas ? canvas.toDataURL('image/png') : msa.signature;
-        stepData = { ...msa, signature: sig };
+        stepData = { ...msa, signature: sig, signer_name: `${msa.signer_first_name} ${msa.signer_last_name}`.trim() };
         stepName = 'msa';
       } else if (currentStep === 4) {
         stepData = rateCard;
@@ -742,31 +692,59 @@ export default function PartnerOnboardPage() {
         )}
       </div>
 
-      <div style={{ marginBottom: '24px' }}>
-        <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
-          Signer Name
-        </label>
-        <input
-          type="text"
-          value={nda.signer_name}
-          onChange={(e) => setNda({ ...nda, signer_name: e.target.value })}
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            backgroundColor: '#1A1A1A',
-            border: `1px solid #1F2937`,
-            borderRadius: '6px',
-            color: '#FFFFFF',
-            fontSize: '14px',
-            fontFamily: 'Inter',
-            boxSizing: 'border-box',
-          }}
-        />
-        {validationErrors.nda_name && (
-          <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
-            {validationErrors.nda_name}
-          </div>
-        )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <div>
+          <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
+            First Name
+          </label>
+          <input
+            type="text"
+            value={nda.signer_first_name}
+            onChange={(e) => setNda({ ...nda, signer_first_name: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              backgroundColor: '#1A1A1A',
+              border: `1px solid #1F2937`,
+              borderRadius: '6px',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontFamily: 'Inter',
+              boxSizing: 'border-box',
+            }}
+          />
+          {validationErrors.nda_first && (
+            <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
+              {validationErrors.nda_first}
+            </div>
+          )}
+        </div>
+        <div>
+          <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
+            Last Name
+          </label>
+          <input
+            type="text"
+            value={nda.signer_last_name}
+            onChange={(e) => setNda({ ...nda, signer_last_name: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              backgroundColor: '#1A1A1A',
+              border: `1px solid #1F2937`,
+              borderRadius: '6px',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontFamily: 'Inter',
+              boxSizing: 'border-box',
+            }}
+          />
+          {validationErrors.nda_last && (
+            <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
+              {validationErrors.nda_last}
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={{ marginBottom: '24px' }}>
@@ -944,31 +922,59 @@ export default function PartnerOnboardPage() {
         )}
       </div>
 
-      <div style={{ marginBottom: '24px' }}>
-        <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
-          Signer Name
-        </label>
-        <input
-          type="text"
-          value={msa.signer_name}
-          onChange={(e) => setMsa({ ...msa, signer_name: e.target.value })}
-          style={{
-            width: '100%',
-            padding: '10px 12px',
-            backgroundColor: '#1A1A1A',
-            border: `1px solid #1F2937`,
-            borderRadius: '6px',
-            color: '#FFFFFF',
-            fontSize: '14px',
-            fontFamily: 'Inter',
-            boxSizing: 'border-box',
-          }}
-        />
-        {validationErrors.msa_name && (
-          <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
-            {validationErrors.msa_name}
-          </div>
-        )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <div>
+          <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
+            First Name
+          </label>
+          <input
+            type="text"
+            value={msa.signer_first_name}
+            onChange={(e) => setMsa({ ...msa, signer_first_name: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              backgroundColor: '#1A1A1A',
+              border: `1px solid #1F2937`,
+              borderRadius: '6px',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontFamily: 'Inter',
+              boxSizing: 'border-box',
+            }}
+          />
+          {validationErrors.msa_first && (
+            <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
+              {validationErrors.msa_first}
+            </div>
+          )}
+        </div>
+        <div>
+          <label style={{ display: 'block', color: '#FFFFFF', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>
+            Last Name
+          </label>
+          <input
+            type="text"
+            value={msa.signer_last_name}
+            onChange={(e) => setMsa({ ...msa, signer_last_name: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              backgroundColor: '#1A1A1A',
+              border: `1px solid #1F2937`,
+              borderRadius: '6px',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontFamily: 'Inter',
+              boxSizing: 'border-box',
+            }}
+          />
+          {validationErrors.msa_last && (
+            <div style={{ color: '#EF4444', fontSize: '13px', marginTop: '4px' }}>
+              {validationErrors.msa_last}
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={{ marginBottom: '24px' }}>
@@ -1394,63 +1400,10 @@ export default function PartnerOnboardPage() {
           </div>
         )}
 
-        <div style={{ position: 'relative', marginBottom: '20px' }}>
-          <svg
-            viewBox="0 0 960 660"
-            style={{
-              width: '100%',
-              maxWidth: '100%',
-              height: 'auto',
-              backgroundColor: '#1A1A1A',
-              borderRadius: '6px',
-              border: `1px solid #1F2937`,
-            }}
-          >
-            {Object.entries(US_STATE_PATHS).map(([state, { name, d }]) => (
-              <g key={state}>
-                <path
-                  d={d}
-                  fill={rateCard.coverage_states.includes(state) ? '#39FF14' : '#1F2937'}
-                  stroke="#0A0A0A"
-                  strokeWidth="1"
-                  style={{
-                    cursor: 'pointer',
-                    opacity: 0.8,
-                    transition: 'opacity 0.2s ease',
-                  }}
-                  onClick={() => toggleState(state)}
-                  onMouseEnter={(e) => {
-                    setHoveredState(state);
-                    const rect = (e.currentTarget as SVGPathElement).getBoundingClientRect();
-                    setTooltipPos({ x: rect.left, y: rect.top });
-                  }}
-                  onMouseLeave={() => setHoveredState(null)}
-                />
-              </g>
-            ))}
-          </svg>
-
-          {hoveredState && (
-            <div
-              style={{
-                position: 'fixed',
-                left: tooltipPos.x,
-                top: tooltipPos.y - 30,
-                backgroundColor: '#111111',
-                color: '#39FF14',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                fontWeight: '600',
-                pointerEvents: 'none',
-                border: `1px solid #39FF14`,
-                zIndex: 1000,
-              }}
-            >
-              {US_STATE_PATHS[hoveredState]?.name}
-            </div>
-          )}
-        </div>
+        <USMap
+          selectedStates={rateCard.coverage_states}
+          onToggleState={toggleState}
+        />
 
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
           <button
