@@ -328,14 +328,19 @@ export default function PartnerOnboardPage() {
       if (!ndaRead) errors.nda_read = 'You must read and agree to the NDA';
       if (!nda.signer_name.trim()) errors.nda_name = 'Signer name is required';
       if (!nda.signer_title.trim()) errors.nda_title = 'Signer title is required';
-      if (!nda.signature) errors.nda_sig = 'Signature is required';
+      // Check canvas directly since React state may lag behind
+      const canvas = canvasRef.current;
+      const hasDrawing = canvas ? (() => { const ctx = canvas.getContext('2d'); if (!ctx) return false; const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data; return pixels.some((v, i) => i % 4 === 3 && v > 0); })() : false;
+      if (!nda.signature && !hasDrawing) errors.nda_sig = 'Signature is required';
     }
 
     if (step === 3) {
       if (!msaRead) errors.msa_read = 'You must read and agree to the MSA';
       if (!msa.signer_name.trim()) errors.msa_name = 'Signer name is required';
       if (!msa.signer_title.trim()) errors.msa_title = 'Signer title is required';
-      if (!msa.signature) errors.msa_sig = 'Signature is required';
+      const canvas = canvasRef.current;
+      const hasDrawing = canvas ? (() => { const ctx = canvas.getContext('2d'); if (!ctx) return false; const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data; return pixels.some((v, i) => i % 4 === 3 && v > 0); })() : false;
+      if (!msa.signature && !hasDrawing) errors.msa_sig = 'Signature is required';
     }
 
     if (step === 4) {
@@ -416,19 +421,28 @@ export default function PartnerOnboardPage() {
 
     try {
       let stepData: any = {};
+      let stepName = '';
 
       if (currentStep === 2) {
-        stepData = { ...nda };
-        saveSignature('nda');
+        // Grab signature directly from canvas before building payload
+        const canvas = canvasRef.current;
+        const sig = canvas ? canvas.toDataURL('image/png') : nda.signature;
+        stepData = { ...nda, signature: sig };
+        stepName = 'nda';
       } else if (currentStep === 3) {
-        stepData = { ...msa };
-        saveSignature('msa');
+        const canvas = canvasRef.current;
+        const sig = canvas ? canvas.toDataURL('image/png') : msa.signature;
+        stepData = { ...msa, signature: sig };
+        stepName = 'msa';
       } else if (currentStep === 4) {
         stepData = rateCard;
+        stepName = 'rate_card';
       } else if (currentStep === 5) {
         stepData = { ...insurance, ...w9 };
+        stepName = 'insurance';
       } else if (currentStep === 6) {
         stepData = banking;
+        stepName = 'banking';
       }
 
       const res = await fetch('/api/partners/onboard', {
@@ -436,7 +450,7 @@ export default function PartnerOnboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token,
-          step: currentStep,
+          step: stepName,
           data: stepData,
         }),
       });
