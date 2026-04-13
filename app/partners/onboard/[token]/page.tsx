@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 // Legal text constants
 const NDA_TEXT = `MUTUAL NONDISCLOSURE AGREEMENT
 
-This Mutual Nondisclosure Agreement (the "Agreement") is entered into as of the date of acceptance by and between Bandit Recycling LLC, a Tennessee limited liability company ("Disclosing Party"), and the signing party below ("Receiving Party").
+This Mutual Nondisclosure Agreement (the "Agreement") is entered into as of the date of acceptance by and between Bandit Recycling LLC, a Mississippi limited liability company ("Disclosing Party"), and the signing party below ("Receiving Party").
 
 WHEREAS, the parties desire to explore a business relationship concerning the provision of equipment repair, maintenance, and related services, and in connection with this purpose, one or both parties may disclose to the other party certain confidential and proprietary information that the disclosing party desires the receiving party to treat as confidential.
 
@@ -34,14 +34,14 @@ This Agreement shall commence on the date of acceptance and shall continue for a
 The Receiving Party acknowledges that breach of this Agreement may cause irreparable harm for which monetary damages would be an insufficient remedy, and the Disclosing Party shall be entitled to seek equitable relief.
 
 8. GOVERNING LAW
-This Agreement shall be governed by and construed in accordance with the laws of the State of Tennessee, without regard to conflicts of law principles.
+This Agreement shall be governed by and construed in accordance with the laws of the State of Mississippi, without regard to conflicts of law principles.
 
 9. ENTIRE AGREEMENT
 This Agreement, together with any other agreements between the parties, constitutes the entire agreement concerning the subject matter and supersedes all prior negotiations and agreements.`;
 
 const MSA_TEXT = `MASTER SERVICE AGREEMENT
 
-This Master Service Agreement (this "Agreement") is entered into as of the date of acceptance between Bandit Recycling LLC, a Tennessee limited liability company ("Company"), and the signing party below ("Partner").
+This Master Service Agreement (this "Agreement") is entered into as of the date of acceptance between Bandit Recycling LLC, a Mississippi limited liability company ("Company"), and the signing party below ("Partner").
 
 1. SERVICES
 Partner agrees to provide equipment repair, maintenance, and related services as described in individual work orders issued by Company. Services may include but are not limited to baler repair, wire delivery, preventive maintenance, equipment moving, and equipment refurbishment. The specific services to be provided and pricing shall be set forth in work orders executed by both parties and shall be governed by Partner's rate card on file with Company.
@@ -80,7 +80,7 @@ In no event shall either party be liable for indirect, incidental, or consequent
 Partner acknowledges that it may receive Confidential Information of Company during the course of providing services and agrees to maintain such information in strict confidence.
 
 10. GOVERNING LAW
-This Agreement shall be governed by the laws of the State of Tennessee without regard to conflicts of law principles.
+This Agreement shall be governed by the laws of the State of Mississippi without regard to conflicts of law principles.
 
 11. ENTIRE AGREEMENT
 This Agreement constitutes the entire agreement between the parties regarding the subject matter and supersedes all prior understandings and agreements.`;
@@ -1899,45 +1899,69 @@ export default function PartnerOnboardPage() {
           }}
         >
           <h2 style={{ fontSize: '16px', fontWeight: '600', color: '#FFFFFF', marginBottom: '16px' }}>
-            Document Downloads
+            Your Documents
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <a
-              href="/docs/mutual_nda.pdf"
+              href={`/api/partners/agreement-pdf?token=${token}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
                 display: 'inline-block',
-                padding: '12px 20px',
-                backgroundColor: '#1F2937',
-                color: '#39FF14',
+                padding: '14px 20px',
+                backgroundColor: '#39FF14',
+                color: '#000000',
                 textDecoration: 'none',
                 borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                border: `1px solid #39FF14`,
+                fontSize: '15px',
+                fontWeight: '600',
+                textAlign: 'center',
               }}
             >
-              Download NDA
+              Download Signed Partnership Agreement (PDF)
             </a>
-            <a
-              href="/docs/master_service_agreement.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                padding: '12px 20px',
-                backgroundColor: '#1F2937',
-                color: '#39FF14',
-                textDecoration: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                border: `1px solid #39FF14`,
-              }}
-            >
-              Download MSA
-            </a>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <a
+                href="/docs/mutual_nda.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  display: 'inline-block',
+                  padding: '12px 20px',
+                  backgroundColor: '#1F2937',
+                  color: '#39FF14',
+                  textDecoration: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  border: '1px solid #39FF14',
+                  textAlign: 'center',
+                }}
+              >
+                NDA Template
+              </a>
+              <a
+                href="/docs/master_service_agreement.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  display: 'inline-block',
+                  padding: '12px 20px',
+                  backgroundColor: '#1F2937',
+                  color: '#39FF14',
+                  textDecoration: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  border: '1px solid #39FF14',
+                  textAlign: 'center',
+                }}
+              >
+                MSA Template
+              </a>
+            </div>
           </div>
         </div>
 
