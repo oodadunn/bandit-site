@@ -98,76 +98,70 @@ export async function POST(request: NextRequest) {
       }
 
       case "rate_card": {
-        // Store rate card pricing entries
+        // New format: data = { services: [...], pricing: { general: {...}, wire_delivery: {...} }, coverage_states: [...] }
+        const general = data.pricing?.general || {};
+        const wire = data.pricing?.wire_delivery || {};
         const pricingEntries = [];
-        if (data.service_call_fee) {
+        const today = new Date().toISOString().split("T")[0];
+
+        if (general.service_call_fee) {
           pricingEntries.push({
             partner_id: partnerId,
             pricing_type: "service_call",
-            amount_usd: parseFloat(data.service_call_fee),
+            amount_usd: parseFloat(general.service_call_fee),
             unit_description: "Flat rate service call fee",
-            effective_date: new Date().toISOString().split("T")[0],
+            effective_date: today,
             is_current: true,
           });
         }
-        if (data.hourly_rate) {
+        if (general.hourly_rate) {
           pricingEntries.push({
             partner_id: partnerId,
             pricing_type: "hourly_labor",
-            amount_usd: parseFloat(data.hourly_rate),
+            amount_usd: parseFloat(general.hourly_rate),
             unit_description: "Standard hourly labor rate",
-            effective_date: new Date().toISOString().split("T")[0],
+            effective_date: today,
             is_current: true,
           });
         }
-        if (data.emergency_rate) {
+        if (general.emergency_rate) {
           pricingEntries.push({
             partner_id: partnerId,
             pricing_type: "hourly_labor",
-            amount_usd: parseFloat(data.emergency_rate),
+            amount_usd: parseFloat(general.emergency_rate),
             unit_description: "Emergency / after-hours hourly rate",
-            effective_date: new Date().toISOString().split("T")[0],
+            effective_date: today,
             is_current: true,
           });
         }
-        if (data.mileage_rate) {
+        if (general.mileage_rate) {
           pricingEntries.push({
             partner_id: partnerId,
             pricing_type: "mileage",
-            amount_usd: parseFloat(data.mileage_rate),
-            unit_description: `Per mile beyond ${data.mileage_threshold || 25} miles`,
-            effective_date: new Date().toISOString().split("T")[0],
+            amount_usd: parseFloat(general.mileage_rate),
+            unit_description: `Per mile beyond ${general.mileage_threshold || 25} miles`,
+            effective_date: today,
             is_current: true,
           });
         }
-        if (data.wire_price_per_ton) {
+        if (wire.price_per_ton) {
           pricingEntries.push({
             partner_id: partnerId,
             pricing_type: "wire_per_ton",
-            amount_usd: parseFloat(data.wire_price_per_ton),
-            unit_description: data.wire_gauge ? `${data.wire_gauge} gauge bale wire` : "Bale wire per ton",
-            effective_date: new Date().toISOString().split("T")[0],
+            amount_usd: parseFloat(wire.price_per_ton),
+            unit_description: wire.wire_gauge ? `${wire.wire_gauge} gauge bale wire` : "Bale wire per ton",
+            effective_date: today,
             expires_date: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
             is_current: true,
           });
         }
-        if (data.equipment_move_rate) {
+        if (wire.delivery_fee) {
           pricingEntries.push({
             partner_id: partnerId,
-            pricing_type: "equipment_move_flat",
-            amount_usd: parseFloat(data.equipment_move_rate),
-            unit_description: "Equipment moving flat rate (local)",
-            effective_date: new Date().toISOString().split("T")[0],
-            is_current: true,
-          });
-        }
-        if (data.pm_monthly_rate) {
-          pricingEntries.push({
-            partner_id: partnerId,
-            pricing_type: "pm_contract_monthly",
-            amount_usd: parseFloat(data.pm_monthly_rate),
-            unit_description: "Preventive maintenance monthly contract",
-            effective_date: new Date().toISOString().split("T")[0],
+            pricing_type: "wire_delivery_fee",
+            amount_usd: parseFloat(wire.delivery_fee),
+            unit_description: "Wire delivery fee",
+            effective_date: today,
             is_current: true,
           });
         }
@@ -176,10 +170,12 @@ export async function POST(request: NextRequest) {
           await sb.from("partner_pricing").insert(pricingEntries);
         }
 
-        // Update service types
-        const serviceTypes = data.service_types || [];
+        // Update service types and coverage states
+        const serviceTypes = data.services || [];
+        const coverageStates = data.coverage_states || [];
         await sb.from("service_partners").update({
           service_types: serviceTypes,
+          coverage_states: coverageStates,
           rate_card_received: true,
           updated_at: new Date().toISOString(),
         }).eq("id", partnerId);
@@ -189,30 +185,61 @@ export async function POST(request: NextRequest) {
           partner_id: partnerId,
           doc_type: "rate_card",
           signed_at: new Date().toISOString(),
-          signer_name: data.signer_name,
           notes: JSON.stringify(data),
         });
         break;
       }
 
       case "insurance": {
-        // Update insurance info on partner record
+        // New format: data = { insurance: { coi_file, coi_filename, confirmed }, w9: { w9_file, w9_filename, confirmed } }
+        const ins = data.insurance || {};
+        const w9Data = data.w9 || {};
+
+        // Upload COI file to Supabase Storage if present
+        if (ins.coi_file) {
+          const base64Data = ins.coi_file.replace(/^data:[^;]+;base64,/, '');
+          const ext = ins.coi_filename?.split('.').pop() || 'pdf';
+          const filePath = `coi/${partnerId}/coi.${ext}`;
+          await sb.storage.from("partner-docs").upload(filePath, Buffer.from(base64Data, 'base64'), {
+            contentType: ext === 'pdf' ? 'application/pdf' : `image/${ext}`,
+            upsert: true,
+          });
+
+          await sb.from("partner_documents").insert({
+            partner_id: partnerId,
+            doc_type: "insurance_cert",
+            notes: `COI uploaded: ${ins.coi_filename}`,
+            signed_at: new Date().toISOString(),
+          });
+        }
+
+        // Upload W9 file to Supabase Storage if present
+        if (w9Data.w9_file) {
+          const base64Data = w9Data.w9_file.replace(/^data:[^;]+;base64,/, '');
+          const ext = w9Data.w9_filename?.split('.').pop() || 'pdf';
+          const filePath = `w9/${partnerId}/w9.${ext}`;
+          await sb.storage.from("partner-docs").upload(filePath, Buffer.from(base64Data, 'base64'), {
+            contentType: ext === 'pdf' ? 'application/pdf' : `image/${ext}`,
+            upsert: true,
+          });
+
+          await sb.from("partner_documents").insert({
+            partner_id: partnerId,
+            doc_type: "w9",
+            notes: `W9 uploaded: ${w9Data.w9_filename}`,
+            signed_at: new Date().toISOString(),
+          });
+          await sb.from("service_partners").update({
+            w9_on_file: true,
+            updated_at: new Date().toISOString(),
+          }).eq("id", partnerId);
+        }
+
+        // Update partner insurance status
         await sb.from("service_partners").update({
-          insurance_provider: data.insurance_provider,
-          insurance_policy_number: data.insurance_policy_number,
-          insurance_expiration: data.insurance_expiration || null,
+          insurance_verified: ins.confirmed || false,
           updated_at: new Date().toISOString(),
         }).eq("id", partnerId);
-
-        // Note: actual file upload would go to Supabase Storage
-        // For now, record that they acknowledged insurance requirements
-        await sb.from("partner_documents").insert({
-          partner_id: partnerId,
-          doc_type: "insurance_cert",
-          signer_name: data.signer_name,
-          notes: `Provider: ${data.insurance_provider}, Policy: ${data.insurance_policy_number}, Expires: ${data.insurance_expiration}`,
-          signed_at: new Date().toISOString(),
-        });
         break;
       }
 
@@ -234,22 +261,6 @@ export async function POST(request: NextRequest) {
           signer_name: data.account_holder_name,
           signer_ip: clientIp,
         });
-        break;
-      }
-
-      case "w9": {
-        // W9 acknowledgment (actual file would go to storage)
-        await sb.from("partner_documents").insert({
-          partner_id: partnerId,
-          doc_type: "w9",
-          signer_name: data.signer_name,
-          notes: data.ein ? `EIN: ${data.ein}` : "W9 to be submitted separately",
-          signed_at: new Date().toISOString(),
-        });
-        await sb.from("service_partners").update({
-          w9_on_file: true,
-          updated_at: new Date().toISOString(),
-        }).eq("id", partnerId);
         break;
       }
 
