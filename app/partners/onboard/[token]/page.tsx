@@ -235,36 +235,41 @@ export default function PartnerOnboardPage() {
     }
   }, [token]);
 
-  // Signature pad functions
+  // Signature pad functions — scale mouse coords to canvas internal resolution
+  const getCanvasCoords = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    const clientX = (e as any).clientX ?? (e as any).touches?.[0]?.clientX ?? 0;
+    const clientY = (e as any).clientY ?? (e as any).touches?.[0]?.clientY ?? 0;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     isDrawingRef.current = true;
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = (e as any).clientX || (e as any).touches?.[0]?.clientX;
-    const y = (e as any).clientY || (e as any).touches?.[0]?.clientY;
-
+    const { x, y } = getCanvasCoords(e);
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.beginPath();
-      ctx.moveTo(x - rect.left, y - rect.top);
+      ctx.moveTo(x, y);
     }
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawingRef.current) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = (e as any).clientX || (e as any).touches?.[0]?.clientX;
-    const y = (e as any).clientY || (e as any).touches?.[0]?.clientY;
-
+    const { x, y } = getCanvasCoords(e);
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.lineTo(x - rect.left, y - rect.top);
+      ctx.lineTo(x, y);
       ctx.strokeStyle = '#FFFFFF';
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
@@ -274,7 +279,12 @@ export default function PartnerOnboardPage() {
   };
 
   const stopDrawing = () => {
-    isDrawingRef.current = false;
+    if (isDrawingRef.current) {
+      isDrawingRef.current = false;
+      // Auto-save signature when user lifts pen/finger
+      if (currentStep === 2) saveSignature('nda');
+      else if (currentStep === 3) saveSignature('msa');
+    }
   };
 
   const clearSignature = (sigType: 'nda' | 'msa') => {
