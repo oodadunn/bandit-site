@@ -21,18 +21,10 @@ interface Post {
   image_url: string | null;
 }
 
-// Curated Unsplash photos per category — fallback when no image_url stored
-const CATEGORY_IMAGES: Record<string, string> = {
-  "Maintenance":         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1400&q=80",
-  "Equipment":           "https://images.unsplash.com/photo-1565340498555-76f0e5bc2b55?auto=format&fit=crop&w=1400&q=80",
-  "Industry Tips":       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
-  "Recycling Education": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=80",
-  "News":                "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=1400&q=80",
-};
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=80";
-
-function heroImage(post: Post) {
-  return post.image_url || CATEGORY_IMAGES[post.category] || DEFAULT_IMAGE;
+// Hero image — Gemini-generated and stored in Supabase. Empty string if the
+// post hasn't been generated yet (rendered as a dark placeholder).
+function heroImage(post: Post): string {
+  return post.image_url || "";
 }
 
 async function getPost(slug: string): Promise<Post | null> {
@@ -110,9 +102,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <>
       {/* ── HERO IMAGE ────────────────────────────────────────────────────── */}
       <div
-        className="w-full h-72 sm:h-96 bg-cover bg-center bg-[#111] relative"
-        style={{ backgroundImage: `url(${heroImage(post)})` }}
+        className="w-full h-72 sm:h-96 bg-cover bg-center bg-[#111] relative flex items-center justify-center"
+        style={heroImage(post) ? { backgroundImage: `url(${heroImage(post)})` } : undefined}
       >
+        {!heroImage(post) && <span className="text-7xl opacity-20">🦝</span>}
         {/* Dark gradient overlay so header text stays readable */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/30 via-transparent to-[#0A0A0A]" />
       </div>
@@ -188,11 +181,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className="grid sm:grid-cols-2 gap-4">
                 {related.map((r) => (
                   <Link key={r.slug} href={`/blog/${r.slug}`} className="group block card-dark hover:border-[#39FF14]/20 transition-all overflow-hidden p-0">
-                    {/* Related post thumbnail */}
+                    {/* Related post thumbnail — same image as the related post's hero */}
                     <div
-                      className="w-full h-32 bg-cover bg-center bg-[#111]"
-                      style={{ backgroundImage: `url(${r.image_url || CATEGORY_IMAGES[r.category] || DEFAULT_IMAGE})` }}
-                    />
+                      className="w-full h-32 bg-cover bg-center bg-[#111] flex items-center justify-center"
+                      style={r.image_url ? { backgroundImage: `url(${r.image_url})` } : undefined}
+                    >
+                      {!r.image_url && <span className="text-2xl opacity-30">🦝</span>}
+                    </div>
                     <div className="p-4">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider mb-2 inline-block ${catColor(r.category)}`}>
                         {r.category}

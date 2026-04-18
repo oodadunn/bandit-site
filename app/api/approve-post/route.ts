@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+const AUTOGEN_SECRET = process.env.AUTOGEN_SECRET;
+
+// Fire-and-forget image generation. Does not block the approval response.
+// If Gemini is slow or fails, the post still publishes; admin can manually
+// regenerate from /admin/blog.
+async function fireAutoGenerate(postId: string, req: NextRequest) {
+  if (!AUTOGEN_SECRET) return; // Not configured → skip silently
+  const origin = new URL(req.url).origin;
+  try {
+    // Don't await — kick it off and let the runtime handle it. Vercel keeps
+    // the function warm long enough for short fire-and-forgets.
+    await fetch(`${origin}/api/admin/generate-post-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-autogen-secret": AUTOGEN_SECRET,
+      },
+      body: JSON.stringify({ postId, trigger: "auto_publish" }),
+    }).catch(() => {}); // Best effort — do not throw
+  } catch {
+    // Swallow — approval flow succeeds regardless
+  }
+}
+
 // Uses a SECURITY DEFINER RPC function so the anon key can publish/reject posts
 // without needing the service role key in production.
 export async function GET(req: NextRequest) {
@@ -42,6 +66,23 @@ export async function GET(req: NextRequest) {
       approvalPage("Post Skipped", `"${data.title}" was skipped and won't be published.`, false),
       { headers: { "Content-Type": "text/html" } }
     );
+  }
+
+  // Fire-and-forget auto image generation. Look up post_id by slug since the
+  // RPC may not return it.
+  if (data.slug) {
+    supabase
+      .from("blog_posts")
+      .select("id, image_url")
+      .eq("slug", data.slug)
+      .single()
+      .then(({ data: post }) => {
+        // Only auto-generate if there's no image yet (avoid re-rolling on
+        // re-approval).
+        if (post?.id && !post.image_url) {
+          fireAutoGenerate(post.id, req);
+        }
+      });
   }
 
   return new NextResponse(

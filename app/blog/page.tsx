@@ -22,34 +22,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   "News":                "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
 
-// Keyword-based Unsplash embeds — each slug gets a unique keyword+seed combo
-// so posts in the same category still get different images, all visually relevant
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  "Maintenance":         ["baler+repair+maintenance", "hydraulic+press+maintenance", "industrial+machine+repair", "factory+equipment+service"],
-  "Equipment":           ["industrial+baler+compactor", "recycling+press+machine", "warehouse+baler+equipment", "heavy+machinery+industrial"],
-  "Industry Tips":       ["recycling+facility+operations", "cardboard+bales+warehouse", "waste+management+facility", "recycling+operations+workers", "industrial+recycling+plant"],
-  "Recycling Education": ["recycling+bins+sorting", "plastic+bottle+recycling+sort", "paper+recycling+green", "sustainable+recycling+bins"],
-  "News":                ["recycling+industry+business", "waste+management+news", "industrial+manufacturing+news", "scrap+metal+business"],
-};
-const DEFAULT_KEYWORD = "recycling+facility";
-
-// Consistent but varied: hash the slug to pick from the keyword pool
-function slugHash(slug: string, len: number): number {
-  let h = 0;
-  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) & 0x7fffffff;
-  return h % len;
-}
-
 function categoryColor(cat: string) {
   return CATEGORY_COLORS[cat] ?? "text-gray-400 bg-white/5 border-white/10";
 }
+
+// Returns the post's Gemini-generated image_url, or empty string if none yet
+// (rendered as a dark placeholder by the parent JSX).
 function postImage(post: Post): string {
-  if (post.image_url) return post.image_url;
-  const pool = CATEGORY_KEYWORDS[post.category];
-  const keyword = pool?.length
-    ? pool[slugHash(post.slug, pool.length)]
-    : DEFAULT_KEYWORD;
-  return `https://source.unsplash.com/900x600/?${keyword}`;
+  return post.image_url || "";
 }
 
 interface Post {
@@ -132,9 +112,11 @@ export default async function BlogPage() {
                     <div className="card-dark hover:border-[#39FF14]/30 transition-all overflow-hidden p-0">
                       {/* Cover image */}
                       <div
-                        className="w-full h-56 sm:h-72 bg-cover bg-center bg-[#111]"
-                        style={{ backgroundImage: `url(${postImage(featured)})` }}
-                      />
+                        className="w-full h-56 sm:h-72 bg-cover bg-center bg-[#111] flex items-center justify-center"
+                        style={postImage(featured) ? { backgroundImage: `url(${postImage(featured)})` } : undefined}
+                      >
+                        {!postImage(featured) && <span className="text-4xl opacity-30">🦝</span>}
+                      </div>
                       <div className="p-8">
                         <div className="flex flex-wrap items-center gap-3 mb-4">
                           <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${categoryColor(featured.category)}`}>
@@ -179,11 +161,13 @@ export default async function BlogPage() {
                     {rest.map((post) => (
                       <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
                         <div className="card-dark h-full hover:border-[#39FF14]/20 transition-all flex flex-col overflow-hidden p-0">
-                          {/* Thumbnail */}
+                          {/* Thumbnail — same image as the post hero, just scaled */}
                           <div
-                            className="w-full h-44 bg-cover bg-center bg-[#111] shrink-0"
-                            style={{ backgroundImage: `url(${postImage(post)})` }}
-                          />
+                            className="w-full h-44 bg-cover bg-center bg-[#111] shrink-0 flex items-center justify-center"
+                            style={postImage(post) ? { backgroundImage: `url(${postImage(post)})` } : undefined}
+                          >
+                            {!postImage(post) && <span className="text-3xl opacity-30">🦝</span>}
+                          </div>
                           <div className="p-5 flex flex-col flex-1">
                             <div className="flex flex-wrap items-center gap-2 mb-3">
                               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${categoryColor(post.category)}`}>
