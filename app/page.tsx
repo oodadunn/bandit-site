@@ -34,18 +34,18 @@ const SERVICES = [
 const STATS_FALLBACK = [
   { stat_key: "repairs_completed", stat_value: 500, display_label: "Repairs Completed" },
   { stat_key: "states_served", stat_value: 50, display_label: "States Served" },
-  { stat_key: "avg_response_hours", stat_value: 4, display_label: "Avg Response (hrs)" },
+  { stat_key: "dispatch_24_7", stat_value: 24, display_label: "Emergency Line (7 days)" },
 ];
 
 const TESTIMONIALS = [
   {
-    quote: "Bandit had a technician at our Atlanta facility within 4 hours. Baler was back up same day — we didn't lose a single shift.",
+    quote: "Bandit got a technician to our Atlanta facility fast and had the baler back up before our next shift. We didn't lose any production.",
     name: "Marcus T.",
     company: "Regional Distribution Center",
     state: "GA",
   },
   {
-    quote: "We switched our wire supplier to Bandit and cut costs by 18%. Same-day shipping on in-stock items is a game changer.",
+    quote: "We switched our wire supplier to Bandit and cut costs by 18%. Fast shipping on in-stock items is a game changer.",
     name: "Lisa K.",
     company: "National Recycling Co.",
     state: "FL",
@@ -57,7 +57,7 @@ const TESTIMONIALS = [
     state: "TN",
   },
   {
-    quote: "We're in Ohio and expected slow response times — Bandit had someone on-site next morning. Impressed doesn't cover it.",
+    quote: "We're in Ohio and expected slow response — Bandit had someone on-site faster than we thought possible. Impressed doesn't cover it.",
     name: "Rachel M.",
     company: "Midwest Fulfillment Center",
     state: "OH",
@@ -69,7 +69,7 @@ const TESTIMONIALS = [
     state: "CA",
   },
   {
-    quote: "We needed an emergency repair in rural Texas on a Saturday. Bandit dispatched someone within hours. That's unheard of.",
+    quote: "We needed an emergency repair in rural Texas on a Saturday. Bandit dispatched someone fast. That's unheard of.",
     name: "Hector G.",
     company: "Industrial Recycling Solutions",
     state: "TX",
@@ -119,7 +119,7 @@ export default async function HomePage() {
               </h1>
 
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Same-day baler repair and preventive maintenance in all 50 states. All makes and models. Emergency dispatch available around the clock.
+                Nationwide baler repair and preventive maintenance in all 50 states. All makes and models. 24/7 emergency dispatch — we escalate baler-down calls first.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-10">
@@ -147,7 +147,7 @@ export default async function HomePage() {
               <QuoteForm
                 formType="service_quote"
                 title="Get a Free Quote"
-                subtitle="We respond within 2 hours during business hours."
+                subtitle="We'll get back to you as quickly as we can."
                 ctaLabel="Request My Quote"
                 showEquipment
                 showUrgency
@@ -165,7 +165,7 @@ export default async function HomePage() {
               <div key={s.stat_key} className="px-6 text-center">
                 <div className="text-3xl font-black text-[#0A0A0A]">
                   {s.stat_key === "repairs_completed" ? `${s.stat_value}+` : s.stat_value}
-                  {s.stat_key === "avg_response_hours" ? "hr" : ""}
+                  {s.stat_key === "dispatch_24_7" ? "/7" : ""}
                 </div>
                 <div className="text-xs font-semibold text-[#0A0A0A]/70 mt-0.5">{s.display_label}</div>
               </div>
@@ -308,13 +308,13 @@ export default async function HomePage() {
               <div className="card-dark">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock size={16} className="text-[#39FF14]" />
-                  <span className="text-sm font-semibold text-white">Response Time Guarantee</span>
+                  <span className="text-sm font-semibold text-white">How We Prioritize</span>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { type: "Emergency Dispatch", time: "Same day", color: "text-[#39FF14]" },
-                    { type: "Urgent Service", time: "Within 24 hours", color: "text-yellow-400" },
-                    { type: "Standard Repair", time: "Within 48 hours", color: "text-blue-400" },
+                    { type: "Emergency Dispatch", time: "Escalated first", color: "text-[#39FF14]" },
+                    { type: "Urgent Service", time: "High priority", color: "text-yellow-400" },
+                    { type: "Standard Repair", time: "Next available", color: "text-blue-400" },
                     { type: "Maintenance Visit", time: "Scheduled", color: "text-gray-300" },
                   ].map((r) => (
                     <div key={r.type} className="flex items-center justify-between py-3 border-b border-[#1F2937] last:border-0">
@@ -327,7 +327,7 @@ export default async function HomePage() {
               <div className="card-dark text-center">
                 <div className="text-4xl font-black text-[#39FF14] font-mono mb-1">50</div>
                 <div className="text-sm text-gray-400 mb-3">States Covered</div>
-                <p className="text-xs text-gray-500">Local technicians in every state, dispatched from within your region for fastest response times.</p>
+                <p className="text-xs text-gray-500">Local technicians in every state, dispatched from within your region so we show up as fast as possible.</p>
               </div>
               <Link href="/service-area" className="btn-ghost-green inline-flex w-full justify-center">
                 <MapPin size={14} /> View Full Service Area

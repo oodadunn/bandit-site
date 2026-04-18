@@ -31,10 +31,13 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const URGENCY_ETA: Record<string, string> = {
-  emergency: "within 2 hours",
-  urgent: "within 24 hours",
-  standard: "within 2 business days",
+// Priority language returned to the caller. We intentionally do NOT promise
+// specific response-time windows — we escalate emergencies and respond as
+// quickly as we can. Keep the copy human and honest.
+const URGENCY_LANGUAGE: Record<string, string> = {
+  emergency: "We're treating this as an emergency — it'll be escalated to a dispatcher right away and we'll get a tech moving as fast as we can.",
+  urgent: "We've marked this as urgent and a dispatcher will follow up with you as quickly as possible.",
+  standard: "We've got it in the queue and a dispatcher will follow up to get you scheduled.",
 };
 
 export async function POST(req: NextRequest) {
@@ -167,12 +170,12 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const eta = URGENCY_ETA[urgency];
+  const priorityMsg = URGENCY_LANGUAGE[urgency];
   const response = {
     ok: true,
     ticket_id: lead.id,
-    eta,
-    acknowledged_message: `You're all set. I've opened a ${serviceType} ticket${equipmentType ? ` for your ${equipmentType}` : ""}. A tech will be in touch ${eta} to confirm details.`,
+    priority: urgency,
+    acknowledged_message: `You're all set. I've opened a ${serviceType} ticket${equipmentType ? ` for your ${equipmentType}` : ""}. ${priorityMsg}`,
   };
 
   await logToolCall({

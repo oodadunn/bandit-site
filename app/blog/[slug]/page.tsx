@@ -172,8 +172,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div className="mt-12 bg-[#111] border border-[#39FF14]/15 rounded-2xl p-8">
             <p className="text-2xl font-black text-white mb-2">Need baler service or wire?</p>
             <p className="text-gray-400 text-sm mb-5">
-              Bandit covers the full Southeast US — Georgia, Florida, Alabama, South Carolina,
-              North Carolina, and Tennessee. Same-day emergency service available.
+              Bandit covers all 50 states. 24/7 emergency service available — baler-down calls escalated first.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/quote" className="btn-primary">Get a Free Quote</Link>

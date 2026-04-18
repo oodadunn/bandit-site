@@ -123,7 +123,7 @@ export default function BalersPage() {
               </div>
               <div>
                 <p className="text-sm font-bold text-white">Bandit services all makes and models</p>
-                <p className="text-xs text-gray-400">Don't see your baler? We still service it. Call for a same-day quote.</p>
+                <p className="text-xs text-gray-400">Don&apos;t see your baler? We still service it. Call and we&apos;ll quote you fast.</p>
               </div>
             </div>
             <div className="flex gap-3 flex-shrink-0">
@@ -151,7 +151,7 @@ export default function BalersPage() {
           </h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
             Nationwide baler experts — repair, PM, wire supply, and equipment sales. All makes and models.
-            Same-day emergency service available.
+            24/7 emergency service available.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/wire" className="btn-primary">

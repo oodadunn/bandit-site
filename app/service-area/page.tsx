@@ -24,7 +24,7 @@ const HIGHLIGHTS = [
   {
     icon: Zap,
     title: "24/7 Emergency Dispatch",
-    desc: "Same-day technician dispatch available around the clock for emergency repairs"
+    desc: "Emergency technician dispatch available around the clock — baler-down calls escalated first"
   },
   {
     icon: Users,
@@ -38,8 +38,8 @@ const HIGHLIGHTS = [
   },
   {
     icon: Clock,
-    title: "Fast Response Times",
-    desc: "Guaranteed response windows: same day emergency, 24hr urgent, 48hr standard"
+    title: "Fast Response",
+    desc: "We work to dispatch as quickly as we can — emergencies are escalated and prioritized"
   }
 ];
 
@@ -69,7 +69,7 @@ export default function ServiceAreaPage() {
               Nationwide Service Coverage
             </h1>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed max-w-2xl">
-              From Maine to Hawaii, Bandit services all 50 states with local technicians dispatched from within your region. Emergency dispatch 24/7, guaranteed response times, same-day repairs.
+              From Maine to Hawaii, Bandit services all 50 states with local technicians dispatched from within your region. 24/7 emergency dispatch — baler-down calls get prioritized.
             </p>
             <div className="flex flex-wrap gap-3">
               <a href="tel:+18574226348" className="btn-primary">
@@ -120,14 +120,14 @@ export default function ServiceAreaPage() {
         <div className="container-site">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-black text-white mb-3">Response Time Guarantee</h2>
-              <p className="text-gray-400">We commit to these response windows across all 50 states</p>
+              <h2 className="text-3xl font-black text-white mb-3">How We Prioritize</h2>
+              <p className="text-gray-400">How we triage incoming service requests across all 50 states</p>
             </div>
             <div className="card-dark p-8 space-y-4">
               {[
-                { type: "Emergency Dispatch", time: "Same day", color: "text-[#39FF14]", desc: "Your baler is down right now" },
-                { type: "Urgent Service", time: "Within 24 hours", color: "text-yellow-400", desc: "Critical issue, time-sensitive" },
-                { type: "Standard Repair", time: "Within 48 hours", color: "text-blue-400", desc: "Important but not blocking production" },
+                { type: "Emergency Dispatch", time: "Escalated first", color: "text-[#39FF14]", desc: "Your baler is down right now" },
+                { type: "Urgent Service", time: "High priority", color: "text-yellow-400", desc: "Critical issue, time-sensitive" },
+                { type: "Standard Repair", time: "Next available", color: "text-blue-400", desc: "Important but not blocking production" },
                 { type: "Maintenance Visit", time: "Scheduled", color: "text-gray-300", desc: "Preventive maintenance appointment" },
               ].map((r) => (
                 <div key={r.type} className="flex items-start justify-between py-4 border-b border-[#1F2937] last:border-0 last:pb-0">
@@ -190,7 +190,7 @@ export default function ServiceAreaPage() {
               Ready to schedule service in your state?
             </h2>
             <p className="text-gray-400 mb-8 max-w-2xl mx-auto text-lg leading-relaxed">
-              Fill out our quote form or call us directly at 857-422-6348. We respond within 2 hours during business hours.
+              Fill out our quote form or call us directly at 857-422-6348. We&apos;ll get back to you as quickly as we can — emergencies are escalated immediately.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/quote" className="btn-primary text-lg px-8 py-4">

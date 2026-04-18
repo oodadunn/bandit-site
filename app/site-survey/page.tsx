@@ -268,8 +268,7 @@ export default function SiteSurveyPage() {
             </h2>
             <p className="text-gray-400 mb-6">
               Thank you! Our team will review your survey and get back to you
-              within 1 business day. We may reach out if we need any
-              clarification.
+              as soon as we can. We may reach out if we need any clarification.
             </p>
             <a href="/" className="btn-primary">
               Back to Home

@@ -4,10 +4,10 @@ import { Phone, AlertTriangle, CheckCircle, Clock, Zap, MapPin } from "lucide-re
 import QuoteForm from "@/components/QuoteForm";
 
 export const metadata: Metadata = {
-  title: "Emergency Baler Repair — Same-Day Dispatch | Nationwide",
+  title: "Emergency Baler Repair — 24/7 Dispatch | Nationwide",
   description:
-    "24/7 emergency baler repair nationwide. Same-day technician dispatch when your baler goes down. All makes and models. Call 857-422-6348.",
-  keywords: ["emergency baler repair", "baler down", "same day baler repair", "24 hour baler service", "emergency baler service nationwide"],
+    "24/7 emergency baler repair nationwide. Rapid technician dispatch when your baler goes down. All makes and models. Call 857-422-6348.",
+  keywords: ["emergency baler repair", "baler down", "24 hour baler service", "emergency baler service nationwide"],
 };
 
 const SE_STATES = [
@@ -20,10 +20,10 @@ const SE_STATES = [
 ];
 
 const WHAT_HAPPENS = [
-  { step: "01", time: "0–30 min", title: "You Call or Submit", desc: "Call 857-422-6348 or submit the emergency form below. A real person answers 24/7." },
-  { step: "02", time: "30–60 min", title: "Dispatch Confirmed", desc: "We confirm the nearest available technician and provide an ETA. You'll get a text update." },
-  { step: "03", time: "Same Day", title: "Technician On-Site", desc: "Our tech arrives with a fully stocked service vehicle and begins diagnosis immediately." },
-  { step: "04", time: "Same Day", title: "Back Online", desc: "Most emergency repairs are completed same-day. We test the full cycle before leaving." },
+  { step: "01", time: "Step 1", title: "You Call or Submit", desc: "Call 857-422-6348 or submit the emergency form below. A real person answers 24/7." },
+  { step: "02", time: "Step 2", title: "Dispatch Confirmed", desc: "We confirm the nearest available technician and provide an ETA. You'll get a text update." },
+  { step: "03", time: "Step 3", title: "Technician On-Site", desc: "Our tech arrives with a fully stocked service vehicle and begins diagnosis immediately." },
+  { step: "04", time: "Step 4", title: "Back Online", desc: "We work to get you back online as quickly as possible, and test the full cycle before leaving." },
 ];
 
 const COMMON_EMERGENCIES = [
@@ -68,10 +68,10 @@ export default function EmergencyRepairPage() {
               </h1>
 
               <p className="text-xl text-gray-300 mb-4 font-semibold">
-                Same-day emergency repair nationwide.
+                24/7 emergency repair nationwide.
               </p>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Every hour your baler is offline, you're losing money. Our technicians are on-call around the clock, dispatched within hours — not days.
+                Every hour your baler is offline, you&apos;re losing money. Our technicians are on-call around the clock — call us and we&apos;ll escalate and dispatch as fast as we can.
               </p>
 
               {/* Emergency phone CTA */}
@@ -89,7 +89,7 @@ export default function EmergencyRepairPage() {
               </a>
 
               <div className="flex flex-wrap gap-4">
-                {["24/7 Real-Person Answer", "Same-Day Dispatch", "All 50 States", "All Makes & Models"].map((t) => (
+                {["24/7 Real-Person Answer", "Rapid Dispatch", "All 50 States", "All Makes & Models"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}
@@ -102,7 +102,7 @@ export default function EmergencyRepairPage() {
               <QuoteForm
                 formType="emergency"
                 title="Emergency Repair Request"
-                subtitle="Submit now and we'll call you back within 15 minutes."
+                subtitle="Submit now and we'll call you back as fast as we can."
                 ctaLabel="Dispatch a Technician"
                 showEquipment
                 showUrgency
@@ -166,12 +166,12 @@ export default function EmergencyRepairPage() {
               <div className="card-dark border-[#39FF14]/20">
                 <div className="flex items-center gap-3 mb-4">
                   <Clock size={18} className="text-[#39FF14]" />
-                  <h3 className="font-bold text-white">Response Time Guarantee</h3>
+                  <h3 className="font-bold text-white">How We Prioritize</h3>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: "Emergency Dispatch", value: "Same Day", sub: "Technician on-site within hours", color: "text-[#39FF14]" },
-                    { label: "Call-Back Guarantee", value: "15 Min", sub: "After form submission", color: "text-[#39FF14]" },
+                    { label: "Emergency Dispatch", value: "ASAP", sub: "Baler down calls are escalated first", color: "text-[#39FF14]" },
+                    { label: "24/7 Line", value: "Live", sub: "A real person answers any hour", color: "text-[#39FF14]" },
                     { label: "After-Hours Premium", value: "$0", sub: "No extra charge for nights/weekends", color: "text-gray-300" },
                   ].map((r) => (
                     <div key={r.label} className="flex justify-between items-center py-3 border-b border-[#1F2937] last:border-0">

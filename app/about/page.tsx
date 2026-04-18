@@ -22,7 +22,7 @@ const VALUES = [
   {
     icon: Zap,
     title: "Fast or It Doesn't Count",
-    desc: "Response time is everything in an emergency. We measure our success in hours, not days.",
+    desc: "Response time is everything in an emergency. We escalate baler-down calls first and dispatch as fast as we can.",
   },
   {
     icon: Package,
@@ -33,7 +33,7 @@ const VALUES = [
 
 const SERVICES_QUICK = [
   { name: "Baler Repair", href: "/services/baler-repair", desc: "All makes & models, on-site" },
-  { name: "Emergency Repair", href: "/services/emergency-repair", desc: "24/7, same-day dispatch" },
+  { name: "Emergency Repair", href: "/services/emergency-repair", desc: "24/7 dispatch" },
   { name: "Preventive Maintenance", href: "/services/preventive-maintenance", desc: "Monthly, bi-monthly, quarterly" },
   { name: "Vertical Baler Service", href: "/services/vertical-baler-repair", desc: "Retail, grocery, distribution" },
   { name: "Horizontal Baler Service", href: "/services/horizontal-baler-repair", desc: "Industrial, MRF, fulfillment" },
@@ -111,7 +111,7 @@ export default function AboutPage() {
                   Across the United States, billions of pounds of recyclable material — cardboard, plastic film, aluminum, OCC — end up in landfills or general waste streams every year. Not because businesses don't care, but because their equipment fails.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  A baler that's down isn't a maintenance problem. It's an environmental one. Cardboard piles up in back rooms, gets thrown in dumpsters, ends up in landfills. That's a downstream failure that starts with a hydraulic pump and a slow response time.
+                  A baler that&apos;s down isn&apos;t a maintenance problem. It&apos;s an environmental one. Cardboard piles up in back rooms, gets thrown in dumpsters, ends up in landfills. That&apos;s a downstream failure that starts with a hydraulic pump and a slow response.
                 </p>
               </div>
 
@@ -150,7 +150,7 @@ export default function AboutPage() {
                 <div className="text-[#39FF14] text-xs font-mono font-bold mb-3 uppercase tracking-widest">The Mission</div>
                 <h3 className="text-white font-bold text-lg mb-3">Infrastructure that keeps the circular economy moving.</h3>
                 <p className="text-gray-400 text-sm leading-relaxed mb-3">
-                  Recycling doesn&apos;t happen by itself. It happens because someone&apos;s baler is running, someone&apos;s wire didn&apos;t run out, and someone showed up same-day when the hydraulic pump gave out at 3am before a big shipment.
+                  Recycling doesn&apos;t happen by itself. It happens because someone&apos;s baler is running, someone&apos;s wire didn&apos;t run out, and someone showed up fast when the hydraulic pump gave out at 3am before a big shipment.
                 </p>
                 <p className="text-gray-400 text-sm leading-relaxed">
                   We&apos;re building the infrastructure layer that makes recycling reliable — repair, maintenance, equipment, and eventually a commodity marketplace that connects recyclers with buyers across the country. One bale at a time.
@@ -233,7 +233,7 @@ export default function AboutPage() {
                 Bandit maintains a nationwide network of local technicians in every state. When you call for emergency service, we dispatch from within your region — not from across the country.
               </p>
               <p className="text-gray-400 mb-8 leading-relaxed">
-                From our roots in the Southeast to coast-to-coast coverage, we&apos;ve built the technician depth and parts inventory to deliver on our response time promises everywhere.
+                From our roots in the Southeast to coast-to-coast coverage, we&apos;ve built the technician depth and parts inventory to show up fast everywhere we operate.
               </p>
               <div className="grid grid-cols-4 gap-2">
                 {["SE", "NE", "MW", "W"].map((r) => (
@@ -250,7 +250,7 @@ export default function AboutPage() {
             {/* Stat card */}
             <div className="space-y-4">
               {[
-                { label: "Emergency Response", value: "Same Day", sub: "Technician on-site, not just a callback" },
+                { label: "Emergency Response", value: "ASAP", sub: "Technician on-site, not just a callback" },
                 { label: "Baler Makes Serviced", value: "All", sub: "Vertical, horizontal, every major brand" },
                 { label: "States Covered", value: "50", sub: "Nationwide — all 50 states" },
                 { label: "Wire Gauges Stocked", value: "All", sub: "Single loop, double loop, black & galvanized" },
@@ -277,7 +277,7 @@ export default function AboutPage() {
                 Ready to keep your recyclables out of Bandit&apos;s dumpster?
               </h2>
               <p className="text-[#0A0A0A]/70 leading-relaxed">
-                Get a quote for baler repair, a preventive maintenance plan, wire supply, or equipment. We&apos;ll respond within 2 hours. Emergencies dispatched immediately.
+                Get a quote for baler repair, a preventive maintenance plan, wire supply, or equipment. We&apos;ll respond as fast as we can — emergencies escalated immediately.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:items-end">

@@ -6,7 +6,7 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Baler Services — Repair, Maintenance & More | Bandit Recycling",
   description:
-    "Nationwide baler repair, emergency service, and preventive maintenance. Vertical and horizontal balers. Same-day dispatch across all 50 states.",
+    "Nationwide baler repair, emergency service, and preventive maintenance. Vertical and horizontal balers. 24/7 emergency dispatch across all 50 states.",
   keywords: ["baler services", "baler repair", "emergency repair", "preventive maintenance", "baler maintenance"],
 };
 
@@ -23,9 +23,9 @@ const SERVICES = [
     id: "emergency-repair",
     icon: AlertTriangle,
     title: "Emergency Repair",
-    short_desc: "24/7 same-day dispatch",
+    short_desc: "24/7 emergency dispatch",
     href: "/services/emergency-repair",
-    full_desc: "Baler down? We dispatch a technician within hours. No callbacks, no delays, just fast expert repair.",
+    full_desc: "Baler down? We dispatch as fast as we can get a qualified tech rolling. No callbacks, no delays — just fast expert repair.",
   },
   {
     id: "preventive-maintenance",
@@ -83,7 +83,7 @@ export default function ServicesPage() {
               <span className="text-[#39FF14]">Repair, Maintenance & More</span>
             </h1>
             <p className="text-lg text-gray-400 mb-10 leading-relaxed">
-              From emergency repair to preventive maintenance, we keep your baling equipment running nationwide. All makes & models. Same-day emergency dispatch available 24/7.
+              From emergency repair to preventive maintenance, we keep your baling equipment running nationwide. All makes & models. 24/7 emergency dispatch available.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a href="tel:+18574226348" className="btn-primary">
@@ -139,8 +139,8 @@ export default function ServicesPage() {
             {[
               {
                 icon: Clock,
-                title: "2-Hour Response",
-                desc: "We respond within 2 hours during business. Emergencies dispatched same-day.",
+                title: "Rapid Response",
+                desc: "We respond as fast as we can. Emergencies are escalated and dispatched immediately.",
               },
               {
                 icon: CheckCircle,
@@ -180,7 +180,7 @@ export default function ServicesPage() {
                 Baler down right now?
               </h2>
               <p className="text-[#0A0A0A]/70 mb-4 text-sm">
-                Stop wasting money. Every hour offline is lost production. Call us immediately for same-day emergency dispatch.
+                Stop wasting money. Every hour offline is lost production. Call us immediately and we&apos;ll get a tech rolling.
               </p>
             </div>
             <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors lg:justify-end">
@@ -200,14 +200,14 @@ export default function ServicesPage() {
                 Get service pricing
               </h2>
               <p className="text-gray-400 leading-relaxed mb-8">
-                Need repair, maintenance, or emergency service? Submit a request and our team will respond within 2 hours with availability and pricing.
+                Need repair, maintenance, or emergency service? Submit a request and our team will get back to you with availability and pricing — emergencies are escalated immediately.
               </p>
 
               <div className="space-y-4">
                 {[
                   "Repair • Maintenance • Emergency Service",
                   "All makes & models • All 50 states",
-                  "Same-day emergency dispatch available",
+                  "24/7 emergency dispatch available",
                   "Free diagnostic • Written estimates • No surprises",
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3">

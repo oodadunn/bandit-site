@@ -220,7 +220,7 @@ export default async function BlogPage() {
             <p className="text-3xl mb-3">🦝</p>
             <h2 className="text-2xl font-black text-white mb-2">Need baler service or wire today?</h2>
             <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto">
-              We cover all 50 states. Same-day emergency service available.
+              We cover all 50 states. 24/7 emergency service available.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/quote" className="btn-primary">Get a Service Quote</Link>

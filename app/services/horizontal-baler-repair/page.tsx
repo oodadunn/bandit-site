@@ -6,7 +6,7 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Horizontal Baler Repair Service | Nationwide",
   description:
-    "Expert horizontal baler repair for industrial, manufacturing, and recycling operations nationwide. Two-ram, closed-door, and auto-tie balers. Same-day dispatch.",
+    "Expert horizontal baler repair for industrial, manufacturing, and recycling operations nationwide. Two-ram, closed-door, and auto-tie balers. 24/7 emergency dispatch.",
   keywords: ["horizontal baler repair", "two ram baler repair", "industrial baler repair", "horizontal baler service nationwide", "auto-tie baler repair"],
 };
 
@@ -81,7 +81,7 @@ export default function HorizontalBalerRepairPage() {
                 <span className="text-[#39FF14]">Done Right.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Two-ram, closed-door, open-end — we repair every type of horizontal baler used in industrial and high-volume recycling operations. Nationwide coverage, same-day emergency dispatch.
+                Two-ram, closed-door, open-end — we repair every type of horizontal baler used in industrial and high-volume recycling operations. Nationwide coverage, 24/7 emergency dispatch.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -104,7 +104,7 @@ export default function HorizontalBalerRepairPage() {
               <QuoteForm
                 formType="service_quote"
                 title="Get a Horizontal Baler Quote"
-                subtitle="Tell us your baler type and issue — we respond within 2 hours."
+                subtitle="Tell us your baler type and issue — we'll get back to you quickly."
                 ctaLabel="Request Repair Quote"
                 showEquipment
                 showUrgency
@@ -206,7 +206,7 @@ export default function HorizontalBalerRepairPage() {
         <div className="container-site text-center">
           <h2 className="text-3xl font-black text-[#0A0A0A] mb-4">Industrial baler issue? Call now.</h2>
           <p className="text-[#0A0A0A]/70 mb-8 max-w-md mx-auto">
-            Horizontal baler downtime in a high-volume operation is expensive. We dispatch same-day nationwide.
+            Horizontal baler downtime in a high-volume operation is expensive. We dispatch nationwide, 24/7 — baler-down calls get prioritized.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">

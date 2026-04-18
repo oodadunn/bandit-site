@@ -6,7 +6,7 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Vertical Baler Repair Service | Nationwide",
   description:
-    "Expert vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models. Same-day emergency service available.",
+    "Expert vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models. 24/7 emergency service available.",
   keywords: ["vertical baler repair", "cardboard baler repair", "retail baler service", "vertical baler service nationwide", "baler repair"],
 };
 
@@ -65,7 +65,7 @@ export default function VerticalBalerRepairPage() {
                 <span className="text-[#39FF14]">Back Up Today.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                We specialize in vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models — same-day emergency service available.
+                We specialize in vertical baler repair for retail, grocery, and distribution operations nationwide. All makes and models — 24/7 emergency service available.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -76,7 +76,7 @@ export default function VerticalBalerRepairPage() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-4">
-                {["All Vertical Makes & Models", "Same-Day Service", "Retail & Distribution Focus", "Licensed & Insured"].map((t) => (
+                {["All Vertical Makes & Models", "24/7 Emergency Line", "Retail & Distribution Focus", "Licensed & Insured"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}
@@ -88,7 +88,7 @@ export default function VerticalBalerRepairPage() {
               <QuoteForm
                 formType="service_quote"
                 title="Get a Vertical Baler Repair Quote"
-                subtitle="Tell us the make/model and issue — we'll respond within 2 hours."
+                subtitle="Tell us the make/model and issue — we'll get back to you quickly."
                 ctaLabel="Request Repair Quote"
                 showEquipment
                 showUrgency
@@ -163,7 +163,7 @@ export default function VerticalBalerRepairPage() {
             {[
               { title: "Horizontal Baler Repair", desc: "For industrial and high-volume operations.", href: "/services/horizontal-baler-repair" },
               { title: "Preventive Maintenance", desc: "Stop breakdowns before they happen.", href: "/services/preventive-maintenance" },
-              { title: "Bale Wire Supply", desc: "All gauges, bulk pricing, same-day ship.", href: "/wire" },
+              { title: "Bale Wire Supply", desc: "All gauges, bulk pricing, fast shipping.", href: "/wire" },
             ].map((s) => (
               <Link key={s.href} href={s.href} className="card-dark group hover:border-[#39FF14]/40 transition-all">
                 <h3 className="font-bold text-white mb-2 text-sm group-hover:text-[#39FF14] transition-colors">{s.title}</h3>
@@ -181,7 +181,7 @@ export default function VerticalBalerRepairPage() {
       <section className="py-20 bg-[#39FF14]">
         <div className="container-site text-center">
           <h2 className="text-3xl font-black text-[#0A0A0A] mb-4">Ready to get your vertical baler fixed?</h2>
-          <p className="text-[#0A0A0A]/70 mb-8">Call now or submit a quote — same-day service available nationwide.</p>
+          <p className="text-[#0A0A0A]/70 mb-8">Call now or submit a quote — 24/7 emergency service available nationwide.</p>
           <a href="tel:+18574226348" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0A0A0A] text-white font-bold rounded-md text-base hover:bg-black transition-colors">
             <Phone size={18} /> Call 857-422-6348
           </a>

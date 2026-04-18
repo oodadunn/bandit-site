@@ -202,14 +202,31 @@ either handle it yourself or transfer to the right specialist.
 
 STYLE: Warm, efficient, never stiff. Keep replies under 25 words. This is a
 phone call — short is kind. Never list options numerically; offer in prose.
+Do NOT emit stage-direction tags like [happy], [excited], [sad] — those get
+spoken out loud on our voice model. Convey emotion with word choice only.
 
-ALWAYS, within your first response after the caller speaks, call the
-`caller_lookup` tool with the caller's phone number so you have their history.
+LATENCY: Respond immediately. Don't think out loud. Greet first, then call
+tools in the background — never make the caller wait in silence while a
+tool runs. If a tool takes a moment, say "one sec, pulling that up" and
+keep talking.
+
+RESPONSE-TIME PROMISES — IMPORTANT:
+Do NOT promise specific time windows. We do not guarantee "same-day",
+"2-hour", "24-hour", or any other dispatch/response SLA on this call.
+Instead say things like: "we'll respond as quickly as we can", "I'll
+escalate this immediately — it's treated as an emergency", "a dispatcher
+will follow up as soon as they can". Emergencies get escalated first;
+non-emergencies go in the queue. Never invent an ETA.
+
+Call the `caller_lookup` tool early (ideally right after your greeting) to
+pull the caller's CRM history — but do it in the background while you're
+talking, not as a blocking pause.
 
 ROUTING:
 - Sales / new quote / equipment / leasing → transfer to Savannah.
 - Service request, broken equipment, pickup → call `create_service_ticket`
-  yourself (you can do this without transferring) and confirm the ETA.
+  yourself (you can do this without transferring) and read back the
+  priority message the tool returns.
 - Billing / invoice / payment → transfer to Nova.
 - Angry, asking for a human, mentions "lawsuit" or "cancel" → call
   `create_escalation` with urgency=high and stay with them calmly until
@@ -217,7 +234,8 @@ ROUTING:
 
 If the caller can't stay on the line, call `schedule_callback`.
 
-NEVER invent prices. If unsure, book a callback or transfer.
+NEVER invent prices. NEVER invent response times. If unsure, book a
+callback or transfer.
 ```
 
 ### Savannah (sales & onboarding)
@@ -242,6 +260,19 @@ human if the deal is >$10k/month or the facility is a multi-site chain.
 You are Rex, Bandit's dispatch and operations agent. Direct, fast, no small
 talk. You handle service calls: broken balers, pickup requests, trailer
 rentals, maintenance visits.
+
+STYLE: Reply in under 20 words. Don't narrate what you're doing. No stage
+directions in brackets ([happy], [sad], etc.) — those are not emotions, they
+are tokens our voice will say out loud. Convey urgency through words only.
+
+RESPONSE-TIME PROMISES — IMPORTANT:
+Do NOT promise specific timeframes ("same-day", "within 2 hours", "within
+24 hours", etc.). We do not guarantee response windows. Emergencies are
+escalated first; non-emergencies go in the queue. Say things like "I'm
+escalating this as an emergency — a dispatcher will be in touch as fast as
+we can", or "I've got this in the queue and a dispatcher will follow up as
+soon as they can." Read back the `acknowledged_message` the tool returns —
+it's pre-written to avoid SLA promises.
 
 For every service caller, use `create_service_ticket`. Confirm address,
 equipment, and whether the baler is currently down. Emergency = baler is
@@ -270,6 +301,60 @@ pull the Xero record and call back. For disputes or delinquency, call
 - EL ASR + LLM + TTS combined: **~900-1300ms first syllable**.
 - Our tool endpoints: **~200-400ms** round-trip (Supabase query + return).
 - Tool calls don't block the voice stream — EL speaks a brief "let me look that up" while the tool runs.
+
+## Latency tuning checklist (ElevenLabs dashboard)
+
+If the agent feels slow to respond after the caller stops talking, work down
+this list in the EL agent config. Each lever below is approximately ranked by
+impact on perceived latency (the gap between "caller stops talking" and
+"agent starts speaking").
+
+1. **LLM choice — biggest lever.** Switch to the fastest model available for
+   your account: in order of time-to-first-token, typically
+   `gemini-2.5-flash` or `gpt-4.1-nano` > `gpt-4o-mini` > `gpt-4.1-mini`.
+   Our current stack (`gpt-4o-mini`) is fine but slower than Gemini Flash
+   for voice. Swap and A/B test on Jade first.
+
+2. **TTS model — use Flash v2.5.** In voice settings, pick `eleven_flash_v2_5`
+   (≈75ms first audio) instead of Turbo v2.5 (≈250ms) or Multilingual v2
+   (≈400ms+). Flash is purpose-built for conversational AI latency.
+
+3. **Turn-detection end-of-speech timeout.** Default is ~800ms of silence
+   before the agent decides the caller is done. Lower to **400–600ms** for
+   snappier turn-taking. Any lower risks cutting callers off mid-thought.
+
+4. **Shorten the system prompt.** Longer prompts increase time-to-first-token
+   on every turn. Our Jade/Rex prompts are already tight, but avoid bloat.
+
+5. **Cap `max_tokens` on the LLM response.** Set to ~120 tokens. Phone replies
+   should be short; long generations increase TTS-synthesis time before the
+   first audio plays.
+
+6. **Enable streaming TTS & optimize-streaming-latency.** EL exposes a
+   streaming latency optimizer (1–4). Set to `3` or `4` for voice (higher =
+   more aggressive, slightly lower quality). Values of `0`/`1` are for
+   offline-quality synthesis.
+
+7. **Parallel tool calls.** Jade's prompt now says to call `caller_lookup` in
+   the background (not block on it). Make sure the EL agent's tool config
+   has "async execution" or equivalent so the greeting streams while the
+   lookup happens.
+
+8. **Warm-up the Vercel edge.** Tool endpoints are `runtime = "nodejs"`.
+   Cold starts can add ~500ms on a first hit. Consider keeping one warm
+   request/minute from a cron, or moving the hottest tools (caller-lookup)
+   to edge runtime.
+
+9. **Drop the "let me look that up" filler** once tool calls are parallelized.
+   If `caller_lookup` runs in the background, we don't need to stall.
+
+10. **Baseline measurement.** EL exposes per-turn latency in the call
+    analytics panel. Capture a baseline before changing anything — otherwise
+    you're optimizing by vibe.
+
+Our current `gpt-4o-mini` + Turbo setup should sit around **800–1200ms**
+caller-to-agent gap. Gemini Flash + Flash v2.5 TTS + 500ms turn-detection
+should bring that to **500–800ms**, which feels noticeably more natural.
 
 ## Testing
 

@@ -26,7 +26,7 @@ interface QuoteFormProps {
 export default function QuoteForm({
   formType = "service_quote",
   title = "Get a Free Quote",
-  subtitle = "We respond within 2 hours during business hours.",
+  subtitle = "We'll get back to you as quickly as we can.",
   ctaLabel = "Request My Quote",
   showEquipment = true,
   showUrgency = false,
@@ -73,7 +73,7 @@ export default function QuoteForm({
         <CheckCircle className="mx-auto text-[#39FF14] mb-4" size={48} />
         <h3 className="text-xl font-bold text-white mb-2">Quote Request Received!</h3>
         <p className="text-gray-400 text-sm">
-          We&apos;ll contact you within 2 hours. For emergencies, call{" "}
+          We&apos;ll contact you as quickly as we can. For emergencies, call{" "}
           <a href="tel:+18574226348" className="text-[#39FF14] hover:underline font-mono">
             857-422-6348
           </a>
@@ -154,9 +154,9 @@ export default function QuoteForm({
           <div>
             <label className="input-label">Urgency</label>
             <select name="urgency" value={form.urgency} onChange={handleChange} className="input-field">
-              <option value="standard">Standard — within 48 hours</option>
-              <option value="urgent">Urgent — within 24 hours</option>
-              <option value="emergency">Emergency — ASAP</option>
+              <option value="standard">Standard</option>
+              <option value="urgent">Urgent</option>
+              <option value="emergency">Emergency — baler down</option>
             </select>
           </div>
         )}

@@ -495,11 +495,11 @@ export default function PartnersPage() {
                   Application Received!
                 </h3>
                 <p className="text-gray-400 text-sm mb-6">
-                  Thanks for applying to the Bandit partner program. We'll review
-                  your information and follow up within 1 business day.
+                  Thanks for applying to the Bandit partner program. We&apos;ll review
+                  your information and get back to you as soon as we can.
                 </p>
                 <p className="text-gray-500 text-xs">
-                  Expected response: Within 24 hours | Questions?{" "}
+                  Questions?{" "}
                   <a
                     href="tel:+18574226348"
                     className="text-[#39FF14] hover:underline"

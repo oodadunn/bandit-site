@@ -6,7 +6,7 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Baler Repair Service — All Makes & Models | Nationwide",
   description:
-    "Professional baler repair for vertical and horizontal balers nationwide. Hydraulic, electrical, and structural repairs. Same-day emergency dispatch available.",
+    "Professional baler repair for vertical and horizontal balers nationwide. Hydraulic, electrical, and structural repairs. 24/7 emergency dispatch available.",
   keywords: ["baler repair", "baler repair nationwide", "vertical baler repair", "horizontal baler repair", "hydraulic baler repair", "baler service"],
 };
 
@@ -35,12 +35,12 @@ const REPAIR_TYPES = [
   {
     icon: AlertTriangle,
     title: "Emergency Repairs",
-    items: ["24/7 emergency dispatch", "Same-day technician arrival", "All makes & models", "Parts sourcing & expediting", "Temporary fix while parts arrive"],
+    items: ["24/7 emergency dispatch", "Rapid technician arrival", "All makes & models", "Parts sourcing & expediting", "Temporary fix while parts arrive"],
   },
 ];
 
 const PROCESS = [
-  { step: "01", title: "Call or Submit", desc: "Contact us by phone or submit a quote request. We'll confirm availability and dispatch timing within 30 minutes." },
+  { step: "01", title: "Call or Submit", desc: "Contact us by phone or submit a quote request. We'll confirm availability and dispatch timing as quickly as we can." },
   { step: "02", title: "Technician Arrives", desc: "Our certified technician arrives on-site with a fully stocked service vehicle. Most common parts are on the truck." },
   { step: "03", title: "Diagnose & Quote", desc: "We perform a full diagnostic and provide a clear written estimate before any work begins. No hidden charges." },
   { step: "04", title: "Repair & Test", desc: "We complete the repair and run the baler through a full test cycle before signing off. You see it work before we leave." },
@@ -69,7 +69,7 @@ export default function BalerRepairPage() {
                 <span className="text-[#39FF14]">Any Make or Model.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Hydraulic failures, electrical faults, structural damage — our certified technicians fix it right the first time. Serving all 50 states with same-day emergency response.
+                Hydraulic failures, electrical faults, structural damage — our certified technicians fix it right the first time. Serving all 50 states with 24/7 emergency response.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
                 <a href="tel:+18574226348" className="btn-primary">
@@ -80,7 +80,7 @@ export default function BalerRepairPage() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-4">
-                {["All Makes & Models", "Same-Day Emergency", "On-Site Service", "Licensed & Insured"].map((t) => (
+                {["All Makes & Models", "24/7 Emergency", "On-Site Service", "Licensed & Insured"].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-gray-400">
                     <CheckCircle size={13} className="text-[#39FF14]" />
                     {t}
@@ -92,7 +92,7 @@ export default function BalerRepairPage() {
               <QuoteForm
                 formType="service_quote"
                 title="Request a Repair Quote"
-                subtitle="We'll respond within 2 hours. Emergencies dispatched immediately."
+                subtitle="We'll respond as fast as we can. Emergencies escalated immediately."
                 ctaLabel="Get My Repair Quote"
                 showEquipment
                 showUrgency
@@ -184,13 +184,13 @@ export default function BalerRepairPage() {
             <div className="card-dark border-[#39FF14]/20">
               <div className="flex items-center gap-3 mb-6">
                 <Clock size={20} className="text-[#39FF14]" />
-                <h2 className="text-xl font-bold text-white">Response Time Commitment</h2>
+                <h2 className="text-xl font-bold text-white">How We Prioritize</h2>
               </div>
               <div className="space-y-0 divide-y divide-[#1F2937]">
                 {[
-                  { type: "Emergency — Baler Down", time: "Same Day", note: "Technician dispatched within 2 hrs of call", color: "text-[#39FF14]" },
-                  { type: "Urgent — Intermittent Failure", time: "Within 24 hrs", note: "Next available dispatch", color: "text-yellow-400" },
-                  { type: "Standard — Planned Repair", time: "Within 48 hrs", note: "Scheduled at your convenience", color: "text-blue-400" },
+                  { type: "Emergency — Baler Down", time: "Escalated first", note: "Baler-down calls are our top priority", color: "text-[#39FF14]" },
+                  { type: "Urgent — Intermittent Failure", time: "High priority", note: "Next available dispatch", color: "text-yellow-400" },
+                  { type: "Standard — Planned Repair", time: "Standard queue", note: "Scheduled at your convenience", color: "text-blue-400" },
                   { type: "Maintenance Visit", time: "Scheduled", note: "Per your service contract schedule", color: "text-gray-300" },
                 ].map((r) => (
                   <div key={r.type} className="flex items-center justify-between py-4">

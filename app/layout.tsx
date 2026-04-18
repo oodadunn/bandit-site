@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Bandit Recycling",
   },
   description:
-    "Professional baler repair, preventive maintenance, and bale wire supply nationwide across all 50 states. Same-day service available. All makes and models.",
+    "Professional baler repair, preventive maintenance, and bale wire supply nationwide across all 50 states. 24/7 emergency service available. All makes and models.",
   keywords: [
     "baler repair", "bale wire", "baler maintenance", "vertical baler repair",
     "horizontal baler repair", "emergency baler repair", "baler service nationwide",

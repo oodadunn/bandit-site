@@ -6,14 +6,14 @@ import QuoteForm from "@/components/QuoteForm";
 export const metadata: Metadata = {
   title: "Get a Free Quote | Bandit Recycling",
   description:
-    "Request a free baler service quote. Our nationwide technicians respond within 2 hours. Repair, maintenance, equipment sales & leasing available across all 50 states.",
+    "Request a free baler service quote. Nationwide technicians, 24/7 emergency dispatch. Repair, maintenance, equipment sales & leasing across all 50 states.",
   keywords: ["baler quote", "free quote", "baler repair quote", "service quote", "equipment quote"],
 };
 
 const TRUST_SIGNALS = [
   { icon: Shield, label: "Licensed & Insured", desc: "Full coverage, all states" },
   { icon: CheckCircle, label: "All 50 States", desc: "Nationwide coverage" },
-  { icon: Clock, label: "2hr Response", desc: "Same-day emergency dispatch" },
+  { icon: Clock, label: "24/7 Dispatch", desc: "Emergencies escalated first" },
 ];
 
 export default function QuotePage() {
@@ -39,7 +39,7 @@ export default function QuotePage() {
                 <span className="text-[#39FF14]">Free Quote</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Need baler repair, maintenance, equipment, or bale wire? Get a custom quote from our team. We respond within 2 hours during business hours.
+                Need baler repair, maintenance, equipment, or bale wire? Get a custom quote from our team. We&apos;ll respond as quickly as we can — emergencies are escalated immediately.
               </p>
 
               <div className="space-y-4 mb-10">
@@ -59,7 +59,7 @@ export default function QuotePage() {
               <div className="card-dark border-l-2 border-[#39FF14]">
                 <div className="text-[#39FF14] text-xs font-mono font-bold mb-2 uppercase">Have an Emergency?</div>
                 <div className="text-gray-300 text-sm mb-3">
-                  For immediate assistance, call us directly. We dispatch same-day emergency response nationwide.
+                  For immediate assistance, call us directly. A real person answers 24/7 and we escalate baler-down calls first.
                 </div>
                 <a href="tel:+18574226348" className="inline-flex items-center gap-2 text-[#39FF14] font-bold text-sm hover:underline">
                   <Phone size={16} /> 857-422-6348
@@ -71,7 +71,7 @@ export default function QuotePage() {
               <QuoteForm
                 formType="service_quote"
                 title="Request Your Quote"
-                subtitle="Service quote, equipment, or wire. We respond within 2 hours."
+                subtitle="Service quote, equipment, or wire. We'll get back to you as quickly as we can."
                 ctaLabel="Get My Quote"
                 showEquipment
                 showUrgency
@@ -97,7 +97,7 @@ export default function QuotePage() {
               <a href="mailto:service@banditrecycling.com" className="text-lg font-bold text-white hover:text-[#39FF14] transition-colors break-all">
                 service@banditrecycling.com
               </a>
-              <p className="text-xs text-gray-500 mt-2">We respond within 2 hours</p>
+              <p className="text-xs text-gray-500 mt-2">We&apos;ll get back to you as quickly as we can</p>
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function QuotePage() {
             {[
               {
                 icon: Zap,
-                title: "2-Hour Response",
+                title: "Rapid Response",
                 desc: "We don't promise callbacks. We promise technicians on-site.",
               },
               {
@@ -130,8 +130,8 @@ export default function QuotePage() {
               },
               {
                 icon: Clock,
-                title: "Same-Day Emergency",
-                desc: "Baler down? We dispatch within hours, not days.",
+                title: "24/7 Emergency Line",
+                desc: "Baler down? Real human answers any hour, day or night.",
               },
               {
                 icon: Phone,
