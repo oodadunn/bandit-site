@@ -471,29 +471,48 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
 // it uploads every *-1k.png in public/reference/ to Supabase Storage in one
 // pass, so new references only need a file drop + button click, no code change.
 
-// ─── White-to-alpha post-processing ──────────────────────────────────────
+// ─── Chroma-key post-processing ──────────────────────────────────────────
 // Gemini doesn't reliably produce transparent PNGs — when asked for
 // "transparent background" it often paints a checkerboard pattern as a
-// literal texture on an opaque background. So we ask for a PURE WHITE
-// background and post-process here: any pixel close to white becomes
-// transparent, with a short feather band for clean edges.
+// literal texture. So we ask for a SOLID FLAT colored background (white or
+// neon green) and post-process: any pixel close to that color becomes
+// transparent, with a short feather band for clean antialiased edges.
+//
+// WHITE chroma key — for assets whose subject has no white coloring
+//   (e.g. matte-black baler, dark wire spool).
+// GREEN chroma key (#39FF14) — for Bandit character assets. Bandit has cream
+//   muzzle fur that gets badly mangled by white-to-alpha, and no natural
+//   green on his body (when we strip the brand-green vest patch). Residual
+//   green on edges reads as brand rim light, not as a visual mistake.
 
-async function whiteToAlpha(input: Buffer, threshold = 238, feather = 12): Promise<Buffer> {
+type ChromaKey = "white" | "green";
+
+// Tunable per-key thresholds. Distance = sqrt((r-kr)² + (g-kg)² + (b-kb)²)
+// in RGB space. Pixels closer than `threshold` go fully transparent.
+// Pixels between threshold and threshold+feather get partial alpha.
+const KEY_PARAMS: Record<ChromaKey, { r: number; g: number; b: number; threshold: number; feather: number }> = {
+  white: { r: 255, g: 255, b: 255, threshold: 30,  feather: 15 },
+  green: { r: 57,  g: 255, b: 20,  threshold: 55,  feather: 30 },
+};
+
+async function chromaKeyToAlpha(input: Buffer, key: ChromaKey = "white"): Promise<Buffer> {
+  const { r: kr, g: kg, b: kb, threshold, feather } = KEY_PARAMS[key];
   const { data, info } = await sharp(input)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  // RGBA bytes, mutate in place.
   for (let i = 0; i < data.length; i += 4) {
-    const r = data[i], g = data[i + 1], b = data[i + 2];
-    const minChan = Math.min(r, g, b);
-    if (minChan >= threshold) {
-      // All channels above threshold — treat as background, fully transparent
-      data[i + 3] = 0;
-    } else if (minChan >= threshold - feather) {
-      // Feather band — partial alpha for clean antialiased edges
-      const ramp = (threshold - minChan) / feather; // 0 at threshold, 1 at threshold-feather
+    const dr = data[i] - kr;
+    const dg = data[i + 1] - kg;
+    const db = data[i + 2] - kb;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+
+    if (dist <= threshold) {
+      data[i + 3] = 0; // fully transparent
+    } else if (dist <= threshold + feather) {
+      // Feather band — ramp alpha from 0 to 255 across the feather width
+      const ramp = (dist - threshold) / feather;
       data[i + 3] = Math.round(ramp * 255);
     }
     // else: keep existing alpha (typically 255)
@@ -535,15 +554,16 @@ export async function generatePageAsset(slug: string): Promise<{
     return { ok: false, error: budget.reason };
   }
 
-  // 2. Load asset row (has the prompt)
+  // 2. Load asset row (has the prompt + chroma key choice)
   const { data: asset, error: assetErr } = await sb
     .from("page_assets")
-    .select("slug, display_name, prompt")
+    .select("slug, display_name, prompt, chroma_key")
     .eq("slug", slug)
     .single();
   if (assetErr || !asset) {
     return { ok: false, error: `page_assets row not found for slug='${slug}': ${assetErr?.message ?? "not found"}` };
   }
+  const chromaKey: ChromaKey = (asset.chroma_key === "green" ? "green" : "white");
 
   // 3. Load references + call Gemini at 1:1
   let refs;
@@ -569,14 +589,14 @@ export async function generatePageAsset(slug: string): Promise<{
     return { ok: false, error: e.message };
   }
 
-  // 4a. Post-process: white background → transparent alpha
+  // 4a. Post-process: chroma key → transparent alpha (white or green per slot)
   let cleanedBuffer: Buffer;
   try {
-    cleanedBuffer = await whiteToAlpha(gen.imageBuffer);
+    cleanedBuffer = await chromaKeyToAlpha(gen.imageBuffer, chromaKey);
   } catch (e: any) {
     await sb.from("image_gen_log").insert({
       post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
-      status: "failed", error: `White-to-alpha: ${e.message}`, trigger: "manual",
+      status: "failed", error: `Chroma key (${chromaKey}): ${e.message}`, trigger: "manual",
       duration_ms: Date.now() - t0,
     });
     return { ok: false, error: `Background removal failed: ${e.message}` };
