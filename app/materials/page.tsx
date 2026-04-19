@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BookOpen, Search } from "lucide-react";
 import MaterialsClient from "./MaterialsClient";
 import { MATERIALS, CATEGORY_META } from "./data";
+import HeroMascot from "@/components/HeroMascot";
 
 export const metadata: Metadata = {
   title: "Recyclable Materials Glossary — ISRI Grades & Specs | Bandit Recycling",
@@ -44,6 +45,7 @@ export default function MaterialsPage() {
 
       {/* ── HERO TEXT ────────────────────────────────────────────────────── */}
       <section className="relative bg-[#0A0A0A] overflow-hidden pt-10 pb-16">
+        <HeroMascot slug="materials" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{

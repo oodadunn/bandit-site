@@ -16,12 +16,23 @@ interface Post {
   published_at: string | null;
 }
 
+interface PageAsset {
+  slug: string;
+  display_name: string;
+  prompt: string;
+  url: string | null;
+  updated_at: string | null;
+}
+
 export default function AdminBlogPage() {
   const router = useRouter();
   const [authed, setAuthed] = useState<boolean | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [assets, setAssets] = useState<PageAsset[]>([]);
   const [busy, setBusy] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
+  const [assetBusy, setAssetBusy] = useState<Record<string, boolean>>({});
+  const [assetResults, setAssetResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [bootstrapBusy, setBootstrapBusy] = useState(false);
   const [bootstrapResult, setBootstrapResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
@@ -38,7 +49,34 @@ export default function AdminBlogPage() {
       .then((r) => r.json())
       .then((d) => setPosts(d.posts ?? []))
       .catch(() => setPosts([]));
+    fetch("/api/admin/page-assets")
+      .then((r) => r.json())
+      .then((d) => setAssets(d.assets ?? []))
+      .catch(() => setAssets([]));
   }, [authed]);
+
+  const generateAsset = async (slug: string) => {
+    setAssetBusy((b) => ({ ...b, [slug]: true }));
+    setAssetResults((r) => { const n = { ...r }; delete n[slug]; return n; });
+    try {
+      const r = await fetch("/api/admin/generate-header-asset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+      const d = await r.json();
+      if (d.ok) {
+        setAssetResults((res) => ({ ...res, [slug]: { ok: true, msg: "Generated" } }));
+        setAssets((list) => list.map((a) => a.slug === slug ? { ...a, url: d.url, updated_at: new Date().toISOString() } : a));
+      } else {
+        setAssetResults((res) => ({ ...res, [slug]: { ok: false, msg: d.error ?? "Failed" } }));
+      }
+    } catch (e: any) {
+      setAssetResults((res) => ({ ...res, [slug]: { ok: false, msg: e.message } }));
+    } finally {
+      setAssetBusy((b) => ({ ...b, [slug]: false }));
+    }
+  };
 
   if (authed === null) {
     return (
@@ -100,7 +138,7 @@ export default function AdminBlogPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white pb-20">
-      <div className="container-site pt-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-10">
         <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] mb-6">
           <ArrowLeft size={14} /> Back to dashboard
         </Link>
@@ -132,6 +170,55 @@ export default function AdminBlogPage() {
           </div>
         </div>
 
+        {/* ── PAGE HEADER ASSETS ──────────────────────────────────────── */}
+        {assets.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold">Page Header Art</h2>
+              <span className="text-[10px] text-gray-600 uppercase tracking-wider">
+                Transparent 1:1 PNGs · used as decorative element on each menu page
+              </span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {assets.map((a) => {
+                const r = assetResults[a.slug];
+                const isBusy = assetBusy[a.slug];
+                return (
+                  <div key={a.slug} className="card-dark p-3 flex flex-col">
+                    <div
+                      className="w-full aspect-square rounded bg-[#111] bg-contain bg-center bg-no-repeat mb-2 flex items-center justify-center text-gray-700"
+                      style={a.url ? { backgroundImage: `url(${a.url})` } : undefined}
+                    >
+                      {!a.url && <ImageIcon size={20} />}
+                    </div>
+                    <p className="text-xs font-bold text-white mb-2">{a.display_name}</p>
+                    <button
+                      onClick={() => generateAsset(a.slug)}
+                      disabled={isBusy}
+                      className="inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded text-[11px] font-bold bg-[#39FF14] text-black hover:bg-[#39FF14]/90 disabled:opacity-50"
+                    >
+                      {isBusy ? (
+                        <><Loader2 size={11} className="animate-spin" /> Generating…</>
+                      ) : a.url ? (
+                        <><RefreshCw size={11} /> Regenerate</>
+                      ) : (
+                        <><Wand2 size={11} /> Generate</>
+                      )}
+                    </button>
+                    {r && (
+                      <p className={`text-[10px] mt-1 flex items-center gap-1 ${r.ok ? "text-[#39FF14]" : "text-red-400"}`}>
+                        {r.ok ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
+                        {r.msg}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <h2 className="text-lg font-bold mb-3">Blog Posts</h2>
         {posts.length === 0 ? (
           <div className="card-dark p-12 text-center text-gray-500">No posts found.</div>
         ) : (

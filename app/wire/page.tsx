@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Package, ChevronRight, CheckCircle, Truck, RefreshCw, Shield, Zap, Star, Wrench } from "lucide-react";
 import QuoteForm from "@/components/QuoteForm";
+import HeroMascot from "@/components/HeroMascot";
 
 export const metadata: Metadata = {
   title: "Bale Wire Supply — Box Wire, Single & Double Loop | Nationwide Delivery",
@@ -179,6 +180,7 @@ export default function WirePage() {
     <>
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <section className="relative min-h-[65vh] flex items-center bg-[#0A0A0A] overflow-hidden">
+        <HeroMascot slug="wire" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{

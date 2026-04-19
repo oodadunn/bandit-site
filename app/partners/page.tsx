@@ -14,6 +14,7 @@ import {
   Shield,
   Phone,
 } from "lucide-react";
+import HeroMascot from "@/components/HeroMascot";
 
 interface PartnerFormState {
   company_name: string;
@@ -77,6 +78,7 @@ export default function PartnersPage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[80vh] flex items-center bg-[#0A0A0A] overflow-hidden">
+        <HeroMascot slug="partners" />
         {/* Background grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, Zap, MapPin, Users, CheckCircle, ChevronRight, Phone } from "lucide-react";
 import USMap from "@/components/USMap";
+import HeroMascot from "@/components/HeroMascot";
 
 const SERVICE_REGIONS = {
   "Northeast": [
@@ -48,6 +49,7 @@ export default function ServiceAreaPage() {
     <>
       {/* ── HEADER ────────────────────────────────────────────────────── */}
       <section className="relative min-h-[50vh] flex items-center bg-[#0A0A0A] overflow-hidden pt-24">
+        <HeroMascot slug="service-area" />
         {/* Background grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"

@@ -253,7 +253,12 @@ interface GenerateResult {
   mimeType: string;
 }
 
-async function callGemini(prompt: string, model: string, refs: Awaited<ReturnType<typeof loadReferenceImages>>): Promise<GenerateResult> {
+async function callGemini(
+  prompt: string,
+  model: string,
+  refs: Awaited<ReturnType<typeof loadReferenceImages>>,
+  aspectRatio: "16:9" | "1:1" | "4:3" | "3:4" | "9:16" = "16:9"
+): Promise<GenerateResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
   const body = {
@@ -268,13 +273,9 @@ async function callGemini(prompt: string, model: string, refs: Awaited<ReturnTyp
     ],
     generationConfig: {
       temperature: 1.0,
-      // Gemini image models return image data as inline parts in the response.
       responseModalities: ["IMAGE"],
-      // 16:9 widescreen — prevents banner hero from cropping Bandit's face.
-      // Thumbnail on /blog uses the same image, just CSS-scaled.
-      imageConfig: {
-        aspectRatio: "16:9",
-      },
+      // Aspect ratio: blog heroes are 16:9; page header assets are 1:1.
+      imageConfig: { aspectRatio },
     },
   };
 
@@ -468,3 +469,102 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
 // Bootstrap logic now lives in /api/admin/bootstrap-references/route.ts —
 // it uploads every *-1k.png in public/reference/ to Supabase Storage in one
 // pass, so new references only need a file drop + button click, no code change.
+
+// ─── Page-asset generation (transparent 1:1 header images) ────────────────
+// Used by /admin/blog's Page Headers section and the /api/admin/generate-header-asset
+// endpoint. Reads prompt from page_assets table, renders 1:1 with the same
+// character references attached, uploads to the `headers` bucket at a stable
+// filename (so menu pages can point to a canonical URL), updates page_assets.
+
+export async function generatePageAsset(slug: string): Promise<{
+  ok: boolean;
+  url?: string;
+  error?: string;
+  prompt?: string;
+}> {
+  const sb = svc();
+  const t0 = Date.now();
+
+  // 1. Budget check (shared cap with blog images)
+  const budget = await checkBudget();
+  if (!budget.ok) {
+    await sb.from("image_gen_log").insert({
+      post_slug: `asset:${slug}`,
+      prompt: "(blocked — budget)",
+      model: budget.config?.model ?? "n/a",
+      status: "blocked",
+      error: budget.reason,
+      trigger: "manual",
+    });
+    return { ok: false, error: budget.reason };
+  }
+
+  // 2. Load asset row (has the prompt)
+  const { data: asset, error: assetErr } = await sb
+    .from("page_assets")
+    .select("slug, display_name, prompt")
+    .eq("slug", slug)
+    .single();
+  if (assetErr || !asset) {
+    return { ok: false, error: `page_assets row not found for slug='${slug}': ${assetErr?.message ?? "not found"}` };
+  }
+
+  // 3. Load references + call Gemini at 1:1
+  let refs;
+  try {
+    refs = await loadReferenceImages();
+  } catch (e: any) {
+    await sb.from("image_gen_log").insert({
+      post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
+      status: "failed", error: `Reference load: ${e.message}`, trigger: "manual",
+    });
+    return { ok: false, error: `Reference load failed: ${e.message}` };
+  }
+
+  let gen;
+  try {
+    gen = await callGemini(asset.prompt, budget.config!.model, refs, "1:1");
+  } catch (e: any) {
+    await sb.from("image_gen_log").insert({
+      post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
+      status: "failed", error: e.message, trigger: "manual",
+      duration_ms: Date.now() - t0,
+    });
+    return { ok: false, error: e.message };
+  }
+
+  // 4. Upload to headers/{slug}-{timestamp}.png (timestamp avoids CDN cache)
+  const filename = `${slug}-${Date.now()}.png`;
+  const { error: upErr } = await sb.storage
+    .from("headers")
+    .upload(filename, gen.imageBuffer, { contentType: "image/png", upsert: true });
+  if (upErr) {
+    await sb.from("image_gen_log").insert({
+      post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
+      status: "failed", error: `Storage upload: ${upErr.message}`, trigger: "manual",
+      duration_ms: Date.now() - t0,
+    });
+    return { ok: false, error: `Upload failed: ${upErr.message}` };
+  }
+
+  const publicUrl = sb.storage.from("headers").getPublicUrl(filename).data.publicUrl;
+
+  // 5. Update page_assets.url + log
+  await sb.from("page_assets")
+    .update({ url: publicUrl, updated_at: new Date().toISOString() })
+    .eq("slug", slug);
+
+  await sb.from("image_gen_log").insert({
+    post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
+    status: "success", image_url: publicUrl, trigger: "manual",
+    duration_ms: Date.now() - t0,
+  });
+
+  // 6. Invalidate the menu page cache so the new asset shows up immediately
+  try {
+    const pagePath = slug === "materials" ? "/materials" : `/${slug}`;
+    revalidatePath(pagePath);
+  } catch {}
+
+  return { ok: true, url: publicUrl, prompt: asset.prompt };
+}

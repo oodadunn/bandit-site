@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Zap, Package, Truck, TrendingUp, ChevronRight, CheckCircle } from "lucide-react";
 import QuoteForm from "@/components/QuoteForm";
+import HeroMascot from "@/components/HeroMascot";
 
 export const metadata: Metadata = {
   title: "Baler Equipment Sales & Leasing | Bandit Recycling",
@@ -61,6 +62,7 @@ export default function EquipmentPage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[70vh] flex items-center bg-[#0A0A0A] overflow-hidden">
+        <HeroMascot slug="equipment" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
