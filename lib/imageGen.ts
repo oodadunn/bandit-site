@@ -8,6 +8,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -134,21 +135,41 @@ async function fetchAsBase64(publicUrl: string): Promise<{ data: string; mimeTyp
   return { data: buf.toString("base64"), mimeType: mime };
 }
 
-async function loadReferenceImages(cfg: { mascot_ref_path: string; baler_ref_path: string } | null) {
+// Dynamic reference loading: every PNG in the Supabase `reference` bucket is
+// attached to every Gemini call (capped at MAX_REFS). Drop a new PNG into the
+// bucket → next generation uses it, no code change needed.
+const MAX_REFS = 5;
+
+async function loadReferenceImages(): Promise<{ data: string; mimeType: string }[]> {
   const sb = svc();
-  // Resolve via Supabase Storage public URLs
-  const mascotPath = cfg?.mascot_ref_path ?? "reference/bandit-mascot-1k.png";
-  const balerPath = cfg?.baler_ref_path ?? "reference/bandit-baler-1k.png";
 
-  // Strip the bucket prefix to get the storage object path
-  const mascotObj = mascotPath.replace(/^reference\//, "");
-  const balerObj = balerPath.replace(/^reference\//, "");
+  // List all files in the reference bucket
+  const { data: files, error } = await sb.storage
+    .from("reference")
+    .list("", { limit: 20, sortBy: { column: "created_at", order: "asc" } });
 
-  const mascotUrl = sb.storage.from("reference").getPublicUrl(mascotObj).data.publicUrl;
-  const balerUrl = sb.storage.from("reference").getPublicUrl(balerObj).data.publicUrl;
+  if (error) throw new Error(`Failed to list reference bucket: ${error.message}`);
 
-  const [mascot, baler] = await Promise.all([fetchAsBase64(mascotUrl), fetchAsBase64(balerUrl)]);
-  return { mascot, baler };
+  // Filter out folders / non-image files; take up to MAX_REFS
+  const pngs = (files ?? [])
+    .filter((f) => f.name && f.name.toLowerCase().endsWith(".png") && !f.name.startsWith("."))
+    .slice(0, MAX_REFS);
+
+  if (pngs.length === 0) {
+    throw new Error(
+      "No reference images found in Supabase 'reference' bucket. Run 'Bootstrap brand references' from /admin/blog first."
+    );
+  }
+
+  // Fetch and base64-encode all refs in parallel
+  const refs = await Promise.all(
+    pngs.map((f) => {
+      const url = sb.storage.from("reference").getPublicUrl(f.name).data.publicUrl;
+      return fetchAsBase64(url);
+    })
+  );
+
+  return refs;
 }
 
 // ─── Gemini call ──────────────────────────────────────────────────────────
@@ -167,8 +188,7 @@ async function callGemini(prompt: string, model: string, refs: Awaited<ReturnTyp
         role: "user",
         parts: [
           { text: prompt },
-          { inlineData: { mimeType: refs.mascot.mimeType, data: refs.mascot.data } },
-          { inlineData: { mimeType: refs.baler.mimeType, data: refs.baler.data } },
+          ...refs.map((r) => ({ inlineData: { mimeType: r.mimeType, data: r.data } })),
         ],
       },
     ],
@@ -176,6 +196,11 @@ async function callGemini(prompt: string, model: string, refs: Awaited<ReturnTyp
       temperature: 1.0,
       // Gemini image models return image data as inline parts in the response.
       responseModalities: ["IMAGE"],
+      // 16:9 widescreen — prevents banner hero from cropping Bandit's face.
+      // Thumbnail on /blog uses the same image, just CSS-scaled.
+      imageConfig: {
+        aspectRatio: "16:9",
+      },
     },
   };
 
@@ -266,17 +291,11 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
     override: opts.promptOverride,
   });
 
-  // 4. Load reference images — always read paths from image_gen_config so we
-  //    can swap refs without redeploying.
-  const { data: fullCfg } = await sb
-    .from("image_gen_config")
-    .select("mascot_ref_path, baler_ref_path")
-    .eq("id", 1)
-    .single();
-
+  // 4. Load reference images dynamically from the Supabase reference bucket.
+  //    Every PNG in the bucket is attached (capped at MAX_REFS=5).
   let refs;
   try {
-    refs = await loadReferenceImages(fullCfg);
+    refs = await loadReferenceImages();
   } catch (e: any) {
     await sb.from("image_gen_log").insert({
       post_id: opts.postId,
@@ -358,35 +377,18 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
     duration_ms: Date.now() - t0,
   });
 
+  // Invalidate the cached blog list + this specific post page so the new
+  // image shows up immediately (no 5-minute ISR wait).
+  try {
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${post.slug}`);
+  } catch {
+    // Non-fatal if called outside a request context (e.g. tests).
+  }
+
   return { ok: true, imageUrl, prompt };
 }
 
-// ─── Bootstrap helpers ────────────────────────────────────────────────────
-// Upload the public/reference PNGs into Supabase Storage so the API has
-// a stable, fetchable URL for them on every generate call.
-
-export async function bootstrapReferences(opts: {
-  mascotBuffer: Buffer;
-  balerBuffer: Buffer;
-}): Promise<{ ok: boolean; mascotUrl?: string; balerUrl?: string; error?: string }> {
-  const sb = svc();
-  try {
-    const m = await sb.storage
-      .from("reference")
-      .upload("bandit-mascot-1k.png", opts.mascotBuffer, { contentType: "image/png", upsert: true });
-    if (m.error) throw new Error(`Mascot upload: ${m.error.message}`);
-
-    const b = await sb.storage
-      .from("reference")
-      .upload("bandit-baler-1k.png", opts.balerBuffer, { contentType: "image/png", upsert: true });
-    if (b.error) throw new Error(`Baler upload: ${b.error.message}`);
-
-    return {
-      ok: true,
-      mascotUrl: sb.storage.from("reference").getPublicUrl("bandit-mascot-1k.png").data.publicUrl,
-      balerUrl: sb.storage.from("reference").getPublicUrl("bandit-baler-1k.png").data.publicUrl,
-    };
-  } catch (e: any) {
-    return { ok: false, error: e.message };
-  }
-}
+// Bootstrap logic now lives in /api/admin/bootstrap-references/route.ts —
+// it uploads every *-1k.png in public/reference/ to Supabase Storage in one
+// pass, so new references only need a file drop + button click, no code change.
