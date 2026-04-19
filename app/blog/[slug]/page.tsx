@@ -102,7 +102,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <>
       {/* ── HERO IMAGE ────────────────────────────────────────────────────── */}
       <div
-        className="w-full h-72 sm:h-96 bg-cover bg-center bg-[#111] relative flex items-center justify-center"
+        className="w-full aspect-video max-h-[640px] bg-cover bg-center bg-[#111] relative flex items-center justify-center"
         style={heroImage(post) ? { backgroundImage: `url(${heroImage(post)})` } : undefined}
       >
         {!heroImage(post) && <span className="text-7xl opacity-20">🦝</span>}
@@ -183,7 +183,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Link key={r.slug} href={`/blog/${r.slug}`} className="group block card-dark hover:border-[#39FF14]/20 transition-all overflow-hidden p-0">
                     {/* Related post thumbnail — same image as the related post's hero */}
                     <div
-                      className="w-full h-32 bg-cover bg-center bg-[#111] flex items-center justify-center"
+                      className="w-full aspect-video bg-cover bg-center bg-[#111] flex items-center justify-center"
                       style={r.image_url ? { backgroundImage: `url(${r.image_url})` } : undefined}
                     >
                       {!r.image_url && <span className="text-2xl opacity-30">🦝</span>}

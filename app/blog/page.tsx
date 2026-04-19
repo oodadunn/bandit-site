@@ -112,7 +112,7 @@ export default async function BlogPage() {
                     <div className="card-dark hover:border-[#39FF14]/30 transition-all overflow-hidden p-0">
                       {/* Cover image */}
                       <div
-                        className="w-full h-56 sm:h-72 bg-cover bg-center bg-[#111] flex items-center justify-center"
+                        className="w-full aspect-video max-h-[520px] bg-cover bg-center bg-[#111] flex items-center justify-center"
                         style={postImage(featured) ? { backgroundImage: `url(${postImage(featured)})` } : undefined}
                       >
                         {!postImage(featured) && <span className="text-4xl opacity-30">🦝</span>}
@@ -163,7 +163,7 @@ export default async function BlogPage() {
                         <div className="card-dark h-full hover:border-[#39FF14]/20 transition-all flex flex-col overflow-hidden p-0">
                           {/* Thumbnail — same image as the post hero, just scaled */}
                           <div
-                            className="w-full h-44 bg-cover bg-center bg-[#111] shrink-0 flex items-center justify-center"
+                            className="w-full aspect-video bg-cover bg-center bg-[#111] shrink-0 flex items-center justify-center"
                             style={postImage(post) ? { backgroundImage: `url(${postImage(post)})` } : undefined}
                           >
                             {!postImage(post) && <span className="text-3xl opacity-30">🦝</span>}
