@@ -4,13 +4,17 @@ import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle({ size = 16 }: { size?: number }) {
-  const [isLight, setIsLight] = useState(false);
+  // Site defaults to light mode — only flip to dark if user explicitly chose it.
+  const [isLight, setIsLight] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem("bandit-theme");
-    if (saved === "light") {
+    if (saved === "dark") {
+      setIsLight(false);
+      document.documentElement.classList.remove("light");
+    } else {
       setIsLight(true);
       document.documentElement.classList.add("light");
     }
