@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ImageIcon, RefreshCw, Loader2, CheckCircle2, AlertCircle, Wand2 } from "lucide-react";
+import { ImageIcon, RefreshCw, Loader2, CheckCircle2, AlertCircle, Wand2 } from "lucide-react";
 
 interface Post {
   id: string;
@@ -137,12 +137,8 @@ export default function AdminBlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white pb-20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-10">
-        <Link href="/admin/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] mb-6">
-          <ArrowLeft size={14} /> Back to dashboard
-        </Link>
-
+    <div className="text-white pb-20">
+      <div className="max-w-5xl mx-auto px-6 lg:px-10 pt-10">
         <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black">Blog Image Pipeline</h1>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Activity,
   Phone,
@@ -129,10 +129,37 @@ interface PartnerDetail {
 }
 
 export default function AdminDashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0A0A0A]" />}>
+      <AdminDashboardInner />
+    </Suspense>
+  );
+}
+
+function AdminDashboardInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabType>("overview");
+  // activeTab syncs to the URL's ?tab= param so the sidebar can deep-link
+  // into dashboard sub-sections (Leads, Calls, Traffic, etc.).
+  const urlTab = searchParams.get("tab") as TabType | null;
+  const [activeTab, setActiveTabState] = useState<TabType>(urlTab ?? "overview");
+
+  // Keep state in sync when the URL tab changes (sidebar click while on dashboard)
+  useEffect(() => {
+    if (urlTab && urlTab !== activeTab) setActiveTabState(urlTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlTab]);
+
+  const setActiveTab = (tab: TabType) => {
+    setActiveTabState(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", tab);
+      window.history.replaceState(null, "", url.toString());
+    }
+  };
 
   // Data states
   const [leads, setLeads] = useState<Lead[]>([]);
