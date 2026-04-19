@@ -222,12 +222,12 @@ export default function AdminBlogPage() {
         {posts.length === 0 ? (
           <div className="card-dark p-12 text-center text-gray-500">No posts found.</div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {posts.map((p) => {
               const r = results[p.id];
               const isBusy = busy[p.id];
               return (
-                <div key={p.id} className="card-dark p-4 flex gap-4 items-stretch">
+                <div key={p.id} className="card-dark p-4 flex gap-4 items-stretch min-w-0 overflow-hidden">
                   {/* Thumbnail */}
                   <div
                     className="w-32 h-20 shrink-0 rounded bg-[#111] bg-cover bg-center flex items-center justify-center text-gray-700"

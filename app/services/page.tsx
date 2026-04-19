@@ -67,7 +67,6 @@ export default function ServicesPage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[70vh] flex items-center bg-[#0A0A0A] overflow-hidden">
-        <HeroMascot slug="services" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -78,22 +77,28 @@ export default function ServicesPage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#39FF14]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container-site relative py-24">
-          <div className="text-center max-w-3xl mx-auto">
-            <div className="badge-green mb-6 justify-center">Our Services</div>
-            <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight mb-6">
-              Baler Services —{" "}
-              <span className="text-[#39FF14]">Repair, Maintenance & More</span>
-            </h1>
-            <p className="text-lg text-gray-400 mb-10 leading-relaxed">
-              From emergency repair to preventive maintenance, we keep your baling equipment running nationwide. All makes & models. 24/7 emergency dispatch available.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="tel:+18574226348" className="btn-primary">
-                <Phone size={16} /> Call 857-422-6348
-              </a>
-              <Link href="/quote" className="btn-ghost-green">
-                Request a Quote <ChevronRight size={16} />
-              </Link>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="badge-green mb-6">Our Services</div>
+              <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight mb-6">
+                Baler Services —{" "}
+                <span className="text-[#39FF14]">Repair, Maintenance & More</span>
+              </h1>
+              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-xl">
+                From emergency repair to preventive maintenance, we keep your baling equipment running nationwide. All makes & models. 24/7 emergency dispatch available.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a href="tel:+18574226348" className="btn-primary">
+                  <Phone size={16} /> Call 857-422-6348
+                </a>
+                <Link href="/quote" className="btn-ghost-green">
+                  Request a Quote <ChevronRight size={16} />
+                </Link>
+              </div>
+            </div>
+            <div className="hidden lg:flex justify-center items-center relative">
+              <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl pointer-events-none" />
+              <HeroMascot slug="services" className="relative w-full max-w-md mx-auto" />
             </div>
           </div>
         </div>

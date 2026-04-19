@@ -78,7 +78,6 @@ export default function PartnersPage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[80vh] flex items-center bg-[#0A0A0A] overflow-hidden">
-        <HeroMascot slug="partners" />
         {/* Background grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -120,6 +119,9 @@ export default function PartnersPage() {
 
             {/* Key benefits preview */}
             <div className="space-y-4">
+              <div className="hidden lg:flex justify-center mb-2">
+                <HeroMascot slug="partners" className="w-48 h-48 object-contain" />
+              </div>
               {[
                 {
                   icon: TrendingUp,

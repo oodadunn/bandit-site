@@ -62,7 +62,6 @@ export default function EquipmentPage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[70vh] flex items-center bg-[#0A0A0A] overflow-hidden">
-        <HeroMascot slug="equipment" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -93,18 +92,9 @@ export default function EquipmentPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: "New & Used", value: "Full Stock" },
-                { label: "Nationwide", value: "Delivery" },
-                { label: "Leasing", value: "Flexible Terms" },
-                { label: "Setup", value: "Included" },
-              ].map((item) => (
-                <div key={item.label} className="card-dark text-center">
-                  <div className="text-xs text-gray-500 mb-1">{item.label}</div>
-                  <div className="font-bold text-white text-sm">{item.value}</div>
-                </div>
-              ))}
+            <div className="hidden lg:flex justify-center items-center relative">
+              <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl pointer-events-none" />
+              <HeroMascot slug="equipment" className="relative w-full max-w-md mx-auto" />
             </div>
           </div>
         </div>

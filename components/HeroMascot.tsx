@@ -4,30 +4,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 /**
- * HeroMascot — decorative Pixar-style element placed inside a page hero.
- * Reads the asset URL from page_assets keyed by slug. Positioned absolute
- * bottom-right of its containing relative ancestor (the page hero).
+ * HeroMascot — decorative Pixar-style transparent PNG element.
+ * Reads the asset URL from page_assets keyed by slug. Renders as a normal
+ * inline <img> with whatever className the parent provides — letting each
+ * page hero own the layout (typically a 2-column grid where the mascot
+ * occupies the right column).
  *
- * Usage inside a hero <section className="relative ...">:
- *   <HeroMascot slug="services" />
- *
- * Rendering:
- *   - pointer-events-none so it never blocks CTAs
- *   - hidden below lg by default to avoid overlapping centered text on mobile
- *   - 420px wide on large screens, visually anchored bottom-right
- *   - client component because we need to work inside both server and client
- *     pages (e.g. /partners is a client component)
+ * Usage:
+ *   <HeroMascot slug="services" className="w-full max-w-md mx-auto" />
  */
 export default function HeroMascot({
   slug,
-  className = "",
-  widthClass = "w-[260px] sm:w-[340px] lg:w-[420px]",
-  hiddenBelow = "hidden lg:block",
+  className = "w-full max-w-md mx-auto",
 }: {
   slug: string;
   className?: string;
-  widthClass?: string;
-  hiddenBelow?: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
 
@@ -47,17 +38,13 @@ export default function HeroMascot({
   if (!url) return null;
 
   return (
-    <div
-      className={`pointer-events-none absolute bottom-0 right-0 ${hiddenBelow} ${widthClass} ${className}`}
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={url}
+      alt=""
+      className={`select-none drop-shadow-[0_0_40px_rgba(57,255,20,0.08)] ${className}`}
+      loading="eager"
       aria-hidden="true"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={url}
-        alt=""
-        className="w-full h-auto select-none drop-shadow-[0_0_40px_rgba(57,255,20,0.08)]"
-        loading="eager"
-      />
-    </div>
+    />
   );
 }

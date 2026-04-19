@@ -180,7 +180,6 @@ export default function WirePage() {
     <>
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <section className="relative min-h-[65vh] flex items-center bg-[#0A0A0A] overflow-hidden">
-        <HeroMascot slug="wire" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -226,20 +225,10 @@ export default function WirePage() {
               </div>
             </div>
 
-            {/* Hero visual — wire diagram */}
-            <div className="hidden lg:flex justify-center items-center">
-              <div className="relative w-80 h-80">
-                <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl" />
-                <div className="relative w-full h-full rounded-full border border-[#39FF14]/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <Package size={80} className="text-[#39FF14]/40 mx-auto mb-4" />
-                    <p className="text-white/40 text-sm font-mono uppercase tracking-widest">
-                      50 lb &amp; 100 lb boxes
-                    </p>
-                    <p className="text-white/20 text-xs mt-1">50 lb — 45/pallet · 100 lb — 36/pallet</p>
-                  </div>
-                </div>
-              </div>
+            {/* Hero visual — Pixar-style wire spool */}
+            <div className="hidden lg:flex justify-center items-center relative">
+              <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl pointer-events-none" />
+              <HeroMascot slug="wire" className="relative w-full max-w-md mx-auto" />
             </div>
           </div>
         </div>

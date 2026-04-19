@@ -45,7 +45,6 @@ export default function MaterialsPage() {
 
       {/* ── HERO TEXT ────────────────────────────────────────────────────── */}
       <section className="relative bg-[#0A0A0A] overflow-hidden pt-10 pb-16">
-        <HeroMascot slug="materials" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -57,27 +56,35 @@ export default function MaterialsPage() {
         <div className="absolute top-0 right-0 w-[600px] h-[400px] bg-[#39FF14]/4 rounded-full blur-[140px] pointer-events-none" />
 
         <div className="container-site relative">
-          <div className="badge-green mb-5 flex items-center gap-2 w-fit">
-            <BookOpen size={13} /> Materials Reference
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight mb-5">
-            Recyclable Materials{" "}
-            <span className="text-[#39FF14]">Glossary.</span>
-          </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mb-8 leading-relaxed">
-            Complete ISRI / ReMA specifications for fiber, plastics, and metals. Common names,
-            grade codes, value ranges, who generates it, who buys it, and what it becomes.
-            Built for recyclers, buyers, and anyone who needs to know what they're handling.
-          </p>
-
-          {/* Stats */}
-          <div className="flex flex-wrap gap-8 mb-10 pt-8 border-t border-white/8">
-            {STATS.map((s) => (
-              <div key={s.label}>
-                <div className="text-3xl font-black text-[#39FF14]">{s.val}</div>
-                <div className="text-sm text-gray-500 mt-0.5">{s.label}</div>
+          <div className="grid lg:grid-cols-[1fr_auto] gap-12 items-center">
+            <div>
+              <div className="badge-green mb-5 flex items-center gap-2 w-fit">
+                <BookOpen size={13} /> Materials Reference
               </div>
-            ))}
+              <h1 className="text-5xl sm:text-6xl font-black text-white leading-none tracking-tight mb-5">
+                Recyclable Materials{" "}
+                <span className="text-[#39FF14]">Glossary.</span>
+              </h1>
+              <p className="text-lg text-gray-400 max-w-2xl mb-8 leading-relaxed">
+                Complete ISRI / ReMA specifications for fiber, plastics, and metals. Common names,
+                grade codes, value ranges, who generates it, who buys it, and what it becomes.
+                Built for recyclers, buyers, and anyone who needs to know what they're handling.
+              </p>
+
+              {/* Stats */}
+              <div className="flex flex-wrap gap-8 mb-2 pt-8 border-t border-white/8">
+                {STATS.map((s) => (
+                  <div key={s.label}>
+                    <div className="text-3xl font-black text-[#39FF14]">{s.val}</div>
+                    <div className="text-sm text-gray-500 mt-0.5">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="hidden lg:flex justify-center items-center relative w-80">
+              <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl pointer-events-none" />
+              <HeroMascot slug="materials" className="relative w-full max-w-sm" />
+            </div>
           </div>
         </div>
       </section>

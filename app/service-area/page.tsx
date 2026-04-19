@@ -49,7 +49,6 @@ export default function ServiceAreaPage() {
     <>
       {/* ── HEADER ────────────────────────────────────────────────────── */}
       <section className="relative min-h-[50vh] flex items-center bg-[#0A0A0A] overflow-hidden pt-24">
-        <HeroMascot slug="service-area" />
         {/* Background grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -62,24 +61,30 @@ export default function ServiceAreaPage() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#39FF14]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container-site relative py-16">
-          <div className="max-w-3xl">
-            <div className="badge-green mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#39FF14] mr-2 animate-pulse" />
-              All 50 States, Local Presence
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="badge-green mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#39FF14] mr-2 animate-pulse" />
+                All 50 States, Local Presence
+              </div>
+              <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-6 tracking-tight">
+                Nationwide Service Coverage
+              </h1>
+              <p className="text-xl text-gray-400 mb-8 leading-relaxed max-w-xl">
+                From Maine to Hawaii, Bandit services all 50 states with local technicians dispatched from within your region. 24/7 emergency dispatch — baler-down calls get prioritized.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a href="tel:+18574226348" className="btn-primary">
+                  <Phone size={16} /> Call 857-422-6348
+                </a>
+                <Link href="/quote" className="btn-secondary">
+                  Request a Quote <ChevronRight size={16} />
+                </Link>
+              </div>
             </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-white leading-tight mb-6 tracking-tight">
-              Nationwide Service Coverage
-            </h1>
-            <p className="text-xl text-gray-400 mb-8 leading-relaxed max-w-2xl">
-              From Maine to Hawaii, Bandit services all 50 states with local technicians dispatched from within your region. 24/7 emergency dispatch — baler-down calls get prioritized.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <a href="tel:+18574226348" className="btn-primary">
-                <Phone size={16} /> Call 857-422-6348
-              </a>
-              <Link href="/quote" className="btn-secondary">
-                Request a Quote <ChevronRight size={16} />
-              </Link>
+            <div className="hidden lg:flex justify-center items-center relative">
+              <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl pointer-events-none" />
+              <HeroMascot slug="service-area" className="relative w-full max-w-md mx-auto" />
             </div>
           </div>
         </div>

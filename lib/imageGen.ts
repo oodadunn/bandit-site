@@ -9,6 +9,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -470,6 +471,41 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
 // it uploads every *-1k.png in public/reference/ to Supabase Storage in one
 // pass, so new references only need a file drop + button click, no code change.
 
+// ─── White-to-alpha post-processing ──────────────────────────────────────
+// Gemini doesn't reliably produce transparent PNGs — when asked for
+// "transparent background" it often paints a checkerboard pattern as a
+// literal texture on an opaque background. So we ask for a PURE WHITE
+// background and post-process here: any pixel close to white becomes
+// transparent, with a short feather band for clean edges.
+
+async function whiteToAlpha(input: Buffer, threshold = 238, feather = 12): Promise<Buffer> {
+  const { data, info } = await sharp(input)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // RGBA bytes, mutate in place.
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const minChan = Math.min(r, g, b);
+    if (minChan >= threshold) {
+      // All channels above threshold — treat as background, fully transparent
+      data[i + 3] = 0;
+    } else if (minChan >= threshold - feather) {
+      // Feather band — partial alpha for clean antialiased edges
+      const ramp = (threshold - minChan) / feather; // 0 at threshold, 1 at threshold-feather
+      data[i + 3] = Math.round(ramp * 255);
+    }
+    // else: keep existing alpha (typically 255)
+  }
+
+  return sharp(data, {
+    raw: { width: info.width, height: info.height, channels: 4 },
+  })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+}
+
 // ─── Page-asset generation (transparent 1:1 header images) ────────────────
 // Used by /admin/blog's Page Headers section and the /api/admin/generate-header-asset
 // endpoint. Reads prompt from page_assets table, renders 1:1 with the same
@@ -533,11 +569,24 @@ export async function generatePageAsset(slug: string): Promise<{
     return { ok: false, error: e.message };
   }
 
-  // 4. Upload to headers/{slug}-{timestamp}.png (timestamp avoids CDN cache)
+  // 4a. Post-process: white background → transparent alpha
+  let cleanedBuffer: Buffer;
+  try {
+    cleanedBuffer = await whiteToAlpha(gen.imageBuffer);
+  } catch (e: any) {
+    await sb.from("image_gen_log").insert({
+      post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
+      status: "failed", error: `White-to-alpha: ${e.message}`, trigger: "manual",
+      duration_ms: Date.now() - t0,
+    });
+    return { ok: false, error: `Background removal failed: ${e.message}` };
+  }
+
+  // 4b. Upload to headers/{slug}-{timestamp}.png (timestamp avoids CDN cache)
   const filename = `${slug}-${Date.now()}.png`;
   const { error: upErr } = await sb.storage
     .from("headers")
-    .upload(filename, gen.imageBuffer, { contentType: "image/png", upsert: true });
+    .upload(filename, cleanedBuffer, { contentType: "image/png", upsert: true });
   if (upErr) {
     await sb.from("image_gen_log").insert({
       post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,
