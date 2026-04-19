@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Search, ChevronDown, ChevronUp, X, BookOpen, Phone } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { Search, X, BookOpen, Phone } from "lucide-react";
 import { MATERIALS, CATEGORY_META, SUBCATEGORIES, type Material, type MaterialCategory } from "./data";
 
-// AI-generated images stored in Supabase Storage (generated via Imagen 4).
-// Subcategories without a dedicated image fall back to picsum seeds.
-const IMG = (f: string) => `https://cerozvtggvwixeyqcgkz.supabase.co/storage/v1/object/public/site-images/${f}`;
+// ── AI-generated images stored in Supabase Storage (generated via Imagen 4). ──
+const IMG = (f: string) =>
+  `https://cerozvtggvwixeyqcgkz.supabase.co/storage/v1/object/public/site-images/${f}`;
 const SUBCATEGORY_IMAGES: Record<string, string[]> = {
   "Corrugated":        [IMG("material-corrugated.png")],
   "Mixed Paper":       [IMG("material-mixed-paper.png")],
@@ -29,16 +29,18 @@ const SUBCATEGORY_IMAGES: Record<string, string[]> = {
   "Rubber":            ["https://picsum.photos/seed/rubber-tires-a/480/360"],
 };
 
+// Variable aspect ratio — makes masonry feel organic (Pinterest-y)
+function aspectFor(id: string): string {
+  const aspects = ["4/5", "3/4", "1/1", "4/3", "4/5", "3/4"];
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return aspects[h % aspects.length];
+}
+
 const VALUE_COLORS: Record<string, string> = {
   high: "text-[#39FF14]",
   medium: "text-yellow-400",
   low: "text-gray-400",
-};
-
-const VALUE_BG: Record<string, string> = {
-  high: "bg-[#39FF14]/10 border-[#39FF14]/30",
-  medium: "bg-yellow-400/10 border-yellow-400/30",
-  low: "bg-gray-400/10 border-gray-400/30",
 };
 
 const DIFF_COLOR: Record<string, string> = {
@@ -47,126 +49,279 @@ const DIFF_COLOR: Record<string, string> = {
   Difficult: "text-red-400",
 };
 
-// Single image — shows a dark tinted placeholder on load error instead of disappearing
-function MaterialImage({ src, alt }: { src: string; alt: string }) {
-  const [status, setStatus] = useState<"loading" | "ok" | "failed">("loading");
+// ── Masonry tile: single material ─────────────────────────────────────
+function MaterialTile({ mat, onOpen }: { mat: Material; onOpen: () => void }) {
+  const img = mat.imageUrl || SUBCATEGORY_IMAGES[mat.subcategory]?.[0];
+  const aspect = aspectFor(mat.id);
+  const [failed, setFailed] = useState(false);
+
   return (
-    <>
-      {status === "failed" && (
-        <div className="w-full h-full flex items-center justify-center bg-[#111] text-gray-600 text-xs text-center px-3">
-          {alt}
+    <button onClick={onOpen} className="tile group block w-full text-left">
+      <div
+        className="relative w-full overflow-hidden"
+        style={{ aspectRatio: aspect, background: "var(--bg-card-hi)" }}
+      >
+        {img && !failed ? (
+          <img
+            src={img}
+            alt={mat.commonName}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+            onError={() => setFailed(true)}
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center text-4xl"
+            style={{ background: `${mat.colorAccent}15` }}
+          >
+            {mat.icon}
+          </div>
+        )}
+
+        {/* Corner ISRI badge */}
+        <div
+          className="absolute top-3 left-3 px-2 py-1 text-[9px] font-bold tracking-[0.2em] uppercase rounded-sm"
+          style={{
+            background: "rgba(0,0,0,0.7)",
+            color: "var(--green-accent)",
+            border: "1px solid var(--green-border)",
+            fontFamily: "'JetBrains Mono', monospace",
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          {mat.isriCode}
         </div>
-      )}
-      <img
-        src={src}
-        alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${status === "ok" ? "opacity-100" : "opacity-0 absolute inset-0"}`}
-        onLoad={() => setStatus("ok")}
-        onError={() => setStatus("failed")}
-      />
-    </>
+
+        {/* Value tag bottom-right */}
+        <div
+          className={`absolute bottom-3 right-3 px-2 py-1 text-[10px] font-bold rounded-sm ${VALUE_COLORS[mat.valueTier]}`}
+          style={{
+            background: "rgba(0,0,0,0.7)",
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          {mat.valueRange}
+        </div>
+      </div>
+
+      <div className="tile-body">
+        <div
+          className="text-[9px] font-bold tracking-[0.28em] uppercase mb-2"
+          style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+        >
+          ◢ {mat.subcategory}
+        </div>
+        <h3
+          className="text-sm font-black uppercase tracking-[0.01em] leading-snug mb-1"
+          style={{ color: "var(--text-primary)" }}
+        >
+          {mat.commonName}
+        </h3>
+        <p className="text-[11px] mb-2" style={{ color: "var(--text-tertiary)" }}>
+          {mat.isriName}
+        </p>
+        <p className="text-xs leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+          {mat.description}
+        </p>
+      </div>
+    </button>
   );
 }
 
-function MaterialCard({ mat, isExpanded, onToggle }: {
-  mat: Material;
-  isExpanded: boolean;
-  onToggle: () => void;
-}) {
-  // Prefer material-specific imageUrl, then fall back to subcategory images
+// ── Detail modal — Pinterest pin detail takeover ──────────────────────
+function MaterialDetail({ mat, onClose }: { mat: Material; onClose: () => void }) {
   const images: string[] = mat.imageUrl
     ? [mat.imageUrl, ...(SUBCATEGORY_IMAGES[mat.subcategory] ?? []).slice(0, 1)]
-    : (SUBCATEGORY_IMAGES[mat.subcategory] ?? []);
+    : SUBCATEGORY_IMAGES[mat.subcategory] ?? [];
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
     <div
-      className={`rounded-xl border transition-all duration-200 overflow-hidden ${
-        isExpanded
-          ? "border-[#39FF14]/40 bg-[#111]"
-          : "border-white/8 bg-[#0d0d0d] hover:border-white/20 hover:bg-[#111] cursor-pointer"
-      }`}
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-10 px-4"
+      style={{ background: "rgba(0,0,0,0.82)", backdropFilter: "blur(8px)" }}
+      onClick={onClose}
     >
-      {/* Card Header — always visible */}
-      <button
-        onClick={onToggle}
-        className="w-full text-left p-5 flex items-start gap-4"
+      <div
+        className="relative w-full max-w-5xl rounded-3xl overflow-hidden my-auto"
+        style={{
+          background: "var(--bg-card)",
+          border: "1px solid var(--border-default)",
+        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Icon */}
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 mt-0.5"
-          style={{ backgroundColor: `${mat.colorAccent}20`, border: `1px solid ${mat.colorAccent}40` }}
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+          style={{
+            background: "rgba(0,0,0,0.6)",
+            border: "1px solid var(--border-hi)",
+            color: "var(--text-primary)",
+            backdropFilter: "blur(8px)",
+          }}
+          aria-label="Close"
         >
-          {mat.icon}
-        </div>
+          <X size={18} />
+        </button>
 
-        {/* Main info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <span className="font-mono text-xs text-[#39FF14] bg-[#39FF14]/10 px-2 py-0.5 rounded border border-[#39FF14]/20">
-              {mat.isriCode}
-            </span>
-            {mat.balerRelevant && (
-              <span className="text-xs text-white/40 bg-white/5 px-2 py-0.5 rounded border border-white/10">
-                🗜 Baler Required
-              </span>
-            )}
-          </div>
-          <h3 className="text-white font-bold text-base leading-snug">{mat.commonName}</h3>
-          <p className="text-gray-500 text-xs mt-0.5">{mat.isriName}</p>
-          <p className="text-gray-400 text-sm mt-2 line-clamp-2">{mat.description}</p>
-        </div>
-
-        {/* Value + expand */}
-        <div className="shrink-0 text-right ml-2">
-          <div className={`text-sm font-bold ${VALUE_COLORS[mat.valueTier]}`}>{mat.valueRange}</div>
-          <div className="text-gray-600 text-xs mt-0.5">est. /ton</div>
-          <div className="mt-3 text-gray-500">
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </div>
-        </div>
-      </button>
-
-      {/* Expanded detail panel */}
-      {isExpanded && (
-        <div className="border-t border-white/8 p-5 space-y-6">
-
-          {/* Photo gallery */}
-          {images.length > 0 && (
-            <div>
-              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">What It Looks Like</h4>
-              <div className={`grid gap-2 ${images.length > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
-                {images.slice(0, 2).map((src, i) => (
-                  <div
-                    key={i}
-                    className="relative rounded-lg overflow-hidden bg-[#0A0A0A] border border-white/5"
-                    style={{ aspectRatio: "4/3" }}
-                  >
-                    <MaterialImage src={src} alt={`${mat.commonName} example ${i + 1}`} />
-                  </div>
-                ))}
+        {/* Hero image band */}
+        {images.length > 0 && (
+          <div className="relative w-full grid grid-cols-1 sm:grid-cols-2 gap-1" style={{ background: "var(--bg-card-hi)" }}>
+            {images.slice(0, 2).map((src, i) => (
+              <div
+                key={i}
+                className="relative overflow-hidden"
+                style={{ aspectRatio: "4/3", background: "var(--bg-card-hi)" }}
+              >
+                <img
+                  src={src}
+                  alt={`${mat.commonName} ${i + 1}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+                  }}
+                />
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          {/* Quick stats row */}
+        <div className="p-8 sm:p-12 space-y-10">
+          {/* Header */}
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span
+                className="px-3 py-1 text-[10px] font-bold tracking-[0.28em] uppercase rounded-sm"
+                style={{
+                  background: "var(--green-bg)",
+                  color: "var(--green-accent)",
+                  border: "1px solid var(--green-border)",
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                {mat.isriCode}
+              </span>
+              {mat.balerRelevant && (
+                <span
+                  className="px-3 py-1 text-[10px] font-bold tracking-[0.28em] uppercase rounded-sm"
+                  style={{
+                    color: "var(--text-secondary)",
+                    background: "var(--bg-card-hi)",
+                    border: "1px solid var(--border-hi)",
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  🗜 Baler Required
+                </span>
+              )}
+            </div>
+            <h2
+              className="font-black uppercase leading-[0.95] mb-3"
+              style={{
+                color: "var(--text-primary)",
+                fontSize: "clamp(28px, 4.5vw, 52px)",
+                letterSpacing: "0.005em",
+              }}
+            >
+              {mat.commonName}
+            </h2>
+            <p className="text-sm mb-4" style={{ color: "var(--text-tertiary)" }}>
+              {mat.isriName} · {mat.subcategory}
+            </p>
+            <p className="text-base leading-relaxed max-w-3xl" style={{ color: "var(--text-secondary)" }}>
+              {mat.description}
+            </p>
+          </div>
+
+          {/* Stat strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: "Value Tier", val: mat.valueTier.charAt(0).toUpperCase() + mat.valueTier.slice(1), color: VALUE_COLORS[mat.valueTier] },
-              { label: "Recyclability", val: mat.recyclability, color: mat.recyclability === "High" ? "text-[#39FF14]" : mat.recyclability === "Medium" ? "text-yellow-400" : "text-red-400" },
-              { label: "Processing", val: mat.processingDifficulty, color: DIFF_COLOR[mat.processingDifficulty] },
-              { label: "Baler", val: mat.balerRelevant ? (mat.balerType === "both" ? "Vertical or Horiz." : mat.balerType === "vertical" ? "Vertical" : mat.balerType === "horizontal" ? "Horizontal" : "Yes") : "Not Required", color: mat.balerRelevant ? "text-[#39FF14]" : "text-gray-500" },
+              {
+                label: "Value Range",
+                val: mat.valueRange,
+                color:
+                  mat.valueTier === "high"
+                    ? "var(--green-accent)"
+                    : mat.valueTier === "medium"
+                    ? "#CA8A04"
+                    : "var(--text-tertiary)",
+              },
+              {
+                label: "Recyclability",
+                val: mat.recyclability,
+                color: mat.recyclability === "High" ? "var(--green-accent)" : mat.recyclability === "Medium" ? "#CA8A04" : "#DC2626",
+              },
+              {
+                label: "Processing",
+                val: mat.processingDifficulty,
+                color: mat.processingDifficulty === "Easy" ? "var(--green-accent)" : mat.processingDifficulty === "Moderate" ? "#CA8A04" : "#DC2626",
+              },
+              {
+                label: "Baler",
+                val: mat.balerRelevant
+                  ? mat.balerType === "both"
+                    ? "Vertical / Horiz"
+                    : mat.balerType === "vertical"
+                    ? "Vertical"
+                    : mat.balerType === "horizontal"
+                    ? "Horizontal"
+                    : "Yes"
+                  : "Not Required",
+                color: mat.balerRelevant ? "var(--green-accent)" : "var(--text-tertiary)",
+              },
             ].map((s) => (
-              <div key={s.label} className="bg-[#0A0A0A] rounded-lg p-3 border border-white/5">
-                <div className="text-gray-600 text-xs mb-1">{s.label}</div>
-                <div className={`text-sm font-semibold ${s.color}`}>{s.val}</div>
+              <div
+                key={s.label}
+                className="rounded-xl p-4"
+                style={{
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border-default)",
+                }}
+              >
+                <div
+                  className="text-[9px] font-bold tracking-[0.3em] uppercase mb-2"
+                  style={{ color: "var(--text-tertiary)", fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  ◢ {s.label}
+                </div>
+                <div
+                  className="text-base font-black uppercase tracking-[0.01em]"
+                  style={{ color: s.color }}
+                >
+                  {s.val}
+                </div>
               </div>
             ))}
           </div>
 
           {/* ISRI Spec */}
           <div>
-            <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">ISRI Specification</h4>
-            <p className="text-sm text-gray-300 bg-[#0A0A0A] rounded-lg p-3 border border-white/5 leading-relaxed font-mono">
+            <div
+              className="text-[10px] font-bold tracking-[0.3em] uppercase mb-3"
+              style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              ◢ ISRI Specification
+            </div>
+            <p
+              className="text-sm leading-relaxed rounded-xl p-5"
+              style={{
+                background: "var(--bg-secondary)",
+                border: "1px solid var(--border-default)",
+                color: "var(--text-secondary)",
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            >
               {mat.isriSpec}
             </p>
           </div>
@@ -174,10 +329,19 @@ function MaterialCard({ mat, isExpanded, onToggle }: {
           {/* Aliases */}
           {mat.aliases.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">Also Known As</h4>
+              <div
+                className="text-[10px] font-bold tracking-[0.3em] uppercase mb-3"
+                style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                ◢ Also Known As
+              </div>
               <div className="flex flex-wrap gap-2">
                 {mat.aliases.map((a) => (
-                  <span key={a} className="text-xs bg-white/5 text-white/60 px-2 py-1 rounded border border-white/8">
+                  <span
+                    key={a}
+                    className="chip"
+                    style={{ cursor: "default", pointerEvents: "none" }}
+                  >
                     {a}
                   </span>
                 ))}
@@ -185,71 +349,92 @@ function MaterialCard({ mat, isExpanded, onToggle }: {
             </div>
           )}
 
-          {/* 3-col: Sources / Buyers / End Uses */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">Common Sources</h4>
-              <ul className="space-y-1">
-                {mat.commonSources.map((s) => (
-                  <li key={s} className="text-xs text-gray-400 flex items-start gap-1.5">
-                    <span className="text-[#39FF14] mt-0.5">›</span> {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">End Buyers</h4>
-              <ul className="space-y-1">
-                {mat.endBuyers.map((b) => (
-                  <li key={b} className="text-xs text-gray-400 flex items-start gap-1.5">
-                    <span className="text-[#39FF14] mt-0.5">›</span> {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-xs font-semibold text-[#39FF14] uppercase tracking-wider mb-2">Becomes</h4>
-              <ul className="space-y-1">
-                {mat.endUses.map((u) => (
-                  <li key={u} className="text-xs text-gray-400 flex items-start gap-1.5">
-                    <span className="text-[#39FF14] mt-0.5">›</span> {u}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Sources / Buyers / End Uses */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { label: "Common Sources", items: mat.commonSources },
+              { label: "End Buyers", items: mat.endBuyers },
+              { label: "Becomes", items: mat.endUses },
+            ].map((col) => (
+              <div key={col.label}>
+                <div
+                  className="text-[10px] font-bold tracking-[0.3em] uppercase mb-3"
+                  style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  ◢ {col.label}
+                </div>
+                <ul className="space-y-2">
+                  {col.items.map((it) => (
+                    <li
+                      key={it}
+                      className="text-xs flex items-start gap-2 leading-relaxed"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      <span style={{ color: "var(--green-accent)", marginTop: 2 }}>›</span>
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
 
-          {/* Kevin Notes */}
-          <div className="bg-[#39FF14]/5 border border-[#39FF14]/20 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Phone size={13} className="text-[#39FF14]" />
-              <span className="text-xs font-bold text-[#39FF14] uppercase tracking-wider">Kevin's Call Notes</span>
+          {/* Kevin's Call Notes */}
+          <div
+            className="rounded-2xl p-6"
+            style={{
+              background: "var(--green-bg)",
+              border: "1px solid var(--green-border)",
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Phone size={13} style={{ color: "var(--green-accent)" }} />
+              <span
+                className="text-[10px] font-bold tracking-[0.3em] uppercase"
+                style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                ◢ Kevin&apos;s Call Notes
+              </span>
             </div>
-            <p className="text-sm text-white/70 leading-relaxed">{mat.kevinNotes}</p>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
+              {mat.kevinNotes}
+            </p>
           </div>
 
-          {/* Baler callout if relevant */}
+          {/* Baler callout */}
           {mat.balerRelevant && (
-            <div className="bg-white/3 border border-white/8 rounded-xl p-4 flex items-start gap-3">
-              <span className="text-xl">🗜</span>
+            <div
+              className="rounded-2xl p-6 flex items-start gap-4"
+              style={{
+                background: "var(--bg-secondary)",
+                border: "1px solid var(--border-default)",
+              }}
+            >
+              <span className="text-3xl leading-none">🗜</span>
               <div>
-                <p className="text-sm font-semibold text-white mb-1">Baler Recommended</p>
-                <p className="text-xs text-gray-400">
+                <p
+                  className="text-sm font-black uppercase tracking-[0.05em] mb-2"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  Baler Recommended
+                </p>
+                <p className="text-xs leading-relaxed mb-3" style={{ color: "var(--text-secondary)" }}>
                   {mat.balerType === "vertical" && "A vertical baler is the standard choice for this material. Compact footprint, good for mid-volume generators."}
                   {mat.balerType === "horizontal" && "A horizontal auto-tie baler is ideal for high-volume operations handling this material."}
                   {mat.balerType === "both" && "Both vertical and horizontal balers work for this material. Vertical balers suit retail and mid-volume; horizontal auto-tie for high-volume distribution and manufacturing."}
                 </p>
                 <a
                   href="/wire"
-                  className="text-xs text-[#39FF14] hover:underline mt-1 inline-block"
+                  className="text-[10px] font-bold tracking-[0.22em] uppercase"
+                  style={{ color: "var(--green-accent)" }}
                 >
-                  Need bale wire? → Shop wire supply
+                  Need Bale Wire? → Shop Wire Supply
                 </a>
               </div>
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -258,7 +443,7 @@ export default function MaterialsClient() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<MaterialCategory | "all">("all");
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openMatId, setOpenMatId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -280,149 +465,188 @@ export default function MaterialsClient() {
   const subcategoriesForActive =
     activeCategory !== "all" ? SUBCATEGORIES[activeCategory] : [];
 
+  const openMat = openMatId ? MATERIALS.find((m) => m.id === openMatId) ?? null : null;
+
   return (
     <div>
-      {/* ── SEARCH + FILTER BAR ─────────────────────────────────────────────── */}
-      <div className="sticky top-16 z-30 bg-[#0A0A0A]/95 backdrop-blur-sm border-b border-white/8 py-4">
-        <div className="container-site">
+      {/* ── STICKY SEARCH + FILTER BAR ────────────────────────────── */}
+      <div
+        className="sticky top-16 z-30 backdrop-blur-md"
+        style={{
+          background: "rgba(0,0,0,0.72)",
+          borderBottom: "1px solid var(--border-default)",
+        }}
+      >
+        <div className="container-site py-5">
           {/* Search */}
-          <div className="relative mb-4">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+          <div className="relative mb-5">
+            <Search
+              size={14}
+              className="absolute left-5 top-1/2 -translate-y-1/2"
+              style={{ color: "var(--text-tertiary)" }}
+            />
             <input
               type="text"
-              placeholder="Search by material name, ISRI code, or alias (e.g. 'cardboard', 'Barley', 'milk jugs')..."
+              placeholder="Search materials, ISRI codes, or aliases (OCC, Barley, milk jugs…)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#111] border border-white/10 rounded-xl pl-10 pr-10 py-3 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#39FF14]/50 focus:ring-1 focus:ring-[#39FF14]/20 transition-colors"
+              className="w-full rounded-full pl-12 pr-12 py-3.5 text-sm focus:outline-none transition-colors"
+              style={{
+                background: "var(--bg-card)",
+                border: "1px solid var(--border-default)",
+                color: "var(--text-primary)",
+              }}
             />
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                className="absolute right-5 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: "var(--text-tertiary)" }}
+                aria-label="Clear search"
               >
                 <X size={14} />
               </button>
             )}
           </div>
 
-          {/* Category tabs */}
+          {/* Category chips */}
           <div className="flex items-center gap-2 flex-wrap">
-            {(["all", "fiber", "plastic", "metal"] as const).map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  setActiveSubcategory(null);
-                }}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeCategory === cat
-                    ? "bg-[#39FF14] text-[#0A0A0A]"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/10"
-                }`}
-              >
-                {cat === "all"
-                  ? `All (${MATERIALS.length})`
-                  : `${CATEGORY_META[cat].icon} ${CATEGORY_META[cat].label} (${MATERIALS.filter((m) => m.category === cat).length})`}
-              </button>
-            ))}
+            {(["all", "fiber", "plastic", "metal"] as const).map((cat) => {
+              const count =
+                cat === "all" ? MATERIALS.length : MATERIALS.filter((m) => m.category === cat).length;
+              const on = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setActiveSubcategory(null);
+                  }}
+                  className={`chip ${on ? "chip-on" : ""}`}
+                >
+                  {cat === "all" ? `All · ${count}` : `${CATEGORY_META[cat].icon} ${CATEGORY_META[cat].label} · ${count}`}
+                </button>
+              );
+            })}
 
-            {/* Subcategory pills */}
             {subcategoriesForActive.length > 0 && (
-              <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-white/10">
-                {subcategoriesForActive.map((sub) => (
-                  <button
-                    key={sub}
-                    onClick={() =>
-                      setActiveSubcategory(activeSubcategory === sub ? null : sub)
-                    }
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                      activeSubcategory === sub
-                        ? "bg-white/20 text-white border border-white/30"
-                        : "bg-white/5 text-gray-500 hover:text-gray-300 border border-white/8"
-                    }`}
-                  >
-                    {sub}
-                  </button>
-                ))}
+              <div
+                className="flex items-center gap-2 ml-3 pl-3 flex-wrap"
+                style={{ borderLeft: "1px solid var(--border-default)" }}
+              >
+                {subcategoriesForActive.map((sub) => {
+                  const on = activeSubcategory === sub;
+                  return (
+                    <button
+                      key={sub}
+                      onClick={() => setActiveSubcategory(on ? null : sub)}
+                      className={`chip ${on ? "chip-on" : ""}`}
+                      style={{ fontSize: 9, padding: "8px 14px" }}
+                    >
+                      {sub}
+                    </button>
+                  );
+                })}
               </div>
             )}
 
-            <div className="ml-auto text-xs text-gray-600">
+            <div
+              className="ml-auto text-[10px] font-bold tracking-[0.22em] uppercase"
+              style={{ color: "var(--text-tertiary)", fontFamily: "'JetBrains Mono', monospace" }}
+            >
               {filtered.length} material{filtered.length !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── MATERIALS GRID ──────────────────────────────────────────────────── */}
-      <div className="container-site py-10">
+      {/* ── MASONRY BOARD ─────────────────────────────────────────── */}
+      <div className="container-site py-12">
         {filtered.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-gray-500 text-lg mb-2">No materials match "{search}"</p>
-            <p className="text-gray-700 text-sm">Try an ISRI code, common name, or alias</p>
+          <div className="text-center py-32">
+            <p className="text-lg mb-2" style={{ color: "var(--text-secondary)" }}>
+              No materials match &ldquo;{search}&rdquo;
+            </p>
+            <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
+              Try an ISRI code, common name, or alias
+            </p>
             <button
-              onClick={() => { setSearch(""); setActiveCategory("all"); setActiveSubcategory(null); }}
-              className="mt-4 text-[#39FF14] text-sm hover:underline"
+              onClick={() => {
+                setSearch("");
+                setActiveCategory("all");
+                setActiveSubcategory(null);
+              }}
+              className="btn-secondary"
             >
-              Clear filters
+              Clear Filters
             </button>
           </div>
+        ) : activeCategory === "all" || activeSubcategory ? (
+          <div className="masonry">
+            {filtered.map((mat) => (
+              <MaterialTile key={mat.id} mat={mat} onOpen={() => setOpenMatId(mat.id)} />
+            ))}
+          </div>
         ) : (
-          <>
-            {/* Group by subcategory */}
-            {activeCategory === "all" || activeSubcategory
-              ? (
-                <div className="space-y-3">
-                  {filtered.map((mat) => (
-                    <MaterialCard
-                      key={mat.id}
-                      mat={mat}
-                      isExpanded={expandedId === mat.id}
-                      onToggle={() => setExpandedId(expandedId === mat.id ? null : mat.id)}
+          <div className="space-y-16">
+            {subcategoriesForActive
+              .filter((sub) => filtered.some((m) => m.subcategory === sub))
+              .map((sub) => (
+                <div key={sub}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div
+                      className="text-[10px] font-bold tracking-[0.3em] uppercase"
+                      style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+                    >
+                      ◢ {sub}
+                    </div>
+                    <div
+                      className="h-px flex-1"
+                      style={{ background: "var(--border-default)" }}
                     />
-                  ))}
+                    <span
+                      className="text-[10px] font-bold tracking-[0.22em] uppercase"
+                      style={{ color: "var(--text-tertiary)", fontFamily: "'JetBrains Mono', monospace" }}
+                    >
+                      {filtered.filter((m) => m.subcategory === sub).length} grades
+                    </span>
+                  </div>
+                  <div className="masonry">
+                    {filtered
+                      .filter((m) => m.subcategory === sub)
+                      .map((mat) => (
+                        <MaterialTile key={mat.id} mat={mat} onOpen={() => setOpenMatId(mat.id)} />
+                      ))}
+                  </div>
                 </div>
-              )
-              : (
-                <div className="space-y-12">
-                  {subcategoriesForActive
-                    .filter((sub) => filtered.some((m) => m.subcategory === sub))
-                    .map((sub) => (
-                      <div key={sub}>
-                        <div className="flex items-center gap-3 mb-4">
-                          <h2 className="text-lg font-bold text-white">{sub}</h2>
-                          <div className="h-px flex-1 bg-white/8" />
-                          <span className="text-xs text-gray-600">
-                            {filtered.filter((m) => m.subcategory === sub).length} grades
-                          </span>
-                        </div>
-                        <div className="space-y-3">
-                          {filtered
-                            .filter((m) => m.subcategory === sub)
-                            .map((mat) => (
-                              <MaterialCard
-                                key={mat.id}
-                                mat={mat}
-                                isExpanded={expandedId === mat.id}
-                                onToggle={() => setExpandedId(expandedId === mat.id ? null : mat.id)}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              )}
-          </>
+              ))}
+          </div>
         )}
       </div>
 
-      {/* ── GLOSSARY ────────────────────────────────────────────────────────── */}
-      <div className="border-t border-white/8 bg-[#050505]">
-        <div className="container-site py-20">
+      {/* ── GLOSSARY ──────────────────────────────────────────────── */}
+      <div
+        className="border-t"
+        style={{
+          background: "var(--bg-secondary)",
+          borderColor: "var(--border-default)",
+        }}
+      >
+        <div className="container-site py-24">
           <div className="flex items-center gap-3 mb-10">
-            <BookOpen size={20} className="text-[#39FF14]" />
-            <h2 className="text-2xl font-black text-white">Industry Glossary</h2>
+            <BookOpen size={18} style={{ color: "var(--green-accent)" }} />
+            <div
+              className="text-[10px] font-bold tracking-[0.3em] uppercase"
+              style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              ◢ Industry Glossary
+            </div>
           </div>
+          <h2 className="section-heading mb-10" style={{ color: "var(--text-primary)" }}>
+            The Vocabulary
+            <br />
+            <span style={{ color: "var(--green-accent)" }}>Of Scrap.</span>
+          </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { term: "ISRI / ReMA", def: "Institute of Scrap Recycling Industries (now Recycled Materials Association). Sets the standard commodity grades used industrywide." },
@@ -442,14 +666,31 @@ export default function MaterialsClient() {
               { term: "Deinking", def: "Process of removing inks from recovered paper before it's pulped for reuse. Affects quality of recovered fiber." },
               { term: "Bale Density", def: "Weight per cubic foot of a finished bale. Higher density = lower transport cost per ton. Critical for OCC and cardboard economics." },
             ].map(({ term, def }) => (
-              <div key={term} className="bg-[#0A0A0A] rounded-xl p-4 border border-white/8">
-                <dt className="text-sm font-bold text-[#39FF14] mb-1">{term}</dt>
-                <dd className="text-xs text-gray-400 leading-relaxed">{def}</dd>
+              <div
+                key={term}
+                className="rounded-xl p-5"
+                style={{
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border-default)",
+                }}
+              >
+                <dt
+                  className="text-[10px] font-bold tracking-[0.28em] uppercase mb-2"
+                  style={{ color: "var(--green-accent)", fontFamily: "'JetBrains Mono', monospace" }}
+                >
+                  ◢ {term}
+                </dt>
+                <dd className="text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  {def}
+                </dd>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* ── DETAIL MODAL (Pinterest pin) ──────────────────────────── */}
+      {openMat && <MaterialDetail mat={openMat} onClose={() => setOpenMatId(null)} />}
     </div>
   );
 }

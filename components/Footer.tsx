@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
 
 const SERVICES = [
   { label: "Baler Repair", href: "/services/baler-repair" },
   { label: "Emergency Repair", href: "/services/emergency-repair" },
   { label: "Preventive Maintenance", href: "/services/preventive-maintenance" },
-  { label: "Equipment Sales & Leasing", href: "/equipment" },
-  { label: "Bale Wire Supply", href: "/wire" },
+  { label: "Equipment", href: "/equipment" },
+  { label: "Bale Wire", href: "/wire" },
 ];
 
 const COVERAGE = [
@@ -18,42 +18,65 @@ const COVERAGE = [
   { label: "Become a Partner", href: "/partners" },
 ];
 
+const RESOURCES = [
+  { label: "Materials Library", href: "/materials" },
+  { label: "Baler Database", href: "/balers" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
+  { label: "About Bandit", href: "/about" },
+];
+
 export default function Footer() {
   return (
-    <footer className="bg-[#050505] border-t border-[#1F2937] mt-24">
-      <div className="container-site py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer
+      className="mt-32"
+      style={{
+        background: "var(--bg-secondary)",
+        borderTop: "1px solid var(--border-default)",
+      }}
+    >
+      <div className="container-site py-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
+            <Link href="/" className="inline-flex items-center gap-3 mb-5 group">
               <img
                 src="/bandit-circle.png"
                 alt="Bandit"
-                width={36}
-                height={36}
-                className="w-9 h-9 rounded-full"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full group-hover:drop-shadow-[0_0_10px_rgba(57,255,20,0.6)] transition-all"
               />
-              <div>
-                <div className="text-2xl font-black text-white tracking-tighter leading-none group-hover:text-[#39FF14] transition-colors">BANDIT</div>
-                <div className="text-xs text-gray-500 font-mono tracking-widest leading-tight">RECYCLING</div>
+              <div className="leading-tight">
+                <div className="text-xl font-black tracking-[0.04em] uppercase" style={{ color: "var(--text-primary)" }}>
+                  BANDIT
+                </div>
+                <div className="text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: "var(--text-tertiary)" }}>
+                  RECYCLING
+                </div>
               </div>
             </Link>
-            <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Automated B2B recycling partner. Baler repair, preventive maintenance, and bale wire supply nationwide across all 50 states.
+            <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>
+              Nationwide baler service, equipment, wire, and recycling logistics. 50 states. One number.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#39FF14]/10 border border-[#39FF14]/20 rounded-full">
-              <span className="w-2 h-2 rounded-full bg-[#39FF14] animate-pulse" />
-              <span className="text-xs font-mono text-[#39FF14]">24/7 Emergency Service</span>
+            <div className="telemetry">
+              <span className="pulse" /> Mission Online · 24/7
             </div>
           </div>
 
           {/* Services */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Services</h3>
-            <ul className="space-y-2">
+            <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase mb-5" style={{ color: "var(--green-accent)" }}>
+              ◢ Services
+            </h3>
+            <ul className="space-y-3">
               {SERVICES.map((s) => (
                 <li key={s.href}>
-                  <Link href={s.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link
+                    href={s.href}
+                    className="text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:text-[#39FF14]"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {s.label}
                   </Link>
                 </li>
@@ -61,13 +84,19 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Service Area */}
+          {/* Coverage */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Service Area</h3>
-            <ul className="space-y-2">
+            <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase mb-5" style={{ color: "var(--green-accent)" }}>
+              ◢ Coverage
+            </h3>
+            <ul className="space-y-3">
               {COVERAGE.map((s) => (
                 <li key={s.href}>
-                  <Link href={s.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link
+                    href={s.href}
+                    className="text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:text-[#39FF14]"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {s.label}
                   </Link>
                 </li>
@@ -75,45 +104,74 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Resources + Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Contact</h3>
-            <ul className="space-y-3">
-              <li>
-                <a href="tel:+18574226348" className="flex items-center gap-2 text-sm text-gray-400 hover:text-[#39FF14] transition-colors">
-                  <Phone size={14} />
-                  <span className="font-mono">857-422-6348</span>
-                </a>
-              </li>
-              <li>
-                <a href="mailto:service@banditrecycling.com" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-                  <Mail size={14} />
-                  service@banditrecycling.com
-                </a>
-              </li>
-              <li>
-                <div className="flex items-start gap-2 text-sm text-gray-400">
-                  <MapPin size={14} className="mt-0.5 shrink-0" />
-                  <span>Nationwide Coverage<br />All 50 States</span>
-                </div>
-              </li>
+            <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase mb-5" style={{ color: "var(--green-accent)" }}>
+              ◢ Resources
+            </h3>
+            <ul className="space-y-3 mb-8">
+              {RESOURCES.map((s) => (
+                <li key={s.href}>
+                  <Link
+                    href={s.href}
+                    className="text-[11px] font-semibold tracking-[0.14em] uppercase transition-colors hover:text-[#39FF14]"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-            <div className="mt-6">
-              <Link href="/quote" className="btn-primary text-xs px-4 py-2 w-full justify-center">
-                Request a Quote
-              </Link>
+            <div className="space-y-3">
+              <a
+                href="tel:+18574226348"
+                className="flex items-center gap-2 text-xs font-bold tracking-[0.18em] uppercase transition-colors hover:text-[#39FF14]"
+                style={{ color: "var(--text-primary)" }}
+              >
+                <Phone size={13} />
+                857-422-6348
+              </a>
+              <a
+                href="mailto:service@banditrecycling.com"
+                className="flex items-center gap-2 text-[11px] transition-colors hover:text-[#39FF14]"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                <Mail size={13} />
+                service@banditrecycling.com
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-[#1F2937] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} Bandit Recycling. All rights reserved.
+        <div
+          className="mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-3"
+          style={{ borderTop: "1px solid var(--border-default)" }}
+        >
+          <p className="text-[10px] font-bold tracking-[0.25em] uppercase" style={{ color: "var(--text-muted)" }}>
+            © {new Date().getFullYear()} Bandit Recycling · All Rights Reserved
           </p>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms of Service</Link>
-            <Link href="/sitemap.xml" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Sitemap</Link>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/privacy"
+              className="text-[10px] font-bold tracking-[0.22em] uppercase transition-colors hover:text-[#39FF14]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-[10px] font-bold tracking-[0.22em] uppercase transition-colors hover:text-[#39FF14]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Terms
+            </Link>
+            <Link
+              href="/sitemap.xml"
+              className="text-[10px] font-bold tracking-[0.22em] uppercase transition-colors hover:text-[#39FF14]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              Sitemap
+            </Link>
           </div>
         </div>
       </div>

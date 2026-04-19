@@ -25,7 +25,7 @@ const NAV_LINKS = [
     label: "Resources",
     href: "/materials",
     sub: [
-      { label: "Materials Glossary", href: "/materials" },
+      { label: "Materials Library", href: "/materials" },
       { label: "Baler Database", href: "/balers" },
       { label: "Blog", href: "/blog" },
     ],
@@ -37,7 +37,13 @@ export default function Nav() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/95 backdrop-blur-sm border-b border-[#1F2937]">
+    <header
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md"
+      style={{
+        background: "linear-gradient(180deg, rgba(0,0,0,0.85), rgba(0,0,0,0.55))",
+        borderBottom: "1px solid var(--border-default)",
+      }}
+    >
       <div className="container-site">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -47,13 +53,13 @@ export default function Nav() {
               alt="Bandit"
               width={32}
               height={32}
-              className="w-8 h-8 rounded-full transition-all duration-200 group-hover:drop-shadow-[0_0_8px_rgba(57,255,20,0.6)]"
+              className="w-8 h-8 rounded-full transition-all duration-200 group-hover:drop-shadow-[0_0_10px_rgba(57,255,20,0.7)]"
             />
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-white tracking-tighter group-hover:text-[#39FF14] transition-colors">
+            <div className="flex items-baseline gap-2">
+              <span className="text-lg font-black tracking-[0.04em] uppercase" style={{ color: "var(--text-primary)" }}>
                 BANDIT
               </span>
-              <span className="hidden sm:block text-xs text-gray-500 font-mono tracking-widest">
+              <span className="hidden sm:block text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: "var(--text-tertiary)" }}>
                 RECYCLING
               </span>
             </div>
@@ -70,18 +76,26 @@ export default function Nav() {
               >
                 <Link
                   href={link.href}
-                  className="px-3 py-2 text-xs text-gray-300 hover:text-white font-medium transition-colors rounded-md hover:bg-white/5"
+                  className="px-3 py-2 text-[11px] font-bold tracking-[0.22em] uppercase transition-colors rounded-md"
+                  style={{ color: "var(--text-secondary)" }}
                 >
                   {link.label}
                 </Link>
                 {link.sub && activeDropdown === link.label && (
-                  <div className="absolute top-full left-0 pt-2 w-52">
-                    <div className="bg-[#111111] border border-[#1F2937] rounded-xl p-2 shadow-2xl">
+                  <div className="absolute top-full left-0 pt-2 w-56">
+                    <div
+                      className="rounded-xl p-2 shadow-2xl"
+                      style={{
+                        background: "var(--bg-card)",
+                        border: "1px solid var(--border-default)",
+                      }}
+                    >
                       {link.sub.map((s) => (
                         <Link
                           key={s.href}
                           href={s.href}
-                          className="block px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                          className="block px-3 py-2 text-xs font-semibold tracking-[0.12em] uppercase rounded-lg transition-colors"
+                          style={{ color: "var(--text-secondary)" }}
                         >
                           {s.label}
                         </Link>
@@ -94,32 +108,33 @@ export default function Nav() {
           </nav>
 
           {/* Right side */}
-          <div className="hidden xl:flex items-center gap-3">
+          <div className="hidden xl:flex items-center gap-4">
             <a
               href="tel:+18574226348"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#39FF14] transition-colors"
+              className="flex items-center gap-2 text-[11px] font-bold tracking-[0.22em] uppercase transition-colors hover:text-[#39FF14]"
+              style={{ color: "var(--text-tertiary)" }}
             >
-              <Phone size={14} />
-              <span className="font-mono">857-422-6348</span>
+              <Phone size={13} />
+              <span>857-422-6348</span>
             </a>
             <ThemeToggle size={14} />
-            <Link href="/quote" className="btn-primary text-xs px-4 py-2">
-              Get a Quote
+            <Link href="/quote" className="btn-primary text-[10px] px-4 py-2.5">
+              Dispatch a Tech
             </Link>
           </div>
 
-          {/* Right side for lg (without phone) */}
           <div className="hidden lg:flex xl:hidden items-center gap-2">
             <ThemeToggle size={14} />
-            <Link href="/quote" className="btn-primary text-xs px-4 py-2">
-              Get a Quote
+            <Link href="/quote" className="btn-primary text-[10px] px-4 py-2.5">
+              Dispatch
             </Link>
           </div>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-gray-400 hover:text-white transition-colors"
+            className="lg:hidden p-2 transition-colors"
+            style={{ color: "var(--text-secondary)" }}
             aria-label="Toggle menu"
           >
             {open ? <X size={20} /> : <Menu size={20} />}
@@ -129,13 +144,20 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden bg-[#0A0A0A] border-t border-[#1F2937] px-4 py-4 space-y-1">
+        <div
+          className="lg:hidden px-4 py-4 space-y-1"
+          style={{
+            background: "var(--bg-primary)",
+            borderTop: "1px solid var(--border-default)",
+          }}
+        >
           {NAV_LINKS.map((link) => (
             <div key={link.label}>
               <Link
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="block px-3 py-2 text-sm text-gray-300 hover:text-white font-medium rounded-md hover:bg-white/5 transition-colors"
+                className="block px-3 py-2 text-[11px] font-bold tracking-[0.22em] uppercase rounded-md"
+                style={{ color: "var(--text-secondary)" }}
               >
                 {link.label}
               </Link>
@@ -146,7 +168,8 @@ export default function Nav() {
                       key={s.href}
                       href={s.href}
                       onClick={() => setOpen(false)}
-                      className="block px-3 py-1.5 text-xs text-gray-400 hover:text-white rounded-md hover:bg-white/5 transition-colors"
+                      className="block px-3 py-1.5 text-[10px] font-semibold tracking-[0.2em] uppercase rounded-md"
+                      style={{ color: "var(--text-tertiary)" }}
                     >
                       {s.label}
                     </Link>
@@ -157,14 +180,16 @@ export default function Nav() {
           ))}
           <div className="pt-3 flex flex-col gap-2">
             <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-xs text-gray-400">Theme</span>
+              <span className="text-[10px] font-bold tracking-[0.25em] uppercase" style={{ color: "var(--text-tertiary)" }}>
+                Theme
+              </span>
               <ThemeToggle />
             </div>
-            <a href="tel:+18574226348" className="btn-secondary text-sm">
-              <Phone size={14} /> Call Us Now
+            <a href="tel:+18574226348" className="btn-secondary text-[10px]">
+              <Phone size={13} /> Call 857-422-6348
             </a>
-            <Link href="/quote" onClick={() => setOpen(false)} className="btn-primary text-sm">
-              Get a Free Quote
+            <Link href="/quote" onClick={() => setOpen(false)} className="btn-primary text-[10px]">
+              Dispatch a Tech
             </Link>
           </div>
         </div>
