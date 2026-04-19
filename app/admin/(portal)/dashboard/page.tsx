@@ -625,9 +625,9 @@ function AdminDashboardInner() {
 
   return (
     <div style={{ backgroundColor: "var(--bg-primary)" }} className="min-h-screen">
-      {/* Top Bar */}
+      {/* Top Bar — hidden, replaced by the portal sidebar's brand + logout */}
       <div
-        className="border-b sticky top-0 z-40"
+        className="hidden border-b sticky top-0 z-40"
         style={{
           backgroundColor: "var(--bg-card)",
           borderColor: "var(--border-default)",
@@ -661,9 +661,9 @@ function AdminDashboardInner() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation — hidden, sidebar provides nav now */}
       <div
-        className="border-b"
+        className="hidden border-b"
         style={{
           backgroundColor: "var(--bg-card)",
           borderColor: "var(--border-default)",

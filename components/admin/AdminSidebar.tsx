@@ -141,8 +141,10 @@ export default function AdminSidebar() {
           </Link>
         </div>
 
-        {/* Nav groups */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3">
+        {/* Nav groups (div, not <nav>, because the parent admin layout has
+            a CSS rule that hides all <nav> elements to suppress the public
+            site nav). */}
+        <div className="flex-1 overflow-y-auto py-4 px-3">
           {NAV.map((group) => (
             <div key={group.label} className="mb-5">
               <p className="px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">
@@ -174,7 +176,7 @@ export default function AdminSidebar() {
               </ul>
             </div>
           ))}
-        </nav>
+        </div>
 
         {/* Footer — logout */}
         <div className="px-3 pb-4 pt-3 border-t border-white/8">
