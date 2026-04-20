@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('bandit-theme');if(t==='light')document.documentElement.classList.add('light')}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('bandit-theme');if(t!=='dark')document.documentElement.classList.add('light')}catch(e){document.documentElement.classList.add('light')}})();`,
           }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,25 +12,23 @@
     --bandit-grey: #6B7280;
     --bandit-grey-light: #F3F4F6;
 
-    /* Theme tokens — dark mode (default, SpaceX canvas) */
-    --bg-primary: #000000;
+    /* Theme tokens — dark mode (default) */
+    --bg-primary: #0A0A0A;
     --bg-secondary: #050505;
-    --bg-card: #101010;
-    --bg-card-hi: #161616;
-    --bg-input: #0d0d0d;
-    --bg-nav: rgba(0, 0, 0, 0.75);
-    --border-default: rgba(255, 255, 255, 0.06);
-    --border-hi: rgba(255, 255, 255, 0.12);
-    --border-input: rgba(255, 255, 255, 0.1);
-    --text-primary: #f0f0fa;        /* spectral white */
-    --text-secondary: rgba(240, 240, 250, 0.70);
-    --text-tertiary: rgba(240, 240, 250, 0.50);
-    --text-muted: rgba(240, 240, 250, 0.35);
+    --bg-card: #111111;
+    --bg-input: #1A1A1A;
+    --bg-nav: rgba(10, 10, 10, 0.95);
+    --border-default: #1F2937;
+    --border-input: #374151;
+    --text-primary: #FFFFFF;
+    --text-secondary: #9CA3AF;  /* gray-400 */
+    --text-tertiary: #6B7280;   /* gray-500 */
+    --text-muted: #4B5563;      /* gray-600 */
     --green-accent: #39FF14;
     --green-glow: rgba(57, 255, 20, 0.4);
-    --green-bg: rgba(57, 255, 20, 0.10);
-    --green-border: rgba(57, 255, 20, 0.35);
-    --green-dark: #000000;          /* text on green bg */
+    --green-bg: rgba(57, 255, 20, 0.1);
+    --green-border: rgba(57, 255, 20, 0.2);
+    --green-dark: #0A0A0A;       /* text on green bg */
 
     color-scheme: dark;
   }
@@ -39,20 +37,18 @@
     --bg-primary: #FFFFFF;
     --bg-secondary: #F3F4F6;
     --bg-card: #F9FAFB;
-    --bg-card-hi: #F3F4F6;
     --bg-input: #F3F4F6;
-    --bg-nav: rgba(255, 255, 255, 0.92);
-    --border-default: rgba(0, 0, 0, 0.08);
-    --border-hi: rgba(0, 0, 0, 0.16);
-    --border-input: rgba(0, 0, 0, 0.14);
+    --bg-nav: rgba(255, 255, 255, 0.95);
+    --border-default: #E5E7EB;
+    --border-input: #D1D5DB;
     --text-primary: #111827;
-    --text-secondary: rgba(17, 24, 39, 0.70);
-    --text-tertiary: rgba(17, 24, 39, 0.55);
-    --text-muted: rgba(17, 24, 39, 0.40);
-    --green-accent: #16A34A;
+    --text-secondary: #4B5563;
+    --text-tertiary: #6B7280;
+    --text-muted: #9CA3AF;
+    --green-accent: #16A34A;      /* darker green for light bg readability */
     --green-glow: rgba(22, 163, 74, 0.3);
     --green-bg: rgba(22, 163, 74, 0.08);
-    --green-border: rgba(22, 163, 74, 0.35);
+    --green-border: rgba(22, 163, 74, 0.2);
     --green-dark: #FFFFFF;
 
     color-scheme: light;
@@ -75,353 +71,234 @@
 }
 
 @layer components {
-  /* ═══════════════════════════════════════════════════════════════════════
-     SPACEX × PINTEREST DESIGN LAYER
-     - SpaceX: full-viewport scenes, stenciled uppercase type, ghost buttons
-     - Pinterest: masonry tiles, generous border-radius, warm-neutral surfaces
-     - Bandit palette: black canvas, electric green accent, spectral white
-     ═══════════════════════════════════════════════════════════════════════ */
-
-  /* ── Primary CTA — ghost green pill (SpaceX) ── */
+  /* Primary CTA — Electric Green */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 font-bold text-xs tracking-[0.22em] uppercase transition-all duration-200 active:scale-95;
-    background-color: var(--green-bg);
-    color: var(--green-accent);
-    border: 1px solid var(--green-border);
-    border-radius: 32px;
-  }
-  .btn-primary:hover {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-bold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
     background-color: var(--green-accent);
     color: var(--green-dark);
-    box-shadow: 0 0 28px var(--green-glow);
+  }
+  .btn-primary:hover {
+    filter: brightness(0.85);
+    box-shadow: 0 0 20px var(--green-glow);
   }
 
-  /* ── Secondary — spectral outline ── */
+  /* Secondary CTA — outlined */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 font-bold text-xs tracking-[0.22em] uppercase transition-all duration-200 active:scale-95;
-    border: 1px solid var(--border-hi);
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
+    border: 1px solid var(--text-primary);
     color: var(--text-primary);
-    border-radius: 32px;
   }
   .btn-secondary:hover {
-    border-color: var(--green-border);
-    color: var(--green-accent);
+    background-color: var(--text-primary);
+    color: var(--bg-primary);
   }
 
-  /* ── Ghost green outline (legacy compat) ── */
+  /* Ghost green outlined */
   .btn-ghost-green {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 font-bold text-xs tracking-[0.22em] uppercase transition-all duration-200 active:scale-95;
-    border: 1px solid var(--green-border);
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-md text-sm tracking-wide transition-all duration-200 active:scale-95;
+    border: 1px solid var(--green-accent);
     color: var(--green-accent);
-    background-color: var(--green-bg);
-    border-radius: 32px;
   }
   .btn-ghost-green:hover {
     background-color: var(--green-accent);
     color: var(--green-dark);
-    box-shadow: 0 0 24px var(--green-glow);
   }
 
-  /* ── Text-only CTA ── */
-  .btn-text {
-    @apply inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.22em] uppercase transition-colors;
-    color: var(--text-primary);
-    padding: 4px 2px;
-    border-bottom: 1px solid transparent;
-  }
-  .btn-text:hover {
-    color: var(--green-accent);
-    border-bottom-color: var(--green-accent);
-  }
-
-  /* ── Site container ── */
+  /* Section container */
   .container-site {
-    @apply max-w-7xl mx-auto px-5 sm:px-8 lg:px-12;
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* ── Input ── */
+  /* Form input */
   .input-field {
-    @apply w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-colors;
+    @apply w-full rounded-md px-4 py-3 text-sm focus:outline-none transition-colors;
     background-color: var(--bg-input);
     border: 1px solid var(--border-input);
     color: var(--text-primary);
   }
-  .input-field::placeholder { color: var(--text-tertiary); }
+  .input-field::placeholder {
+    color: var(--text-tertiary);
+  }
   .input-field:focus {
-    border-color: var(--green-border);
-    box-shadow: 0 0 0 3px var(--green-bg);
+    border-color: var(--green-accent);
+    box-shadow: 0 0 0 1px var(--green-accent);
   }
 
+  /* Form label */
   .input-label {
-    @apply block text-[11px] font-bold tracking-[0.2em] uppercase mb-2;
+    @apply block text-sm font-medium mb-1.5;
     color: var(--text-secondary);
   }
 
-  /* ── Card (Pinterest tile) ── */
+  /* Card on dark background */
   .card-dark {
-    @apply rounded-2xl p-6;
+    @apply rounded-xl p-6;
     background-color: var(--bg-card);
     border: 1px solid var(--border-default);
-    transition: border-color .2s ease, transform .25s ease, box-shadow .25s ease;
-  }
-  .card-dark:hover {
-    border-color: var(--green-border);
   }
 
+  /* Card on grey background */
   .card-grey {
-    @apply rounded-2xl p-6;
+    @apply rounded-xl p-6;
     background-color: var(--bg-secondary);
     color: var(--text-primary);
   }
 
-  /* ── TAG — small stenciled label (replaces badge-green) ── */
-  .badge-green, .tag {
-    @apply inline-flex items-center px-3 py-1.5 rounded-sm text-[10px] font-bold tracking-[0.3em] uppercase;
+  /* Green accent badge */
+  .badge-green {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-mono font-medium;
     background-color: var(--green-bg);
     color: var(--green-accent);
     border: 1px solid var(--green-border);
-    font-family: 'JetBrains Mono', 'Inter', monospace;
   }
 
-  /* ── Section heading — SpaceX stencil style ── */
+  /* Section heading */
   .section-heading {
-    @apply text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[0.95] uppercase;
-    letter-spacing: 0.005em;
+    @apply text-3xl sm:text-4xl font-bold tracking-tight;
   }
 
-  .hero-heading {
-    @apply font-black uppercase;
-    font-size: clamp(44px, 6.5vw, 96px);
-    line-height: 0.92;
-    letter-spacing: 0.005em;
-  }
-
-  /* ── Divider — green laser line ── */
+  /* Divider line */
   .divider-green {
     @apply h-px my-16;
     background: linear-gradient(to right, transparent, var(--green-accent), transparent);
-    opacity: 0.4;
-  }
-
-  /* ── SCENE — SpaceX full-viewport section ── */
-  .scene {
-    @apply relative overflow-hidden;
-    min-height: 100vh;
-    background-color: var(--bg-primary);
-  }
-  .scene-pad {
-    @apply px-5 sm:px-8 lg:px-12 py-24;
-  }
-
-  /* grid background accent */
-  .scene-grid::before {
-    content: "";
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(57,255,20,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(57,255,20,0.05) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse at center, black, transparent 75%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black, transparent 75%);
-    opacity: 0.6;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .scene-glow::after {
-    content: "";
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(circle at 75% 35%, var(--green-bg), transparent 55%),
-      radial-gradient(circle at 20% 80%, rgba(57,255,20,0.05), transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .scene > * { position: relative; z-index: 1; }
-
-  /* ── Telemetry chrome (top-left mission label) ── */
-  .telemetry {
-    @apply inline-flex items-center gap-3 text-[10px] font-bold tracking-[0.3em] uppercase;
-    color: var(--green-accent);
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .telemetry .pulse {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--green-accent);
-    box-shadow: 0 0 12px var(--green-glow);
-    animation: bandit-pulse 1.8s infinite;
-  }
-  @keyframes bandit-pulse { 50% { opacity: 0.35; } }
-
-  /* ── MASONRY — Pinterest discovery board ── */
-  .masonry {
-    column-count: 1;
-    column-gap: 18px;
-  }
-  @media (min-width: 640px)  { .masonry { column-count: 2; } }
-  @media (min-width: 1024px) { .masonry { column-count: 3; } }
-  @media (min-width: 1400px) { .masonry { column-count: 4; } }
-
-  .tile {
-    break-inside: avoid;
-    display: block;
-    margin-bottom: 18px;
-    border-radius: 20px;
-    overflow: hidden;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-default);
-    position: relative;
-    isolation: isolate;
-    transition: transform .25s ease, border-color .2s ease, box-shadow .25s ease;
-  }
-  .tile:hover {
-    transform: translateY(-3px);
-    border-color: var(--green-border);
-    box-shadow: 0 20px 40px -20px var(--green-glow);
-  }
-  .tile-body { padding: 16px 18px 18px; }
-  .tile-text-body {
-    padding: 26px 22px;
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(135deg, var(--bg-card), var(--bg-card-hi));
-  }
-
-  /* ── Circular filter chip ── */
-  .chip {
-    @apply inline-flex items-center text-[10px] font-bold tracking-[0.22em] uppercase transition-all duration-200;
-    padding: 10px 18px;
-    border-radius: 50px;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-default);
-    color: var(--text-secondary);
-    cursor: pointer;
-  }
-  .chip:hover:not(.chip-on) {
-    color: var(--green-accent);
-    border-color: var(--green-border);
-  }
-  .chip-on {
-    background-color: var(--green-accent);
-    color: var(--green-dark);
-    border-color: var(--green-accent);
-    box-shadow: 0 0 18px var(--green-glow);
-  }
-
-  /* ── Stat strip (used on heroes) ── */
-  .stat-strip {
-    @apply inline-flex flex-wrap items-start gap-x-10 gap-y-5;
-    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--text-tertiary);
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .stat-strip b {
-    display: block; color: var(--green-accent);
-    font-size: 22px; letter-spacing: 0.02em; margin-bottom: 4px;
-    font-weight: 800; font-family: 'Inter', sans-serif;
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   LIGHT MODE OVERRIDES
-   ═══════════════════════════════════════════════════════════════════════ */
+/* ─── LIGHT MODE OVERRIDES ───────────────────────────────────────────────
+   These selectors target the hardcoded Tailwind colors used throughout
+   page files and flip them for light mode without editing every .tsx file.
+   Uses html.light descendant selectors (no CSS nesting) for PostCSS compat.
+   ────────────────────────────────────────────────────────────────────── */
 
-html.light .bg-\[\#000\],
-html.light .bg-\[\#000000\],
-html.light .bg-\[\#0A0A0A\],
-html.light .bg-\[\#050505\],
-html.light .bg-\[\#0d0d0d\],
-html.light .bg-\[\#101010\],
-html.light .bg-\[\#111\],
-html.light .bg-\[\#111111\],
-html.light .bg-\[\#161616\],
-html.light .bg-\[\#1A1A1A\]    { background-color: var(--bg-primary) !important; }
+/* ── Background overrides ── */
+html.light .bg-\[\#0A0A0A\] { background-color: var(--bg-primary) !important; }
+html.light .bg-\[\#050505\] { background-color: var(--bg-secondary) !important; }
+html.light .bg-\[\#111111\] { background-color: var(--bg-card) !important; }
+html.light .bg-\[\#1A1A1A\] { background-color: var(--bg-input) !important; }
+html.light .bg-\[\#0A0A0A\]\/95 { background-color: var(--bg-nav) !important; }
 
-html.light .bg-\[\#0A0A0A\]\/95,
-html.light .bg-\[\#0A0A0A\]\/75,
-html.light .bg-\[\#000\]\/75   { background-color: var(--bg-nav) !important; }
+/* ── Text color overrides ── */
+html.light .text-white { color: var(--text-primary) !important; }
+html.light .text-gray-300 { color: var(--text-secondary) !important; }
+html.light .text-gray-400 { color: var(--text-secondary) !important; }
+html.light .text-gray-500 { color: var(--text-tertiary) !important; }
+html.light .text-gray-600 { color: var(--text-muted) !important; }
 
-html.light .text-white,
-html.light .text-\[\#f0f0fa\]  { color: var(--text-primary) !important; }
-html.light .text-gray-300      { color: var(--text-secondary) !important; }
-html.light .text-gray-400      { color: var(--text-secondary) !important; }
-html.light .text-gray-500      { color: var(--text-tertiary) !important; }
-html.light .text-gray-600      { color: var(--text-muted) !important; }
-html.light .text-gray-700      { color: var(--text-muted) !important; }
+/* ── Green accent overrides ── */
+html.light .text-\[\#39FF14\] { color: var(--green-accent) !important; }
+html.light .bg-\[\#39FF14\] { background-color: var(--green-accent) !important; }
+html.light .border-\[\#39FF14\] { border-color: var(--green-accent) !important; }
+html.light .bg-\[\#39FF14\]\/5 { background-color: rgba(22, 163, 74, 0.05) !important; }
+html.light .bg-\[\#39FF14\]\/10 { background-color: var(--green-bg) !important; }
+html.light .bg-\[\#39FF14\]\/20 { background-color: rgba(22, 163, 74, 0.15) !important; }
+html.light .border-\[\#39FF14\]\/20 { border-color: var(--green-border) !important; }
+html.light .border-\[\#39FF14\]\/30 { border-color: rgba(22, 163, 74, 0.25) !important; }
+html.light .border-\[\#39FF14\]\/40 { border-color: rgba(22, 163, 74, 0.3) !important; }
 
-html.light .text-\[\#39FF14\]        { color: var(--green-accent) !important; }
-html.light .bg-\[\#39FF14\]          { background-color: var(--green-accent) !important; }
-html.light .border-\[\#39FF14\]      { border-color: var(--green-accent) !important; }
-html.light .bg-\[\#39FF14\]\/5       { background-color: rgba(22, 163, 74, 0.05) !important; }
-html.light .bg-\[\#39FF14\]\/10      { background-color: var(--green-bg) !important; }
-html.light .bg-\[\#39FF14\]\/20      { background-color: rgba(22, 163, 74, 0.15) !important; }
-html.light .border-\[\#39FF14\]\/20  { border-color: var(--green-border) !important; }
-html.light .border-\[\#39FF14\]\/30  { border-color: rgba(22, 163, 74, 0.3) !important; }
-html.light .border-\[\#39FF14\]\/40  { border-color: rgba(22, 163, 74, 0.3) !important; }
+/* ── Border overrides ── */
+html.light .border-\[\#1F2937\] { border-color: var(--border-default) !important; }
+html.light .border-\[\#374151\] { border-color: var(--border-input) !important; }
+html.light .divide-\[\#22C55E\] { --tw-divide-color: var(--green-accent) !important; }
 
-html.light .border-\[\#1F2937\]    { border-color: var(--border-default) !important; }
-html.light .border-\[\#374151\]    { border-color: var(--border-input) !important; }
-html.light .divide-\[\#22C55E\]    { --tw-divide-color: var(--green-accent) !important; }
+/* ── Green banner section — stays green but text adjusts ── */
+html.light .bg-\[\#39FF14\] .text-\[\#0A0A0A\] { color: #FFFFFF !important; }
+html.light .bg-\[\#39FF14\] .text-\[\#0A0A0A\]\/70 { color: rgba(255, 255, 255, 0.8) !important; }
 
-html.light .bg-\[\#39FF14\] .text-\[\#0A0A0A\]       { color: #FFFFFF !important; }
-html.light .bg-\[\#39FF14\] .text-\[\#0A0A0A\]\/70   { color: rgba(255, 255, 255, 0.8) !important; }
-
+/* ── Nav and header ── */
 html.light header { border-bottom-color: var(--border-default) !important; }
 html.light footer { border-top-color: var(--border-default) !important; }
 
+/* ── Images — keep mascot visible ── */
 html.light img.drop-shadow-\[0_0_60px_rgba\(57\,255\,20\,0\.3\)\] {
   filter: drop-shadow(0 0 40px rgba(22, 163, 74, 0.2)) !important;
 }
 
+/* ── Green glow effects — soften for light mode ── */
 html.light .blur-\[120px\],
 html.light .blur-\[150px\],
-html.light .blur-3xl { opacity: 0.3 !important; }
+html.light .blur-3xl {
+  opacity: 0.3 !important;
+}
 
-html.light .opacity-\[0\.03\] { opacity: 0.04 !important; filter: invert(1) !important; }
+/* ── Grid pattern — darken for light bg ── */
+html.light .opacity-\[0\.03\] {
+  opacity: 0.04 !important;
+  filter: invert(1) !important;
+}
 
+/* ── Placeholder text in inputs ── */
 html.light .placeholder-gray-500::placeholder { color: var(--text-tertiary) !important; }
-html.light .placeholder-gray-600::placeholder { color: var(--text-tertiary) !important; }
 
-html.light .hover\:bg-white\/5:hover   { background-color: rgba(0, 0, 0, 0.04) !important; }
-html.light .hover\:bg-white\/10:hover  { background-color: rgba(0, 0, 0, 0.06) !important; }
-html.light .hover\:text-white:hover    { color: var(--text-primary) !important; }
+/* ── Hover states ── */
+html.light .hover\:bg-white\/5:hover { background-color: rgba(0, 0, 0, 0.04) !important; }
+html.light .hover\:text-white:hover { color: var(--text-primary) !important; }
 html.light .hover\:text-\[\#39FF14\]:hover { color: var(--green-accent) !important; }
 html.light .hover\:border-\[\#39FF14\]\/30:hover { border-color: rgba(22, 163, 74, 0.25) !important; }
 html.light .hover\:border-\[\#39FF14\]\/40:hover { border-color: rgba(22, 163, 74, 0.3) !important; }
 html.light .hover\:bg-black:hover { background-color: #111827 !important; }
 
+/* ── Pulse dot stays green ── */
 html.light .bg-\[\#39FF14\].animate-pulse { background-color: var(--green-accent) !important; }
-html.light .font-mono.text-\[\#39FF14\]   { color: var(--green-accent) !important; }
+
+/* ── Font mono green elements ── */
+html.light .font-mono.text-\[\#39FF14\] { color: var(--green-accent) !important; }
+
+/* ── Select / option styling ── */
 html.light select option { background-color: var(--bg-card); color: var(--text-primary); }
 
-html.light .bg-red-900\/20   { background-color: rgba(220, 38, 38, 0.08) !important; }
+/* ── Error states stay red ── */
+html.light .bg-red-900\/20 { background-color: rgba(220, 38, 38, 0.08) !important; }
 html.light .border-red-800\/40 { border-color: rgba(220, 38, 38, 0.2) !important; }
-html.light .text-red-300     { color: #DC2626 !important; }
-html.light .text-red-400     { color: #DC2626 !important; }
+html.light .text-red-300 { color: #DC2626 !important; }
+html.light .text-red-400 { color: #DC2626 !important; }
 
+/* ── Material cards + misc page-specific dark hexes ── */
+html.light .bg-\[\#0d0d0d\] { background-color: var(--bg-card) !important; }
+html.light .bg-\[\#111\]    { background-color: var(--bg-card) !important; }
+html.light .bg-\[\#0A0A0A\]\/95 { background-color: var(--bg-nav) !important; }
+
+/* ── White-opacity overlays → subtle dark overlays on light bg ── */
 html.light .bg-white\/3   { background-color: rgba(0, 0, 0, 0.025) !important; }
 html.light .bg-white\/5   { background-color: rgba(0, 0, 0, 0.04)  !important; }
 html.light .bg-white\/8   { background-color: rgba(0, 0, 0, 0.06)  !important; }
 html.light .bg-white\/10  { background-color: rgba(0, 0, 0, 0.06)  !important; }
 html.light .bg-white\/20  { background-color: rgba(0, 0, 0, 0.1)   !important; }
 
+/* ── White-opacity borders ── */
 html.light .border-white\/5   { border-color: rgba(0, 0, 0, 0.06) !important; }
 html.light .border-white\/8   { border-color: rgba(0, 0, 0, 0.08) !important; }
 html.light .border-white\/10  { border-color: rgba(0, 0, 0, 0.1)  !important; }
 html.light .border-white\/20  { border-color: rgba(0, 0, 0, 0.15) !important; }
 html.light .border-white\/30  { border-color: rgba(0, 0, 0, 0.2)  !important; }
 
+/* ── Divide (used for thin separators in cards) ── */
+html.light .divide-white\/8 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(0, 0, 0, 0.08) !important; }
+
+/* ── Translucent white text → translucent dark text ── */
 html.light .text-white\/30 { color: rgba(0, 0, 0, 0.4)  !important; }
 html.light .text-white\/40 { color: rgba(0, 0, 0, 0.5)  !important; }
 html.light .text-white\/60 { color: rgba(0, 0, 0, 0.65) !important; }
 html.light .text-white\/70 { color: rgba(0, 0, 0, 0.75) !important; }
 
-html.light .text-yellow-400     { color: #CA8A04 !important; }
-html.light .bg-yellow-400\/10   { background-color: rgba(202, 138, 4, 0.1) !important; }
-html.light .border-yellow-400\/30 { border-color: rgba(202, 138, 4, 0.3)   !important; }
-html.light .bg-gray-400\/10     { background-color: rgba(107, 114, 128, 0.1) !important; }
-html.light .border-gray-400\/30 { border-color: rgba(107, 114, 128, 0.3)    !important; }
+/* ── Hover overlays ── */
+html.light .hover\:bg-white\/10:hover { background-color: rgba(0, 0, 0, 0.06) !important; }
+html.light .hover\:text-gray-300:hover { color: var(--text-secondary) !important; }
+
+/* ── Yellow / gray / red tier chips — readable on light bg ── */
+html.light .text-yellow-400            { color: #CA8A04 !important; }
+html.light .bg-yellow-400\/10          { background-color: rgba(202, 138, 4, 0.1) !important; }
+html.light .border-yellow-400\/30      { border-color: rgba(202, 138, 4, 0.3)     !important; }
+html.light .text-red-400               { color: #DC2626 !important; }
+html.light .bg-gray-400\/10            { background-color: rgba(107, 114, 128, 0.1) !important; }
+html.light .border-gray-400\/30        { border-color: rgba(107, 114, 128, 0.3)     !important; }
+
+/* ── Extra gray text tones seen on materials page ── */
+html.light .text-gray-700  { color: var(--text-muted)    !important; }
+html.light .placeholder-gray-600::placeholder { color: var(--text-tertiary) !important; }
+
+/* ── Focus ring tints (green) ── */
+html.light .focus\:border-\[\#39FF14\]\/50:focus { border-color: rgba(22, 163, 74, 0.5) !important; }
+html.light .focus\:ring-\[\#39FF14\]\/20:focus  { --tw-ring-color: rgba(22, 163, 74, 0.2) !important; }
 
 /* ── Smooth transition for theme switching ── */
 html.light *,
