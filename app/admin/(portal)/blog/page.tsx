@@ -35,6 +35,8 @@ export default function AdminBlogPage() {
   const [assetResults, setAssetResults] = useState<Record<string, { ok: boolean; msg: string }>>({});
   const [bootstrapBusy, setBootstrapBusy] = useState(false);
   const [bootstrapResult, setBootstrapResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [rekeyBusy, setRekeyBusy] = useState(false);
+  const [rekeyResult, setRekeyResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
   // Auth check (mirrors /admin/dashboard pattern)
   useEffect(() => {
@@ -118,6 +120,36 @@ export default function AdminBlogPage() {
     }
   };
 
+  // Re-run the chroma keyer on every existing header asset (no Gemini call).
+  // Used to fix images whose original generation didn't produce transparent
+  // backgrounds — e.g. when Gemini painted a flat green wall that slipped
+  // through the old RGB-distance keyer.
+  const rekeyAll = async () => {
+    setRekeyBusy(true);
+    setRekeyResult(null);
+    try {
+      const r = await fetch("/api/admin/rekey-header-asset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const d = await r.json();
+      const ok = d.ok;
+      const okCount = (d.results ?? []).filter((x: any) => x.ok).length;
+      const total = (d.results ?? []).length;
+      setRekeyResult({ ok, msg: `Re-keyed ${okCount}/${total} assets` });
+      // Refresh the asset list so the new URLs + thumbnails show up
+      fetch("/api/admin/page-assets")
+        .then((r) => r.json())
+        .then((d) => setAssets(d.assets ?? []))
+        .catch(() => {});
+    } catch (e: any) {
+      setRekeyResult({ ok: false, msg: e.message });
+    } finally {
+      setRekeyBusy(false);
+    }
+  };
+
   const bootstrap = async () => {
     setBootstrapBusy(true);
     setBootstrapResult(null);
@@ -169,11 +201,28 @@ export default function AdminBlogPage() {
         {/* ── PAGE HEADER ASSETS ──────────────────────────────────────── */}
         {assets.length > 0 && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
               <h2 className="text-lg font-bold">Page Header Art</h2>
-              <span className="text-[10px] text-gray-600 uppercase tracking-wider">
-                Transparent 1:1 PNGs · used as decorative element on each menu page
-              </span>
+              <div className="flex items-center gap-3">
+                {rekeyResult && (
+                  <p className={`text-[10px] ${rekeyResult.ok ? "text-[#39FF14]" : "text-red-400"}`}>
+                    {rekeyResult.msg}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={rekeyAll}
+                  disabled={rekeyBusy}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-bold border border-white/20 text-white hover:bg-white/10 disabled:opacity-50"
+                  title="Re-runs the chroma keyer on every existing asset. No Gemini call, no cost."
+                >
+                  {rekeyBusy ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+                  Re-key existing (free)
+                </button>
+                <span className="text-[10px] text-gray-600 uppercase tracking-wider">
+                  Transparent 1:1 PNGs · used as decorative element on each menu page
+                </span>
+              </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {assets.map((a) => {

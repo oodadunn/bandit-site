@@ -485,37 +485,97 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
 //   green on his body (when we strip the brand-green vest patch). Residual
 //   green on edges reads as brand rim light, not as a visual mistake.
 
-type ChromaKey = "white" | "green";
+type ChromaKey = "white" | "green" | "auto";
 
-// Tunable per-key thresholds. Distance = sqrt((r-kr)² + (g-kg)² + (b-kb)²)
-// in RGB space. Pixels closer than `threshold` go fully transparent.
-// Pixels between threshold and threshold+feather get partial alpha.
-const KEY_PARAMS: Record<ChromaKey, { r: number; g: number; b: number; threshold: number; feather: number }> = {
-  white: { r: 255, g: 255, b: 255, threshold: 30,  feather: 15 },
-  green: { r: 57,  g: 255, b: 20,  threshold: 55,  feather: 30 },
-};
+// Auto-detect: sample the 4 corners of the raw image to figure out which
+// chroma key the actual background needs. Gemini doesn't always honor our
+// "electric green background" prompt — sometimes it falls back to white
+// (or off-white). We pick whichever key the corners agree on.
+async function detectChromaKey(input: Buffer): Promise<"white" | "green"> {
+  const meta = await sharp(input).metadata();
+  const w = meta.width ?? 1;
+  const h = meta.height ?? 1;
+  const { data } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const pickAt = (x: number, y: number) => {
+    const i = (Math.min(h - 1, Math.max(0, y)) * w + Math.min(w - 1, Math.max(0, x))) * 4;
+    return { r: data[i], g: data[i + 1], b: data[i + 2] };
+  };
+  const corners = [pickAt(0, 0), pickAt(w - 1, 0), pickAt(0, h - 1), pickAt(w - 1, h - 1)];
+  const whiteVotes = corners.filter((p) => p.r > 220 && p.g > 220 && p.b > 220).length;
+  const greenVotes = corners.filter((p) => p.g >= 150 && p.g - p.r >= 20 && p.g - p.b >= 40).length;
+  // Tie / no clear winner → white (safer default; Bandit has no pure white).
+  return greenVotes >= 3 && greenVotes > whiteVotes ? "green" : "white";
+}
+
+// White key: RGB-distance (subject has no white so this works fine).
+// Green key: "green-dominance" heuristic — a pixel is background if its
+//   green channel is bright AND noticeably higher than red and blue.
+//   This catches the full range of greens Gemini actually produces
+//   (from electric #39FF14 all the way to light washed-out grass greens
+//   around RGB 160,240,100) without needing a single reference color.
+//   Bandit's palette (cream, tan, gray, black, brown) never triggers
+//   green-dominance, so the subject is preserved cleanly.
 
 async function chromaKeyToAlpha(input: Buffer, key: ChromaKey = "white"): Promise<Buffer> {
-  const { r: kr, g: kg, b: kb, threshold, feather } = KEY_PARAMS[key];
+  // "auto" → sniff the background from corner pixels and delegate.
+  const effectiveKey: "white" | "green" = key === "auto" ? await detectChromaKey(input) : key;
+
   const { data, info } = await sharp(input)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  for (let i = 0; i < data.length; i += 4) {
-    const dr = data[i] - kr;
-    const dg = data[i + 1] - kg;
-    const db = data[i + 2] - kb;
-    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
-
-    if (dist <= threshold) {
-      data[i + 3] = 0; // fully transparent
-    } else if (dist <= threshold + feather) {
-      // Feather band — ramp alpha from 0 to 255 across the feather width
-      const ramp = (dist - threshold) / feather;
-      data[i + 3] = Math.round(ramp * 255);
+  if (effectiveKey === "white") {
+    const threshold = 30;
+    const feather = 15;
+    for (let i = 0; i < data.length; i += 4) {
+      const dr = data[i] - 255;
+      const dg = data[i + 1] - 255;
+      const db = data[i + 2] - 255;
+      const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+      if (dist <= threshold) {
+        data[i + 3] = 0;
+      } else if (dist <= threshold + feather) {
+        const ramp = (dist - threshold) / feather;
+        data[i + 3] = Math.round(ramp * 255);
+      }
     }
-    // else: keep existing alpha (typically 255)
+  } else {
+    // Green-dominance keyer.
+    // FULL transparent if:    g >= minG_hard  AND  g - r >= rMargin_hard  AND  g - b >= bMargin_hard
+    // FEATHER band between "hard" and "soft" thresholds for anti-aliased edges.
+    const minG_hard = 150;
+    const rMargin_hard = 20;
+    const bMargin_hard = 40;
+    const minG_soft = 120;
+    const rMargin_soft = 5;
+    const bMargin_soft = 20;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const dr = g - r;
+      const db = g - b;
+
+      // Hard-green: kill it.
+      if (g >= minG_hard && dr >= rMargin_hard && db >= bMargin_hard) {
+        data[i + 3] = 0;
+        continue;
+      }
+
+      // Soft-green band: partial alpha based on how "green-dominant" the pixel is.
+      if (g >= minG_soft && dr >= rMargin_soft && db >= bMargin_soft) {
+        // Score of 0 at soft edge, 1 at hard edge.
+        const gScore = Math.min(1, Math.max(0, (g - minG_soft) / (minG_hard - minG_soft)));
+        const rScore = Math.min(1, Math.max(0, (dr - rMargin_soft) / (rMargin_hard - rMargin_soft)));
+        const bScore = Math.min(1, Math.max(0, (db - bMargin_soft) / (bMargin_hard - bMargin_soft)));
+        const score = Math.min(gScore, rScore, bScore); // must satisfy all three
+        // Invert: score=1 → alpha=0, score=0 → alpha=255
+        data[i + 3] = Math.round((1 - score) * 255);
+      }
+      // else: fully opaque (Bandit's actual colors), keep alpha=255
+    }
   }
 
   return sharp(data, {
@@ -636,4 +696,84 @@ export async function generatePageAsset(slug: string): Promise<{
   } catch {}
 
   return { ok: true, url: publicUrl, prompt: asset.prompt };
+}
+
+// ─── Re-key an existing stored asset (no Gemini call) ─────────────────────
+// For fixing images whose original generation skipped or failed the chroma
+// key step. Downloads the current page_assets.url, re-runs the keyer with
+// mode="auto" (so white backgrounds work even if the slot is tagged 'green'
+// and vice versa), uploads a fresh file, swaps the URL, revalidates. Free —
+// no Gemini API call, no budget hit.
+
+export async function rekeyExistingPageAsset(slug: string): Promise<{
+  ok: boolean;
+  url?: string;
+  error?: string;
+  detectedKey?: "white" | "green";
+}> {
+  const sb = svc();
+
+  // 1. Load current URL
+  const { data: asset, error: assetErr } = await sb
+    .from("page_assets")
+    .select("slug, url")
+    .eq("slug", slug)
+    .single();
+  if (assetErr || !asset) {
+    return { ok: false, error: `page_assets row not found for slug='${slug}'` };
+  }
+  if (!asset.url) {
+    return { ok: false, error: `slug='${slug}' has no existing url to re-key` };
+  }
+
+  // 2. Download
+  let inputBuf: Buffer;
+  try {
+    const r = await fetch(asset.url);
+    if (!r.ok) throw new Error(`${r.status} fetching ${asset.url}`);
+    inputBuf = Buffer.from(await r.arrayBuffer());
+  } catch (e: any) {
+    return { ok: false, error: `Download existing asset: ${e.message}` };
+  }
+
+  // 3. Detect + key
+  const detectedKey = await detectChromaKey(inputBuf);
+  let cleanedBuffer: Buffer;
+  try {
+    cleanedBuffer = await chromaKeyToAlpha(inputBuf, detectedKey);
+  } catch (e: any) {
+    return { ok: false, error: `Chroma key (${detectedKey}): ${e.message}` };
+  }
+
+  // 4. Upload under a new timestamp filename (breaks CDN cache)
+  const filename = `${slug}-${Date.now()}.png`;
+  const { error: upErr } = await sb.storage
+    .from("headers")
+    .upload(filename, cleanedBuffer, { contentType: "image/png", upsert: true });
+  if (upErr) return { ok: false, error: `Upload: ${upErr.message}` };
+
+  const publicUrl = sb.storage.from("headers").getPublicUrl(filename).data.publicUrl;
+
+  // 5. Swap URL
+  await sb.from("page_assets")
+    .update({ url: publicUrl, updated_at: new Date().toISOString() })
+    .eq("slug", slug);
+
+  // 6. Log (as a success with trigger="rekey")
+  await sb.from("image_gen_log").insert({
+    post_slug: `asset:${slug}`,
+    prompt: `(re-key existing, detected=${detectedKey})`,
+    model: "n/a",
+    status: "success",
+    image_url: publicUrl,
+    trigger: "manual",
+  });
+
+  // 7. Invalidate the page cache
+  try {
+    const pagePath = slug === "materials" ? "/materials" : `/${slug}`;
+    revalidatePath(pagePath);
+  } catch {}
+
+  return { ok: true, url: publicUrl, detectedKey };
 }
