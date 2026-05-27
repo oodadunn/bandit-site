@@ -3,7 +3,32 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ImageIcon, RefreshCw, Loader2, CheckCircle2, AlertCircle, Wand2 } from "lucide-react";
+import { ImageIcon, RefreshCw, Loader2, CheckCircle2, AlertCircle, Wand2, CreditCard, ExternalLink } from "lucide-react";
+
+/**
+ * Detect Gemini "billing required" 429s.
+ *
+ * The API returns a verbose JSON envelope (`Gemini API error 429: { ... }`) that
+ * looks awful when dumped onto a post card. We sniff for the signature strings
+ * and surface a single friendly sentence instead. Returns `null` if the error
+ * is not a quota/billing block.
+ */
+function detectQuotaError(raw: string | undefined | null): string | null {
+  if (!raw) return null;
+  const lower = raw.toLowerCase();
+  const isQuota =
+    lower.includes('"code": 429') ||
+    lower.includes("error 429") ||
+    lower.includes("quota") ||
+    lower.includes("rate-limits") ||
+    lower.includes("free_tier_requests");
+  return isQuota ? "Billing required — enable on Google Cloud" : null;
+}
+
+/** Same idea, but for the bootstrap/asset paths. Used only for the banner. */
+function isQuotaError(raw: string | undefined | null): boolean {
+  return detectQuotaError(raw) !== null;
+}
 
 interface Post {
   id: string;
@@ -168,9 +193,39 @@ export default function AdminBlogPage() {
     }
   };
 
+  // Surface a single banner if any recent generate call hit a Gemini billing
+  // wall. Cheaper than annotating every card with the same long explanation.
+  const quotaHit =
+    Object.values(results).some((r) => !r.ok && isQuotaError(r.msg)) ||
+    Object.values(assetResults).some((r) => !r.ok && isQuotaError(r.msg));
+
   return (
     <div className="text-white pb-20">
       <div className="max-w-5xl mx-auto px-6 lg:px-10 pt-10">
+        {quotaHit && (
+          <div className="mb-6 rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-4 flex items-start gap-3">
+            <CreditCard size={18} className="text-yellow-400 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-bold text-yellow-300 mb-1">
+                Image generation paused — Google Cloud billing required
+              </p>
+              <p className="text-yellow-100/80 leading-relaxed">
+                Google moved <code className="text-yellow-300">gemini-2.5-flash-image</code> off
+                the free tier. Adding a card to the project unblocks it (≈$0.04 per image,
+                roughly $20/mo at our 500-image cap).
+              </p>
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-2 text-yellow-300 font-bold hover:underline"
+              >
+                Open AI Studio → find the project → "Set up billing"
+                <ExternalLink size={12} />
+              </a>
+            </div>
+          </div>
+        )}
         <div className="flex items-start justify-between flex-wrap gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black">Blog Image Pipeline</h1>
@@ -251,9 +306,9 @@ export default function AdminBlogPage() {
                       )}
                     </button>
                     {r && (
-                      <p className={`text-[10px] mt-1 flex items-center gap-1 ${r.ok ? "text-[#39FF14]" : "text-red-400"}`}>
-                        {r.ok ? <CheckCircle2 size={10} /> : <AlertCircle size={10} />}
-                        {r.msg}
+                      <p className={`text-[10px] mt-1 flex items-start gap-1 ${r.ok ? "text-[#39FF14]" : "text-red-400"} break-words`}>
+                        {r.ok ? <CheckCircle2 size={10} className="shrink-0 mt-0.5" /> : <AlertCircle size={10} className="shrink-0 mt-0.5" />}
+                        <span className="line-clamp-2">{r.ok ? r.msg : (detectQuotaError(r.msg) ?? r.msg)}</span>
                       </p>
                     )}
                   </div>
@@ -327,12 +382,14 @@ export default function AdminBlogPage() {
                     </button>
                     {r && (
                       <p
-                        className={`text-[11px] flex items-center gap-1 ${
+                        className={`text-[11px] flex items-start gap-1 max-w-[200px] text-right ${
                           r.ok ? "text-[#39FF14]" : "text-red-400"
                         }`}
                       >
-                        {r.ok ? <CheckCircle2 size={11} /> : <AlertCircle size={11} />}
-                        {r.msg}
+                        {r.ok ? <CheckCircle2 size={11} className="shrink-0 mt-0.5" /> : <AlertCircle size={11} className="shrink-0 mt-0.5" />}
+                        <span className="line-clamp-2">
+                          {r.ok ? r.msg : (detectQuotaError(r.msg) ?? r.msg)}
+                        </span>
                       </p>
                     )}
                   </div>
