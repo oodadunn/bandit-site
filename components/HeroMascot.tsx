@@ -16,9 +16,12 @@ import { supabase } from "@/lib/supabase";
 export default function HeroMascot({
   slug,
   className = "w-full max-w-md mx-auto",
+  fallback,
 }: {
   slug: string;
   className?: string;
+  /** Rendered while the asset has no generated image yet (e.g. an emoji). */
+  fallback?: React.ReactNode;
 }) {
   const [url, setUrl] = useState<string | null>(null);
 
@@ -35,7 +38,7 @@ export default function HeroMascot({
     return () => { cancelled = true; };
   }, [slug]);
 
-  if (!url) return null;
+  if (!url) return fallback ? <>{fallback}</> : null;
 
   return (
     /* eslint-disable-next-line @next/next/no-img-element */

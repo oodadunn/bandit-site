@@ -230,9 +230,9 @@ export default function AdminBlogPage() {
           <div>
             <h1 className="text-3xl font-black">Blog Image Pipeline</h1>
             <p className="text-gray-400 mt-1 text-sm max-w-2xl">
-              Generate Pixar-style hero images for blog posts via Gemini 2.5 Flash Image. The
-              same image is used for the post hero AND the thumbnail. References (mascot + baler) are attached
-              to every call for character consistency.
+              Generate Pixar-style hero images for blog posts (model set in image_gen_config —
+              currently OpenAI gpt-image-1.5). The same image is used for the post hero AND the
+              thumbnail. References (mascot + baler) are attached to every call for character consistency.
             </p>
           </div>
 

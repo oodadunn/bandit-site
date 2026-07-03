@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   keywords: [
     "bale wire", "baling wire nationwide", "auto-tie box wire", "single loop bale ties",
     "double loop bale ties", "black annealed baling wire", "galvanized bale wire",
-    "baling wire supply", "recycling wire supply",
+    "baling wire supply", "recycling wire supply", "stump wire", "stem wire",
+    "bale wire bundles", "baling wire pallet",
   ],
 };
 
@@ -22,12 +23,13 @@ const WIRE_TYPES = [
     tag: "Most Popular",
     tagColor: "bg-[#39FF14] text-[#0A0A0A]",
     description:
-      "Continuous coiled wire designed for automatic horizontal single-ram balers. Feeds smoothly through wire guides with zero snags. Available in 50 lb and 100 lb boxes.",
+      "Continuous coiled wire designed for automatic horizontal single-ram balers. Feeds smoothly through wire guides with zero snags. Available in 50 lb and 100 lb boxes, or as stump (stem) wire coils on carriers.",
     gauges: ["9 gauge", "10 gauge", "11 gauge", "12 gauge"],
     finishes: ["Black Annealed", "Galvanized"],
-    packaging: ["50 lb box (45 boxes/pallet)", "100 lb box (36 boxes/pallet)"],
+    packaging: ["50 lb box (45 boxes/pallet)", "100 lb box (36 boxes/pallet)", "Stump / stem wire coils on carriers"],
     bestFor: ["Horizontal auto-tie balers", "High-volume cardboard recycling", "OCC / paper recycling operations"],
     icon: "🔄",
+    imageSlug: "wire-box",
   },
   {
     id: "single-loop",
@@ -38,9 +40,10 @@ const WIRE_TYPES = [
       "Pre-cut wire with a formed loop on one end for fast manual tying. The workhorse for retail backroom vertical balers. Available in multiple lengths to match your bale size.",
     gauges: ["11 gauge", "12 gauge", "13 gauge", "14 gauge"],
     finishes: ["Black Annealed"],
-    packaging: ["Standard box (approx. 100 ties)", "Half-pallet & full-pallet quantities"],
+    packaging: ["Wire bundles (approx. 100–250 ties)", "Bundles on pallets or in gaylords"],
     bestFor: ["Vertical balers (retail, grocery, distribution)", "Manual tying operations", "Cardboard, plastic film, textiles"],
     icon: "〰️",
+    imageSlug: "wire-single-loop",
   },
   {
     id: "double-loop",
@@ -51,9 +54,10 @@ const WIRE_TYPES = [
       "Square-lock double loop ties for heavy-duty applications and dense material bales. Fast feeding, superior tensile strength. Ideal when bales need to hold tight through rough handling.",
     gauges: ["9 gauge", "10 gauge", "11 gauge", "12 gauge", "13 gauge", "14 gauge"],
     finishes: ["Black Annealed", "Galvanized"],
-    packaging: ["Standard box quantities", "Pallet pricing available"],
+    packaging: ["Wire bundles", "Bundles on pallets — pallet pricing available"],
     bestFor: ["Industrial recycling operations", "Metal, tire, and dense material baling", "High-compression horizontal balers"],
     icon: "🔗",
+    imageSlug: "wire-double-loop",
   },
 ];
 
@@ -267,7 +271,12 @@ export default function WirePage() {
             {WIRE_TYPES.map((wire) => (
               <div key={wire.id} className="card-dark flex flex-col">
                 <div className="flex items-start justify-between mb-4">
-                  <span className="text-3xl">{wire.icon}</span>
+                  {/* Generated product image (transparent PNG); emoji until it exists */}
+                  <HeroMascot
+                    slug={wire.imageSlug}
+                    className="h-28 w-28 object-contain"
+                    fallback={<span className="text-3xl">{wire.icon}</span>}
+                  />
                   <span className={`text-xs font-bold px-3 py-1 rounded-full ${wire.tagColor}`}>
                     {wire.tag}
                   </span>
