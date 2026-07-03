@@ -29,4 +29,5 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true, url: result.url });
 }
 
-export const maxDuration = 60;
+// gpt-image-1.5 with reference images can exceed 60s — see generate-post-image.
+export const maxDuration = 300;

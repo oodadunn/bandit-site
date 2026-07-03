@@ -62,6 +62,8 @@ export async function POST(req: NextRequest) {
   });
 }
 
-// Run longer than the 10s Vercel default — Gemini image generation usually
-// takes 15–30s.
-export const maxDuration = 60;
+// Run longer than the 10s Vercel default. gpt-image-1.5 at high quality with
+// reference images attached can take 60–120s, which silently killed the
+// function at the old 60s cap (no log row, spinner forever). Pro plan allows
+// up to 300s.
+export const maxDuration = 300;
