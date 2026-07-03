@@ -1,8 +1,12 @@
 /**
  * Bandit Image Generation
- * Calls Gemini 2.5 Flash Image with mascot + baler reference images attached
- * for character consistency. Built directly on the REST API to avoid an extra
- * SDK dependency.
+ * Generates blog heroes / page assets with mascot + baler reference images
+ * attached for character consistency. Built directly on the REST APIs to
+ * avoid extra SDK dependencies.
+ *
+ * Provider is selected by the model name in image_gen_config:
+ *   gpt-image-* / dall-e-* / chatgpt-image-* → OpenAI images/edits endpoint
+ *   anything else (e.g. gemini-2.5-flash-image) → Gemini generateContent
  *
  * Style bible: /Bandit_Visual_Style_Bible.md (§8 scaffold + §9 category prompts)
  */
@@ -12,6 +16,7 @@ import { revalidatePath } from "next/cache";
 import sharp from "sharp";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY!;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
@@ -124,7 +129,7 @@ export function buildPrompt(opts: {
   const contentSnippet = cleanContent(opts.content);
 
   return [
-    `Pixar-style 3D animation still, cinematic render. Aspect ratio 16:9.`,
+    `Pixar-style 3D animation still, cinematic render. Wide landscape composition.`,
     ``,
     `=== BLOG POST (the image must feel SPECIFIC to this post, not generic) ===`,
     `TITLE: ${opts.title}`,
@@ -142,7 +147,7 @@ export function buildPrompt(opts: {
     `=== STYLE ===`,
     `Lighting: Cinematic three-point — soft warm key, cool neon-green #39FF14 rim light, subtle fill. Grounded shadows. Shallow depth of field on Bandit.`,
     `Palette: matte black #0A0A0A and neon green #39FF14 accents only, warm cardboard tan #C8A97E where applicable. No other greens.`,
-    `Composition: 16:9, leave ~10% quiet space at the top edge for headline overlay.`,
+    `Composition: wide landscape frame, leave ~10% quiet space at the top edge for headline overlay.`,
     `Style: Pixar-grade 3D, PBR materials, subsurface-scattered fur. Match the attached reference images for the character and any baler equipment.`,
     ``,
     `=== AVOID ===`,
@@ -306,6 +311,80 @@ async function callGemini(
   };
 }
 
+// ─── OpenAI call ──────────────────────────────────────────────────────────
+// Uses the images/edits endpoint so the reference images (mascot + equipment)
+// are attached as inputs — same character-consistency trick as the Gemini
+// path. input_fidelity=high makes the model preserve reference details.
+
+type AspectRatio = "16:9" | "1:1" | "4:3" | "3:4" | "9:16";
+
+// gpt-image sizes: 1024x1024, 1536x1024 (landscape 3:2), 1024x1536 (portrait).
+function openAISize(aspectRatio: AspectRatio): string {
+  if (aspectRatio === "1:1") return "1024x1024";
+  if (aspectRatio === "3:4" || aspectRatio === "9:16") return "1024x1536";
+  return "1536x1024";
+}
+
+async function callOpenAI(
+  prompt: string,
+  model: string,
+  refs: Awaited<ReturnType<typeof loadReferenceImages>>,
+  aspectRatio: AspectRatio = "16:9"
+): Promise<GenerateResult> {
+  if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set");
+
+  const form = new FormData();
+  form.append("model", model);
+  form.append("prompt", prompt);
+  form.append("size", openAISize(aspectRatio));
+  form.append("quality", "high");
+  form.append("input_fidelity", "high");
+  refs.forEach((r, i) => {
+    const blob = new Blob([Buffer.from(r.data, "base64")], { type: r.mimeType });
+    form.append("image[]", blob, `reference-${i}.png`);
+  });
+
+  const r = await fetch("https://api.openai.com/v1/images/edits", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+    body: form,
+  });
+
+  if (!r.ok) {
+    const errText = await r.text();
+    throw new Error(`OpenAI API error ${r.status}: ${errText.substring(0, 500)}`);
+  }
+
+  const json = await r.json();
+  const b64 = json?.data?.[0]?.b64_json;
+  if (!b64) {
+    throw new Error(`OpenAI returned no image. Response: ${JSON.stringify(json).substring(0, 500)}`);
+  }
+  return {
+    imageBuffer: Buffer.from(b64, "base64"),
+    mimeType: json?.output_format === "jpeg" ? "image/jpeg" : "image/png",
+  };
+}
+
+// ─── Provider dispatch ────────────────────────────────────────────────────
+// image_gen_config.model decides the provider, so switching is a one-row
+// DB update — no deploy needed.
+
+function isOpenAIModel(model: string): boolean {
+  return /^(gpt-image|dall-e|chatgpt-image)/.test(model);
+}
+
+async function callImageModel(
+  prompt: string,
+  model: string,
+  refs: Awaited<ReturnType<typeof loadReferenceImages>>,
+  aspectRatio: AspectRatio = "16:9"
+): Promise<GenerateResult> {
+  return isOpenAIModel(model)
+    ? callOpenAI(prompt, model, refs, aspectRatio)
+    : callGemini(prompt, model, refs, aspectRatio);
+}
+
 // ─── Storage upload ───────────────────────────────────────────────────────
 
 async function uploadToStorage(slug: string, buffer: Buffer, mime: string): Promise<string> {
@@ -390,7 +469,7 @@ export async function generatePostImage(opts: GenerateOptions): Promise<{
   // 5. Call Gemini
   let gen;
   try {
-    gen = await callGemini(prompt, budget.config!.model, refs);
+    gen = await callImageModel(prompt, budget.config!.model, refs);
   } catch (e: any) {
     await sb.from("image_gen_log").insert({
       post_id: opts.postId,
@@ -639,7 +718,7 @@ export async function generatePageAsset(slug: string): Promise<{
 
   let gen;
   try {
-    gen = await callGemini(asset.prompt, budget.config!.model, refs, "1:1");
+    gen = await callImageModel(asset.prompt, budget.config!.model, refs, "1:1");
   } catch (e: any) {
     await sb.from("image_gen_log").insert({
       post_slug: `asset:${slug}`, prompt: asset.prompt, model: budget.config!.model,

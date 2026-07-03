@@ -1,9 +1,15 @@
 import { MetadataRoute } from 'next';
+import { supabase } from '@/lib/supabase';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Revalidate the sitemap every hour so newly published blog posts get picked
+// up without a redeploy.
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // www is canonical — the apex domain 307-redirects to www at Vercel.
   const baseUrl = 'https://www.banditrecycling.com';
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/services`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/services/baler-repair`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
@@ -23,4 +29,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ];
+
+  // Published blog posts — the blog is the main organic-growth surface, so
+  // every post needs to be discoverable from the sitemap.
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const { data } = await supabase
+      .from('blog_posts')
+      .select('slug, published_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+    blogPages = (data ?? []).map((p) => ({
+      url: `${baseUrl}/blog/${p.slug}`,
+      lastModified: p.published_at ? new Date(p.published_at) : new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+  } catch {
+    // Supabase unavailable at build time → ship the static pages only.
+  }
+
+  return [...staticPages, ...blogPages];
 }

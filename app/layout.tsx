@@ -5,6 +5,7 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.banditrecycling.com"),
   title: {
     default: "Bandit Recycling — Baler Repair & Bale Wire Supply | Nationwide Service",
     template: "%s | Bandit Recycling",
@@ -50,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@type": "LocalBusiness",
               name: "Bandit Recycling",
               description: "B2B baler repair, maintenance, and bale wire supply nationwide.",
-              url: "https://banditrecycling.com",
+              url: "https://www.banditrecycling.com",
               telephone: "+18574226348",
               email: "service@banditrecycling.com",
               areaServed: "United States",

@@ -63,6 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: post.seo_title ?? `${post.title} | Bandit Recycling`,
     description: post.seo_description ?? post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       title: post.seo_title ?? post.title,
       description: post.seo_description ?? post.excerpt,
@@ -98,8 +99,27 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     month: "long", day: "numeric", year: "numeric",
   });
 
+  // Article structured data — helps Google show rich results and gives
+  // AI answer engines (ChatGPT, Perplexity, AI Overviews) a machine-readable
+  // summary of the post to cite.
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.seo_description ?? post.excerpt,
+    image: post.image_url ? [post.image_url] : undefined,
+    datePublished: post.published_at,
+    author: { "@type": "Organization", name: "Bandit Recycling", url: "https://www.banditrecycling.com" },
+    publisher: { "@type": "Organization", name: "Bandit Recycling", url: "https://www.banditrecycling.com" },
+    mainEntityOfPage: `https://www.banditrecycling.com/blog/${post.slug}`,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       {/* ── HERO IMAGE ────────────────────────────────────────────────────── */}
       <div
         className="w-full aspect-video max-h-[640px] bg-cover bg-center bg-[#111] relative flex items-center justify-center"
