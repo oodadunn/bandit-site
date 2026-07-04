@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Phone, Wrench, Shield, Zap, Package, ChevronRight, MapPin, Clock, CheckCircle } from "lucide-react";
 import QuoteForm from "@/components/QuoteForm";
+import HeroMascot from "@/components/HeroMascot";
 import USMap from "@/components/USMap";
 import { getSiteStats, getServiceAreas } from "@/lib/supabase";
 
@@ -216,10 +217,18 @@ export default async function HomePage() {
               <div className="relative">
                 {/* Glow ring behind character */}
                 <div className="absolute inset-0 rounded-full bg-[#39FF14]/5 blur-3xl scale-110" />
-                <img
-                  src="/bandit-face.png"
-                  alt="Bandit the Raccoon"
-                  className="relative w-64 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
+                {/* Generated Pixar Bandit (page_assets slug: home-mascot); old flat
+                    logo mark stays as fallback until the asset is generated. */}
+                <HeroMascot
+                  slug="home-mascot"
+                  className="relative w-72 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
+                  fallback={
+                    <img
+                      src="/bandit-face.png"
+                      alt="Bandit the Raccoon"
+                      className="relative w-64 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
+                    />
+                  }
                 />
                 {/* Speech bubble */}
                 <div className="absolute -top-6 -right-4 lg:-right-16 bg-[#39FF14] text-[#0A0A0A] text-xs font-black px-4 py-3 rounded-2xl rounded-bl-sm max-w-[180px] leading-snug shadow-lg">
