@@ -57,28 +57,76 @@ interface AnalyticsData {
   traffic_sources: Record<string, number>;
 }
 
+interface PeriodSummary {
+  sessions: number;
+  page_views: number;
+  users: number;
+  bounce_rate: number;
+  avg_session_duration: number;
+}
+
 interface AnalyticsSummary {
   ga4_connected?: boolean;
   daily: AnalyticsData[];
   summary: {
-    last7: {
-      sessions: number;
-      page_views: number;
-      users: number;
-      bounce_rate: number;
-      avg_session_duration: number;
-    };
-    last30: {
-      sessions: number;
-      page_views: number;
-      users: number;
-      bounce_rate: number;
-      avg_session_duration: number;
-    };
+    last7: PeriodSummary;
+    prev7?: PeriodSummary;
+    last30: PeriodSummary;
   };
 }
 
 type TabType = "overview" | "accounts" | "leads" | "calls" | "traffic" | "partners" | "surveys";
+
+// ── Traffic trend chart ─────────────────────────────────────────────────
+// Zero-dependency SVG line chart: sessions (solid green, filled) + users
+// (dashed blue) per day. GA4 omits zero-traffic days, so we rebuild the
+// full window and fill gaps with 0 — otherwise slow days silently vanish
+// and the trend looks better than it is.
+function TrendChart({ daily, days }: { daily: AnalyticsData[]; days: number }) {
+  const byDate = new Map(daily.map((d) => [d.date, d]));
+  const points: { date: string; sessions: number; users: number }[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const row = byDate.get(date);
+    points.push({ date, sessions: row?.sessions ?? 0, users: row?.users ?? 0 });
+  }
+
+  const W = 720, H = 220, PL = 36, PR = 8, PT = 12, PB = 24;
+  const innerW = W - PL - PR, innerH = H - PT - PB;
+  const maxY = Math.max(4, ...points.map((p) => Math.max(p.sessions, p.users)));
+  const x = (i: number) => PL + (points.length <= 1 ? 0 : (i / (points.length - 1)) * innerW);
+  const y = (v: number) => PT + innerH - (v / maxY) * innerH;
+
+  const line = (key: "sessions" | "users") =>
+    points.map((p, i) => `${x(i).toFixed(1)},${y(p[key]).toFixed(1)}`).join(" ");
+  const area = `${PL},${(PT + innerH).toFixed(1)} ${line("sessions")} ${x(points.length - 1).toFixed(1)},${(PT + innerH).toFixed(1)}`;
+
+  const tickEvery = Math.max(1, Math.round(points.length / 6));
+  const fmt = (d: string) => `${parseInt(d.slice(5, 7))}/${parseInt(d.slice(8, 10))}`;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="img" aria-label="Traffic trend chart">
+      {[0.25, 0.5, 0.75, 1].map((f) => (
+        <g key={f}>
+          <line x1={PL} x2={W - PR} y1={y(maxY * f)} y2={y(maxY * f)} stroke="var(--border-default)" strokeWidth="1" />
+          <text x={PL - 6} y={y(maxY * f) + 3} textAnchor="end" fontSize="9" fill="var(--text-secondary)">
+            {Math.round(maxY * f)}
+          </text>
+        </g>
+      ))}
+      <polygon points={area} fill="#22c55e" opacity="0.08" />
+      <polyline points={line("sessions")} fill="none" stroke="#16a34a" strokeWidth="2" strokeLinejoin="round" />
+      <polyline points={line("users")} fill="none" stroke="#60a5fa" strokeWidth="1.5" strokeDasharray="4 3" strokeLinejoin="round" />
+      {points.map((p, i) =>
+        i % tickEvery === 0 ? (
+          <text key={p.date} x={x(i)} y={H - 6} textAnchor="middle" fontSize="9" fill="var(--text-secondary)">
+            {fmt(p.date)}
+          </text>
+        ) : null
+      )}
+    </svg>
+  );
+}
 
 interface AccountListItem {
   id: string;
@@ -165,6 +213,7 @@ function AdminDashboardInner() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [calls, setCalls] = useState<CallEvent[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [trendRange, setTrendRange] = useState<7 | 30 | 90>(30);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [callsLoading, setCallsLoading] = useState(false);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
@@ -590,11 +639,14 @@ function AdminDashboardInner() {
     value,
     icon: Icon,
     color = "var(--green-accent)",
+    delta,
   }: {
     label: string;
     value: string | number;
     icon: any;
     color?: string;
+    /** Percent change vs the prior period; null hides the chip. */
+    delta?: number | null;
   }) => (
     <div
       className="p-6 rounded-lg border"
@@ -617,6 +669,14 @@ function AdminDashboardInner() {
           >
             {value}
           </p>
+          {typeof delta === "number" && (
+            <p
+              className="text-xs font-semibold mt-1"
+              style={{ color: delta >= 0 ? "#16a34a" : "#dc2626" }}
+            >
+              {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(0)}% vs prior 7d
+            </p>
+          )}
         </div>
         <Icon size={24} style={{ color }} opacity={0.6} />
       </div>
@@ -1679,33 +1739,87 @@ function AdminDashboardInner() {
               </div>
             ) : (
               <>
-                {/* Summary KPIs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                  <KPICard
-                    label="Sessions (7d)"
-                    value={analytics.summary.last7.sessions}
-                    icon={Activity}
-                  />
-                  <KPICard
-                    label="Page Views (7d)"
-                    value={analytics.summary.last7.page_views}
-                    icon={BarChart3}
-                  />
-                  <KPICard
-                    label="Users (7d)"
-                    value={analytics.summary.last7.users}
-                    icon={Users}
-                  />
-                  <KPICard
-                    label="Bounce Rate (7d)"
-                    value={`${(analytics.summary.last7.bounce_rate * 100).toFixed(1)}%`}
-                    icon={TrendingUp}
-                  />
-                  <KPICard
-                    label="Avg Duration (7d)"
-                    value={`${analytics.summary.last7.avg_session_duration.toFixed(1)}s`}
-                    icon={Clock}
-                  />
+                {/* Summary KPIs — deltas compare to the 7 days before */}
+                {(() => {
+                  const prev = analytics.summary.prev7;
+                  const pct = (cur: number, prevVal?: number) =>
+                    prev && prevVal && prevVal > 0 ? ((cur - prevVal) / prevVal) * 100 : null;
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      <KPICard
+                        label="Sessions (7d)"
+                        value={analytics.summary.last7.sessions}
+                        icon={Activity}
+                        delta={pct(analytics.summary.last7.sessions, prev?.sessions)}
+                      />
+                      <KPICard
+                        label="Page Views (7d)"
+                        value={analytics.summary.last7.page_views}
+                        icon={BarChart3}
+                        delta={pct(analytics.summary.last7.page_views, prev?.page_views)}
+                      />
+                      <KPICard
+                        label="Users (7d)"
+                        value={analytics.summary.last7.users}
+                        icon={Users}
+                        delta={pct(analytics.summary.last7.users, prev?.users)}
+                      />
+                      <KPICard
+                        label="Bounce Rate (7d)"
+                        value={`${(analytics.summary.last7.bounce_rate * 100).toFixed(1)}%`}
+                        icon={TrendingUp}
+                      />
+                      <KPICard
+                        label="Avg Duration (7d)"
+                        value={`${analytics.summary.last7.avg_session_duration.toFixed(1)}s`}
+                        icon={Clock}
+                      />
+                    </div>
+                  );
+                })()}
+
+                {/* Trend over time */}
+                <div
+                  className="rounded-lg border p-6"
+                  style={{
+                    backgroundColor: "var(--bg-card)",
+                    borderColor: "var(--border-default)",
+                  }}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-4">
+                      <h3 className="font-bold" style={{ color: "var(--text-primary)" }}>
+                        Traffic Trend
+                      </h3>
+                      <div className="flex items-center gap-3 text-xs" style={{ color: "var(--text-secondary)" }}>
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block w-4 border-t-2" style={{ borderColor: "#16a34a" }} />
+                          Sessions
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="inline-block w-4 border-t-2 border-dashed" style={{ borderColor: "#60a5fa" }} />
+                          Users
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {([7, 30, 90] as const).map((d) => (
+                        <button
+                          key={d}
+                          onClick={() => setTrendRange(d)}
+                          className="px-3 py-1 rounded-md text-xs font-bold border transition-colors"
+                          style={
+                            trendRange === d
+                              ? { backgroundColor: "var(--green-accent)", color: "#000", borderColor: "var(--green-accent)" }
+                              : { color: "var(--text-secondary)", borderColor: "var(--border-default)" }
+                          }
+                        >
+                          {d}d
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <TrendChart daily={analytics.daily} days={trendRange} />
                 </div>
 
                 {/* Top Pages & Traffic Sources */}

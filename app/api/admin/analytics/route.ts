@@ -22,8 +22,11 @@ async function isAuthenticated(request: NextRequest): Promise<boolean> {
 
 // ── Cache logic ────────────────────────────────────────────────────────
 // We store daily rows in analytics_daily. On each request we check if
-// today's row exists (meaning we've already synced today). If not, pull
-// the last 30 days from GA4, upsert into Supabase, then return.
+// today's row exists (meaning we've already synced today). If not — or if
+// the cache is missing most of the trend window (e.g. right after this
+// feature shipped) — pull the last HISTORY_DAYS from GA4, upsert, return.
+
+const HISTORY_DAYS = 90;
 
 async function ensureFreshData(): Promise<GA4DailyRow[]> {
   const supabase = getSupabaseAdmin();
@@ -36,24 +39,28 @@ async function ensureFreshData(): Promise<GA4DailyRow[]> {
     .eq("date", today)
     .maybeSingle();
 
-  // If today's row exists, just return everything from the table
-  if (todayRow) {
+  const { count: cachedCount } = await supabase
+    .from("analytics_daily")
+    .select("date", { head: true, count: "exact" });
+
+  // Fresh enough: today synced AND the cache spans most of the window.
+  // (GA4 omits zero-traffic days, so expect fewer rows than HISTORY_DAYS.)
+  if (todayRow && (cachedCount ?? 0) >= 60) {
     const { data } = await supabase
       .from("analytics_daily")
       .select("*")
       .order("date", { ascending: false })
-      .limit(30);
+      .limit(HISTORY_DAYS);
     return (data || []) as GA4DailyRow[];
   }
 
-  // Otherwise, fetch last 30 days from GA4 and cache
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000)
+  const windowStart = new Date(Date.now() - HISTORY_DAYS * 86400000)
     .toISOString()
     .slice(0, 10);
 
   let ga4Rows: GA4DailyRow[];
   try {
-    ga4Rows = await fetchGA4Data(thirtyDaysAgo, today);
+    ga4Rows = await fetchGA4Data(windowStart, today);
   } catch (err) {
     console.error("GA4 fetch failed:", err);
     // Fall back to whatever we have cached
@@ -61,7 +68,7 @@ async function ensureFreshData(): Promise<GA4DailyRow[]> {
       .from("analytics_daily")
       .select("*")
       .order("date", { ascending: false })
-      .limit(30);
+      .limit(HISTORY_DAYS);
     return (data || []) as GA4DailyRow[];
   }
 
@@ -137,21 +144,26 @@ export async function GET(request: NextRequest) {
         .from("analytics_daily")
         .select("*")
         .order("date", { ascending: false })
-        .limit(30);
+        .limit(HISTORY_DAYS);
       dailyData = (data || []) as GA4DailyRow[];
     }
 
     const now = new Date();
     const last7Date = new Date(now.getTime() - 7 * 86400000);
+    const prev7Date = new Date(now.getTime() - 14 * 86400000);
     const last30Date = new Date(now.getTime() - 30 * 86400000);
 
     const last7 = dailyData.filter((d) => new Date(d.date) >= last7Date);
+    const prev7 = dailyData.filter(
+      (d) => new Date(d.date) >= prev7Date && new Date(d.date) < last7Date
+    );
     const last30 = dailyData.filter((d) => new Date(d.date) >= last30Date);
 
     return NextResponse.json({
       daily: dailyData,
       summary: {
         last7: calculateSummary(last7),
+        prev7: calculateSummary(prev7),
         last30: calculateSummary(last30),
       },
       ga4_connected: hasGA4,
