@@ -96,13 +96,20 @@ export default async function HomePage() {
         />
         {/* Green glow top-right */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#39FF14]/5 rounded-full blur-[120px] pointer-events-none" />
-        {/* Baler wireframe background */}
+        {/* Baler background — generated Bandit-branded render (page_assets: equipment);
+            old wireframe stays as fallback until the asset exists */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-          <img
-            src="/vertical-baler.png"
-            alt=""
-            className="w-[700px] h-auto opacity-[0.15] select-none"
-            aria-hidden="true"
+          <HeroMascot
+            slug="equipment"
+            className="w-[700px] h-auto opacity-[0.22] select-none"
+            fallback={
+              <img
+                src="/vertical-baler.png"
+                alt=""
+                className="w-[700px] h-auto opacity-[0.15] select-none"
+                aria-hidden="true"
+              />
+            }
           />
         </div>
 
@@ -221,7 +228,7 @@ export default async function HomePage() {
                     logo mark stays as fallback until the asset is generated. */}
                 <HeroMascot
                   slug="home-mascot"
-                  className="relative w-72 h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
+                  className="relative w-96 max-w-full h-auto drop-shadow-[0_0_60px_rgba(57,255,20,0.3)]"
                   fallback={
                     <img
                       src="/bandit-face.png"
