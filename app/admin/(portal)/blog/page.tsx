@@ -352,7 +352,20 @@ export default function AdminBlogPage() {
                         {p.status}
                       </span>
                     </div>
-                    <h3 className="font-bold text-white truncate">{p.title}</h3>
+                    <h3 className="font-bold text-white truncate">
+                      {p.status === "published" ? (
+                        <a
+                          href={`/blog/${p.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-[#39FF14] hover:underline transition-colors"
+                        >
+                          {p.title}
+                        </a>
+                      ) : (
+                        p.title
+                      )}
+                    </h3>
                     <p className="text-xs text-gray-500 truncate">{p.excerpt}</p>
                   </div>
 
