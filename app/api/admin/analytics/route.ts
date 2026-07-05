@@ -82,7 +82,11 @@ async function ensureFreshData(): Promise<GA4DailyRow[]> {
       users: r.users,
       bounce_rate: r.bounce_rate,
       avg_session_duration: r.avg_session_duration,
-      top_pages: r.top_pages,
+      // Admin pages are Jason's own visits — they drown out real visitor
+      // behavior in Top Pages, so keep them out of the cache.
+      top_pages: Object.fromEntries(
+        Object.entries(r.top_pages ?? {}).filter(([path]) => !path.startsWith("/admin"))
+      ),
       traffic_sources: r.traffic_sources,
     }));
 

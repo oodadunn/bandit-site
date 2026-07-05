@@ -30,6 +30,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ];
 
+  // State landing pages from the service_areas table
+  let statePages: MetadataRoute.Sitemap = [];
+  try {
+    const { data } = await supabase.from('service_areas').select('state').eq('active', true);
+    statePages = (data ?? []).map((a) => ({
+      url: `${baseUrl}/service-area/${a.state.toLowerCase().replace(/\s+/g, '-')}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }));
+  } catch {
+    // table unavailable → skip
+  }
+
   // Published blog posts — the blog is the main organic-growth surface, so
   // every post needs to be discoverable from the sitemap.
   let blogPages: MetadataRoute.Sitemap = [];
@@ -49,5 +63,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Supabase unavailable at build time → ship the static pages only.
   }
 
-  return [...staticPages, ...blogPages];
+  return [...staticPages, ...statePages, ...blogPages];
 }

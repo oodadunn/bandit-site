@@ -2,6 +2,13 @@ import Link from "next/link";
 import { Clock, Zap, MapPin, Users, CheckCircle, ChevronRight, Phone } from "lucide-react";
 import USMap from "@/components/USMap";
 import HeroMascot from "@/components/HeroMascot";
+import { getServiceAreas } from "@/lib/supabase";
+
+export const revalidate = 3600;
+
+function stateSlug(state: string): string {
+  return state.toLowerCase().replace(/\s+/g, "-");
+}
 
 const SERVICE_REGIONS = {
   "Northeast": [
@@ -44,7 +51,10 @@ const HIGHLIGHTS = [
   }
 ];
 
-export default function ServiceAreaPage() {
+export default async function ServiceAreaPage() {
+  // States with dedicated landing pages (driven by the service_areas table)
+  const areas = await getServiceAreas().catch(() => []);
+  const statePageSlugs = new Map(areas.map((a) => [a.state, stateSlug(a.state)]));
   return (
     <>
       {/* ── HEADER ────────────────────────────────────────────────────── */}
@@ -171,7 +181,7 @@ export default function ServiceAreaPage() {
                   {states.map((state) => (
                     <Link
                       key={state}
-                      href="/quote"
+                      href={statePageSlugs.has(state) ? `/service-area/${statePageSlugs.get(state)}` : "/quote"}
                       className="card-dark px-4 py-3 text-center hover:border-[#39FF14]/40 hover:bg-[#39FF14]/5 transition-all duration-200"
                     >
                       <div className="flex items-center justify-center gap-2">

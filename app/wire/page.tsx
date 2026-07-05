@@ -180,8 +180,21 @@ const FAQS = [
 ];
 
 export default function WirePage() {
+  // FAQPage structured data — makes the FAQ content below eligible for rich
+  // results and quotable by AI answer engines.
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* ── HERO ──────────────────────────────────────────────────────── */}
       <section className="relative min-h-[65vh] flex items-center bg-[#0A0A0A] overflow-hidden">
         <div
