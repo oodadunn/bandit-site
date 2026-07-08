@@ -32,6 +32,10 @@ const SERVICES = [
   },
 ];
 
+// Re-render at most hourly so DB-driven content (site_stats, service_areas)
+// shows without needing a deploy.
+export const revalidate = 3600;
+
 const STATS_FALLBACK = [
   { stat_key: "repairs_completed", stat_value: 500, display_label: "Repairs Completed" },
   { stat_key: "states_served", stat_value: 50, display_label: "States Served" },
