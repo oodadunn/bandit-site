@@ -164,11 +164,12 @@ export default function WireOrderBuilder() {
         <div className="grid xl:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
           <div className="min-w-0">
             <div className="border border-white/10 rounded-lg bg-[#111] p-5 mb-8">
+              <h2 className="text-lg font-bold text-white">Baler details <span className="font-normal text-gray-500">(optional)</span></h2>
+              <p className="text-sm text-gray-400 mt-1 mb-5">Enter your baler make and model if you want us to confirm that your selected wire is compatible before sending the final quote. This will not filter the products below.</p>
               <div className="grid md:grid-cols-2 gap-5">
-                <div><label className="input-label">Equipment make <span className="text-gray-600">(optional)</span></label><input className="input-field" value={form.equipment_make} onChange={(e) => setForm({ ...form, equipment_make: e.target.value })} placeholder="Harris, PTR, Maren..." /></div>
-                <div><label className="input-label">Equipment model <span className="text-gray-600">(optional)</span></label><input className="input-field" value={form.equipment_model} onChange={(e) => setForm({ ...form, equipment_model: e.target.value })} placeholder="Model number or name" /></div>
+                <div><label className="input-label">Equipment make</label><input className="input-field" value={form.equipment_make} onChange={(e) => setForm({ ...form, equipment_make: e.target.value })} placeholder="Harris, PTR, Maren..." /></div>
+                <div><label className="input-label">Equipment model</label><input className="input-field" value={form.equipment_model} onChange={(e) => setForm({ ...form, equipment_model: e.target.value })} placeholder="Model number or name" /></div>
               </div>
-              <p className="text-xs text-gray-500 mt-3">Add the baler details if you want us to verify compatibility before quoting.</p>
             </div>
 
             <div className="flex border-b border-white/10 mb-5" role="tablist" aria-label="Wire category">
