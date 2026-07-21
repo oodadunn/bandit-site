@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, Package, ChevronRight, CheckCircle, Truck, RefreshCw, Shield, Zap, Star, Wrench } from "lucide-react";
-import QuoteForm from "@/components/QuoteForm";
 import HeroMascot from "@/components/HeroMascot";
 
 export const metadata: Metadata = {
-  title: "Bale Wire Supply — Box Wire, Single & Double Loop | Nationwide Delivery",
+  title: "Bale Wire Supply — Single Loop Ties & Box Wire | Nationwide Delivery",
   description:
-    "Auto-tie box wire, single loop, and double loop bale ties for vertical and horizontal balers. Black annealed and galvanized. Delivered fast nationwide. Get a quote today.",
+    "Single loop bale ties in 11-14 gauge and box wire in 10-12 gauge. View bundle counts, weights, and pricing before requesting a delivered quote.",
   keywords: [
     "bale wire", "baling wire nationwide", "auto-tie box wire", "single loop bale ties",
-    "double loop bale ties", "black annealed baling wire", "galvanized bale wire",
-    "baling wire supply", "recycling wire supply", "stump wire", "stem wire",
+    "black annealed baling wire", "galvanized bale wire",
+    "baling wire supply", "recycling wire supply",
     "bale wire bundles", "baling wire pallet",
   ],
 };
@@ -23,10 +22,10 @@ const WIRE_TYPES = [
     tag: "Most Popular",
     tagColor: "bg-[#39FF14] text-[#0A0A0A]",
     description:
-      "Continuous coiled wire designed for automatic horizontal single-ram balers. Feeds smoothly through wire guides with zero snags. Available in 50 lb and 100 lb boxes, or as stump (stem) wire coils on carriers.",
-    gauges: ["9 gauge", "10 gauge", "11 gauge", "12 gauge"],
+      "Continuous coiled wire for automatic horizontal and closed-door balers. Available in 10, 11, and 12 gauge with 50 lb or 100 lb box options.",
+    gauges: ["10 gauge", "11 gauge", "12 gauge"],
     finishes: ["Black Annealed", "Galvanized"],
-    packaging: ["50 lb box (45 boxes/pallet)", "100 lb box (36 boxes/pallet)", "Stump / stem wire coils on carriers"],
+    packaging: ["50 lb box (45 boxes/pallet)", "100 lb box (36 boxes/pallet)"],
     bestFor: ["Horizontal auto-tie balers", "High-volume cardboard recycling", "OCC / paper recycling operations"],
     icon: "🔄",
     imageSlug: "wire-box",
@@ -39,25 +38,11 @@ const WIRE_TYPES = [
     description:
       "Pre-cut wire with a formed loop on one end for fast manual tying. The workhorse for retail backroom vertical balers. Available in multiple lengths to match your bale size.",
     gauges: ["11 gauge", "12 gauge", "13 gauge", "14 gauge"],
-    finishes: ["Black Annealed"],
-    packaging: ["Wire bundles (approx. 100–250 ties)", "Bundles on pallets or in gaylords"],
+    finishes: ["Black Annealed", "Galvanized"],
+    packaging: ["62, 75, 125, or 250 ties per bundle", "Bundle count varies by gauge and length", "30-60 bundles per gaylord"],
     bestFor: ["Vertical balers (retail, grocery, distribution)", "Manual tying operations", "Cardboard, plastic film, textiles"],
     icon: "〰️",
     imageSlug: "wire-single-loop",
-  },
-  {
-    id: "double-loop",
-    name: "Double Loop Bale Ties",
-    tag: "Heavy Duty",
-    tagColor: "bg-[#1a1a1a] text-[#39FF14] border border-[#39FF14]/40",
-    description:
-      "Square-lock double loop ties for heavy-duty applications and dense material bales. Fast feeding, superior tensile strength. Ideal when bales need to hold tight through rough handling.",
-    gauges: ["9 gauge", "10 gauge", "11 gauge", "12 gauge", "13 gauge", "14 gauge"],
-    finishes: ["Black Annealed", "Galvanized"],
-    packaging: ["Wire bundles", "Bundles on pallets — pallet pricing available"],
-    bestFor: ["Industrial recycling operations", "Metal, tire, and dense material baling", "High-compression horizontal balers"],
-    icon: "🔗",
-    imageSlug: "wire-double-loop",
   },
 ];
 
@@ -93,32 +78,24 @@ const BALER_GUIDE = [
     balerType: "Vertical Baler (Manual Tie)",
     examples: "Harris V-Series, Maren, Pakrite, Mil-tek 200–500",
     wireType: "Single Loop Bale Ties",
-    gauge: "11–13 gauge",
-    finish: "Black Annealed",
+    gauge: "11–14 gauge",
+    finish: "Black Annealed or Galvanized",
     notes: "Match tie length to your bale width + 18–24\". Ask us if unsure.",
   },
   {
     balerType: "Horizontal Auto-Tie Baler",
     examples: "Harris HRB, Balemaster, International Baler, PTR",
     wireType: "Auto-Tie Box Wire",
-    gauge: "11–12 gauge",
+    gauge: "10–12 gauge",
     finish: "Black Annealed or Galvanized",
     notes: "Verify box diameter fits your wire guides. We'll confirm before shipping.",
-  },
-  {
-    balerType: "Two-Ram Baler",
-    examples: "Harris Two-Ram, Bollegraaf, Macpresse",
-    wireType: "Double Loop Bale Ties",
-    gauge: "9–11 gauge",
-    finish: "Black Annealed or Galvanized",
-    notes: "High-density bales require heavier gauge. Call for sizing help.",
   },
   {
     balerType: "Closed-Door / Vertical Auto-Tie",
     examples: "Harmony, American Baler, Maren Auto",
     wireType: "Auto-Tie Box Wire",
-    gauge: "11–12 gauge",
-    finish: "Black Annealed",
+    gauge: "10–12 gauge",
+    finish: "Black Annealed or Galvanized",
     notes: "Same coil format as horizontal auto-tie. Gauge may vary by model.",
   },
 ];
@@ -159,7 +136,7 @@ const WHY_BANDIT = [
 const FAQS = [
   {
     q: "How do I know what gauge wire I need?",
-    a: "Gauge is determined by your baler model and material density. Heavier gauge (lower number) = stronger wire. For vertical balers tying cardboard, 12–13 gauge is common. For horizontal auto-tie balers, 11–12 gauge is standard. Call us with your baler model and we'll confirm the right spec.",
+    a: "Gauge is determined by your baler model and material density. Heavier wire has a lower gauge number. This catalog contains 11-14 gauge single-loop bale ties and 10-12 gauge box wire. Length is listed separately in feet so it is not confused with gauge. Share your baler model and we'll confirm the right spec.",
   },
   {
     q: "What's the difference between black annealed and galvanized?",
@@ -167,7 +144,7 @@ const FAQS = [
   },
   {
     q: "What's the minimum order?",
-    a: "We sell by the box (50 lb or 100 lb) with no strict minimums for new customers. Volume pricing starts at half-pallet quantities. For standing accounts, we can set up monthly delivery schedules with pallet-level pricing.",
+    a: "Box wire is sold in 50 lb or 100 lb boxes. Bale ties are sold in bundles of 62, 75, 125, or 250 ties depending on gauge and length. The quote builder shows the exact package before you submit.",
   },
   {
     q: "How fast is delivery?",
@@ -216,12 +193,12 @@ export default function WirePage() {
                 <span className="text-[#39FF14]">Your Baler.</span>
               </h1>
               <p className="text-lg text-gray-400 mb-8 max-w-xl leading-relaxed">
-                Auto-tie box wire, single loop, and double loop bale ties — matched to your baler model, delivered fast nationwide. From the team that fixes balers for a living.
+                Single-loop bale ties and auto-tie box wire, matched to your baler model and shown with exact package quantities before you request a delivered quote.
               </p>
               <div className="flex flex-wrap gap-3 mb-10">
-                <a href="tel:+18574226348" className="btn-primary">
-                  <Phone size={16} /> Get a Wire Quote
-                </a>
+                <Link href="/wire/order" className="btn-primary">
+                  <Package size={16} /> See Prices &amp; Build a Quote
+                </Link>
                 <Link href="#wire-types" className="btn-ghost-green">
                   Browse Wire Types <ChevronRight size={16} />
                 </Link>
@@ -230,8 +207,8 @@ export default function WirePage() {
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/10">
                 {[
-                  { val: "3", label: "Wire formats" },
-                  { val: "9–14", label: "Gauge range" },
+                  { val: "2", label: "Priced formats" },
+                  { val: "10–14", label: "Overall gauge range" },
                   { val: "1–2", label: "Day SE delivery" },
                 ].map((s) => (
                   <div key={s.label}>
@@ -276,11 +253,11 @@ export default function WirePage() {
               Wire Types &amp; Formats
             </h2>
             <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
-              Three formats covering every baler type. Tell us your machine and material, and we'll point you to the right spec.
+              Two formats from the current supplier sheet. Tell us your machine and material, and we&apos;ll confirm the correct gauge and length.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {WIRE_TYPES.map((wire) => (
               <div key={wire.id} className="card-dark flex flex-col">
                 <div className="flex items-start justify-between mb-4">
@@ -343,7 +320,7 @@ export default function WirePage() {
                 </div>
 
                 <Link
-                  href="/quote?service=wire"
+                  href={`/wire/order?type=${wire.id}`}
                   className="btn-ghost-green w-full justify-center mt-6"
                 >
                   Get Quote for {wire.name} <ChevronRight size={14} />
@@ -498,52 +475,15 @@ export default function WirePage() {
         </div>
       </section>
 
-      {/* ── QUOTE FORM ────────────────────────────────────────────────── */}
+      {/* ── PRICED QUOTE BUILDER ─────────────────────────────────────── */}
       <section className="py-24 bg-[#050505]">
         <div className="container-site">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
+          <div className="max-w-4xl mx-auto border border-[#39FF14]/25 bg-[#111] rounded-xl p-8 sm:p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div>
-              <div className="badge-green mb-6">Get a Wire Quote</div>
-              <h2 className="text-4xl font-black text-white mb-4">
-                Tell us your baler. <br />
-                <span className="text-[#39FF14]">We'll spec the wire.</span>
-              </h2>
-              <p className="text-gray-400 mb-8 leading-relaxed">
-                Submit your request and we'll come back with a wire recommendation, pricing, and delivery timeline — usually within a few hours during business hours.
-              </p>
-              <div className="space-y-4">
-                {[
-                  "Baler model matched to wire spec",
-                  "Volume pricing at half-pallet and pallet quantities",
-                  "Delivery timeline for your area",
-                  "Option to bundle with PM service visit",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <CheckCircle size={16} className="text-[#39FF14] shrink-0" />
-                    <span className="text-gray-300 text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-10 p-5 bg-[#111] rounded-xl border border-white/10">
-                <p className="text-sm text-white/70 mb-1">Prefer to call?</p>
-                <a
-                  href="tel:+18574226348"
-                  className="text-2xl font-black text-[#39FF14] hover:underline"
-                >
-                  857-422-6348
-                </a>
-                <p className="text-gray-500 text-xs mt-1">Mon–Fri 7am–6pm ET · Sat 8am–2pm ET</p>
-              </div>
+              <h2 className="text-3xl sm:text-4xl font-black text-white mb-3">See pricing. Build one clean request.</h2>
+              <p className="text-gray-400 max-w-2xl">Choose exact gauge, length, bundle size, and quantity. We&apos;ll remember the products, equipment, and delivery location for fast reorders. Freight is quoted separately.</p>
             </div>
-
-            <QuoteForm
-              formType="wire_quote"
-              title="Wire Quote Request"
-              subtitle="We'll recommend the right wire and pricing for your baler."
-              ctaLabel="Request Wire Quote"
-              showEquipment
-            />
+            <Link href="/wire/order" className="btn-primary shrink-0"><Package size={16} /> Build My Wire Quote</Link>
           </div>
         </div>
       </section>

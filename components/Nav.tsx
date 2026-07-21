@@ -18,9 +18,17 @@ const NAV_LINKS = [
     ],
   },
   { label: "Equipment", href: "/equipment" },
-  { label: "Bale Wire", href: "/wire" },
+  {
+    label: "Bale Wire",
+    href: "/wire",
+    sub: [
+      { label: "Wire Guide", href: "/wire" },
+      { label: "Prices & Quote Builder", href: "/wire/order" },
+      { label: "Reorder", href: "/account/orders" },
+    ],
+  },
   { label: "Service Area", href: "/service-area" },
-  { label: "Partners", href: "/partners" },
+  { label: "Vendors", href: "/vendors" },
   {
     label: "Resources",
     href: "/materials",
