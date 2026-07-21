@@ -191,17 +191,17 @@ export default function WireOrderBuilder() {
               <button type="button" onClick={() => resetFilters()} className="self-end h-[46px] text-sm text-gray-400 hover:text-[#39FF14]">Clear filters</button>
             </div>
 
-            <div className="border border-white/10 rounded-lg overflow-hidden">
-              <div className="hidden md:grid grid-cols-[minmax(210px,1.5fr)_110px_140px_110px_140px] gap-4 bg-[#151515] px-5 py-3 text-[11px] uppercase tracking-wider text-gray-500">
+            <div className="border border-white/10 rounded-lg overflow-x-auto">
+              <div className="hidden md:grid grid-cols-[minmax(180px,1.5fr)_90px_120px_95px_124px] gap-3 bg-[#151515] px-4 py-3 text-[11px] uppercase tracking-wider text-gray-500">
                 <span>Gauge &amp; length</span>
                 <span>{category === "bale-tie" ? "Ties / bundle" : "Box size"}</span>
                 <span>Shipping unit</span>
                 <span>Price</span>
-                <span>Quantity</span>
+                <span>Qty</span>
               </div>
               {filtered.slice(0, visibleCount).map((product) => {
                 const quantity = lines[product.id] ?? 0;
-                return <div key={product.id} className="grid md:grid-cols-[minmax(210px,1.5fr)_110px_140px_110px_140px] gap-3 md:gap-4 items-center px-5 py-4 border-t border-white/10 first:border-t-0 md:first:border-t">
+                return <div key={product.id} className="grid md:grid-cols-[minmax(180px,1.5fr)_90px_120px_95px_124px] gap-3 items-center px-4 py-4 border-t border-white/10 first:border-t-0 md:first:border-t">
                   <div>
                     <p className="font-semibold text-white">{product.name}</p>
                     <p className="text-xs text-gray-500 mt-1">Gauge: {product.gauge}{product.lengthFt ? ` · Length: ${product.lengthFt} ft` : ""}</p>
