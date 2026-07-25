@@ -15,6 +15,16 @@ interface PartnerFormBody {
   states?: string;
   years_experience?: string;
   business_description?: string;
+  vendor_types?: string[];
+  website?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  service_radius?: string;
+  capabilities?: string[];
+  insurance_status?: string;
+  w9_ready?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -33,8 +43,15 @@ export async function POST(req: NextRequest) {
     // preserved on the lead row and in the resulting Account notes.
     const details = [
       `Contact: ${body.contact_name}`,
-      body.states ? `Service states: ${body.states}` : null,
+      body.vendor_types?.length ? `Vendor type: ${body.vendor_types.join(", ")}` : null,
+      body.website ? `Website: ${body.website}` : null,
+      body.address ? `Business address: ${[body.address, body.city, body.state, body.zip].filter(Boolean).join(", ")}` : null,
+      body.states ? `Coverage states: ${body.states}` : null,
+      body.service_radius ? `Service radius: ${body.service_radius}` : null,
       body.years_experience ? `Baler experience: ${body.years_experience}` : null,
+      body.capabilities?.length ? `Capabilities: ${body.capabilities.join(", ")}` : null,
+      body.insurance_status ? `Insurance: ${body.insurance_status}` : null,
+      body.w9_ready ? `W-9 ready: ${body.w9_ready}` : null,
       body.business_description ? `\nAbout: ${body.business_description}` : null,
     ]
       .filter(Boolean)
@@ -48,7 +65,9 @@ export async function POST(req: NextRequest) {
       company: body.company_name,
       email: body.email,
       phone: body.phone,
-      state: body.states || undefined,
+      address: body.address,
+      city: body.city,
+      state: body.states || body.state || undefined,
       issue_description: details,
     };
 

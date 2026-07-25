@@ -6,7 +6,8 @@ const SERVICES = [
   { label: "Emergency Repair", href: "/services/emergency-repair" },
   { label: "Preventive Maintenance", href: "/services/preventive-maintenance" },
   { label: "Equipment Sales & Leasing", href: "/equipment" },
-  { label: "Bale Wire Supply", href: "/wire" },
+  { label: "Bale Wire Prices", href: "/wire/order" },
+  { label: "My Wire Orders", href: "/account/orders" },
 ];
 
 const COVERAGE = [
@@ -15,7 +16,7 @@ const COVERAGE = [
   { label: "Northeast", href: "/service-area#northeast" },
   { label: "Midwest", href: "/service-area#midwest" },
   { label: "West", href: "/service-area#west" },
-  { label: "Become a Partner", href: "/partners" },
+  { label: "Become a Vendor", href: "/vendors" },
 ];
 
 export default function Footer() {
