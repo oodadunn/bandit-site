@@ -7,6 +7,7 @@ const SERVICES = [
   { label: "Preventive Maintenance", href: "/services/preventive-maintenance" },
   { label: "Equipment Sales & Leasing", href: "/equipment" },
   { label: "Bale Wire Prices", href: "/wire/order" },
+  { label: "My Wire Orders", href: "/account/orders" },
 ];
 
 const COVERAGE = [

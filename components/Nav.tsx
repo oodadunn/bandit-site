@@ -24,7 +24,7 @@ const NAV_LINKS = [
     sub: [
       { label: "Wire Guide", href: "/wire" },
       { label: "Prices & Quote Builder", href: "/wire/order" },
-      { label: "Reorder", href: "/account/orders" },
+      { label: "My Orders & Reorder", href: "/account/orders" },
     ],
   },
   { label: "Service Area", href: "/service-area" },

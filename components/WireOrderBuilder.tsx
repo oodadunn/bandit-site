@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle, ChevronDown, Loader2, Minus, Plus, RotateCcw, ShieldCheck, Trash2 } from "lucide-react";
+import { CheckCircle, ChevronDown, Loader2, Mail, Minus, Plus, RotateCcw, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { WIRE_CATALOG, type WireProduct } from "@/lib/wire-catalog";
 
@@ -41,10 +41,17 @@ export default function WireOrderBuilder() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [signedInEmail, setSignedInEmail] = useState("");
+  const [saveToAccount, setSaveToAccount] = useState(true);
+  const [accountLinkSent, setAccountLinkSent] = useState(false);
+  const [accountLinkError, setAccountLinkError] = useState("");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) setForm((current) => ({ ...current, email: data.user?.email ?? current.email }));
+      if (data.user?.email) {
+        setSignedInEmail(data.user.email);
+        setForm((current) => ({ ...current, email: data.user?.email ?? current.email }));
+      }
     });
     try {
       const saved = localStorage.getItem("bandit-wire-reorder");
@@ -105,6 +112,17 @@ export default function WireOrderBuilder() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Quote request failed.");
+      if (saveToAccount && !data.session) {
+        const { error: authError } = await supabase.auth.signInWithOtp({
+          email: form.email.trim(),
+          options: {
+            emailRedirectTo: `${window.location.origin}/account/orders`,
+            shouldCreateUser: true,
+          },
+        });
+        if (authError) setAccountLinkError(authError.message);
+        else setAccountLinkSent(true);
+      }
       setOrderId(result.order_id); setStatus("success");
     } catch (error) {
       setStatus("error"); setMessage(error instanceof Error ? error.message : "Quote request failed.");
@@ -117,11 +135,14 @@ export default function WireOrderBuilder() {
         <div className="container-site max-w-2xl">
           <div className="card-dark text-center py-12 sm:py-16">
             <CheckCircle size={52} className="text-[#39FF14] mx-auto mb-6" />
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-4">Your wire quote is in.</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-4">Your order request is in.</h1>
             <p className="text-gray-400 max-w-lg mx-auto mb-2">We saved the products, equipment, and delivery location you provided. We&apos;ll confirm freight and send the final delivered price.</p>
-            <p className="text-xs text-gray-500 font-mono mb-8">Request {orderId.slice(0, 8).toUpperCase()}</p>
+            <p className="text-xs text-gray-500 font-mono mb-6">Request {orderId.slice(0, 8).toUpperCase()}</p>
+            {signedInEmail && <div className="max-w-lg mx-auto mb-8 rounded-lg border border-[#39FF14]/25 bg-[#39FF14]/10 p-4 text-left"><p className="flex items-center gap-2 font-semibold text-white"><UserRound size={17} className="text-[#39FF14]" /> Saved to your account</p><p className="text-sm text-gray-400 mt-1">You can view or reorder this request anytime while signed in as {signedInEmail}.</p></div>}
+            {accountLinkSent && <div className="max-w-lg mx-auto mb-8 rounded-lg border border-[#39FF14]/25 bg-[#39FF14]/10 p-4 text-left"><p className="flex items-center gap-2 font-semibold text-white"><Mail size={17} className="text-[#39FF14]" /> Check your email to finish</p><p className="text-sm text-gray-400 mt-1">We sent a secure account link to {form.email}. Open it to view this request and reorder later—no password needed.</p></div>}
+            {accountLinkError && <div className="max-w-lg mx-auto mb-8 rounded-lg border border-amber-400/25 bg-amber-400/10 p-4 text-left"><p className="font-semibold text-white">Your order request was saved</p><p className="text-sm text-gray-400 mt-1">We could not send the account email: {accountLinkError}. Use the account page to try again.</p></div>}
             <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <Link href="/account/orders" className="btn-primary"><RotateCcw size={16} /> Save this for easy reordering</Link>
+              <Link href="/account/orders" className="btn-primary"><RotateCcw size={16} /> {signedInEmail ? "View my orders" : accountLinkSent ? "Account sign-in" : "Create account & save order"}</Link>
               <Link href="/wire" className="btn-ghost-green">Back to wire guide</Link>
             </div>
           </div>
@@ -232,7 +253,7 @@ export default function WireOrderBuilder() {
           </div>
 
           <aside className="xl:sticky xl:top-24 border border-white/15 rounded-lg bg-[#111] overflow-hidden">
-            <div className="p-5 border-b border-white/10 flex justify-between items-center"><h2 className="text-xl font-bold text-white">Quote summary</h2><span className="text-xs text-[#39FF14]">{packageCount} package{packageCount === 1 ? '' : 's'}</span></div>
+            <div className="p-5 border-b border-white/10 flex justify-between items-center"><h2 className="text-xl font-bold text-white">Order summary</h2><span className="text-xs text-[#39FF14]">{packageCount} package{packageCount === 1 ? '' : 's'}</span></div>
             <div className="p-5 max-h-72 overflow-y-auto">
               {!quoteItems.length ? <p className="text-sm text-gray-500 py-4">Choose a quantity beside any product to add it here.</p> : quoteItems.map(({ product, quantity }) => <div key={product.id} className="flex gap-3 justify-between py-3 border-b border-white/10 last:border-0">
                 <div><p className="text-sm font-semibold text-white">{product.name}</p><p className="text-xs text-gray-500">{quantity} x {money(product.customerPrice)}</p></div>
@@ -258,8 +279,19 @@ export default function WireOrderBuilder() {
                 </div>
               </div>
               <div><label className="input-label text-xs">Notes <span className="text-gray-600">(optional)</span></label><textarea className="input-field min-h-20 resize-y" value={form.customer_notes} onChange={(e) => setForm({ ...form, customer_notes: e.target.value })} placeholder="PO number, dock hours, or anything else" /></div>
+              {signedInEmail ? (
+                <div className="rounded-lg border border-[#39FF14]/20 bg-[#39FF14]/5 p-4">
+                  <p className="flex items-center gap-2 text-sm font-semibold text-white"><UserRound size={16} className="text-[#39FF14]" /> Save to my account</p>
+                  <p className="text-xs text-gray-500 mt-1">This request will appear in My Orders for {signedInEmail}.</p>
+                </div>
+              ) : (
+                <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-4 cursor-pointer hover:border-white/20">
+                  <input type="checkbox" checked={saveToAccount} onChange={(event) => setSaveToAccount(event.target.checked)} className="mt-0.5 h-4 w-4 accent-[#39FF14]" />
+                  <span><span className="block text-sm font-semibold text-white">Save this order to my account</span><span className="block text-xs leading-relaxed text-gray-500 mt-1">We&apos;ll email a secure account link after submission. No password required.</span></span>
+                </label>
+              )}
               {status === "error" && <p role="alert" className="text-sm text-red-400">{message}</p>}
-              <button disabled={status === "submitting" || !quoteItems.length} className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed">{status === "submitting" ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : "Request my quote"}</button>
+              <button disabled={status === "submitting" || !quoteItems.length} className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed">{status === "submitting" ? <><Loader2 size={16} className="animate-spin" /> Sending...</> : "Submit order request"}</button>
               <p className="flex gap-2 text-[11px] leading-relaxed text-gray-500"><ShieldCheck size={14} className="shrink-0 mt-0.5" />No payment is collected. We verify compatibility, availability, and delivered freight before confirming your order.</p>
             </div>
           </aside>
